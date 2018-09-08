@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>moe-thread demo</title>
+
+    <script src="https://www.youtube.com/player_api"></script>
+    <script src="../node_modules/web-animations-js/web-animations-next-lite.min.js"></script>
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+    <script type="module">
+      import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+      import '@polymer/iron-demo-helpers/demo-snippet';
+    </script>
+
+    <script type="module" src="../moe-thread.js"></script>
+
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+      </style>
+    </custom-style>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+      <h3>Basic moe-thread demo</h3>
+      <demo-snippet>
+        <template>
+          <moe-thread id="thread"></moe-thread>
+          <script>
+            const thread = document.getElementById("thread");
+            thread.no = 729493;
+            thread.replyCount = 58;
+            thread.flagAdminSticky = false;
+            thread.flagAdminThreadStop = false;
+            thread.flagAdminSage = false;
+            thread.firstpost = {
+                "id": 2688188,
+                "board_id": 83,
+                "resto": 0,
+                "no": 729493,
+                "trip_id": "uYY3lUEo",
+                "sub": "月領31K想退休？恐得不吃不喝52年！",
+                "name": "無名",
+                "email": "",
+                // "com": "月領31K想退休？恐得不吃不喝52年！<br /><br /><br />2016年03月28日 11:54           邱怡萱<br /><br /><br />大環境艱困，不只導致年輕人難以買房、連退休夢想似乎都很難達成。根據調查，如果想要退休，平均得需準備至少約1960萬元的退休金，但以目前平均薪資約3萬1299元估算，恐怕得要不吃不喝52.2年，才有可能存到這樣的退休金目標！<br /><br />而針對薪資部分，根據yes123求職網站調查，如果以20至39歲青年勞工平均年齡30歲來估算，就算累積工作經驗約8年，其實每年薪水也僅有約2.2%的緩步成長。更有14.8%的人透露，目前月薪甚至比剛進社會時還低。<br /><br />除了薪資成長緩慢外，也有44.5%表示自己目前「有負債」，至於導致負債的最大主因就是學貸(占比46.2%)，緊接著才是一般信用貸款(占比32.2%)，以及卡債(占比22.6%)，也導致現階段，能存到人生第一個100萬元以上者，比例僅有約6%。",
+                "com": "月領31K想退休？恐得不吃不喝52年！",
+                "root": "2016-04-05T05:17:33.000Z",
+                "created_at": "2016-04-03T12:11:16.000Z",
+                "poll": {
+                    "subject": "測試投票",
+                    "items": [
+                        {
+                            "text": "選項一",
+                            "votes": 1
+                        },
+                        {
+                            "text": "選項二",
+                            "votes": 2
+                        },
+                        {
+                            "text": "選項三",
+                            "votes": 3
+                        }
+                    ],
+                    "voted": false
+                },
+                "rate": {
+                    "like": 0,
+                    "dislike": 0,
+                    "rated": false
+                },
+                "embeds":  [
+                    {
+                        "data": "{\"type\":\"youtube\",\"title\":\"\\u6b63\\u7247Full2018\\u300a\\u4e2d\\u56fd\\u597d\\u58f0\\u97f3\\u300b\\u7b2c7\\u96c6\\uff1a\\u5468\\u6770\\u4f26\\u6218\\u961fvs\\u54c8\\u6797\\u6218\\u961fPK\\u8d5b Sing\\uff01China 0831\\u5b98\\u65b9\\u8d85\\u6e05\",\"thumb\":\"https:\\/\\/i.ytimg.com\\/vi\\/5JH9fy6bLKc\\/hqdefault.jpg\",\"url\":\"https:\\/\\/youtu.be\\/5JH9fy6bLKc\",\"res_id\":\"-rSW74L-XMA\"}"
+                    },
+                    {
+                        "data": "{\"type\":\"youtube\",\"title\":\"\\u6b63\\u7247Full2018\\u300a\\u4e2d\\u56fd\\u597d\\u58f0\\u97f3\\u300b\\u7b2c7\\u96c6\\uff1a\\u5468\\u6770\\u4f26\\u6218\\u961fvs\\u54c8\\u6797\\u6218\\u961fPK\\u8d5b Sing\\uff01China 0831\\u5b98\\u65b9\\u8d85\\u6e05\",\"thumb\":\"https:\\/\\/i.ytimg.com\\/vi\\/5JH9fy6bLKc\\/hqdefault.jpg\",\"url\":\"https:\\/\\/youtu.be\\/5JH9fy6bLKc\",\"res_id\":\"0UpZnSjMko4\"}"
+                    },
+                ],
+                "images": [
+                    {
+                        image_src: "https://my.mixtape.moe/duvjjp.jpg",
+                        image_width: 914,
+                        image_height: 1249,
+                        thumb_src: "https://my.mixtape.moe/umofyd.jpg",
+                        thumb_width: 183,
+                        thumb_height: 250
+                    }
+                ]
+            };
+            thread.replies = [
+                {
+                    "id": 2690485,
+                    "board_id": 83,
+                    "resto": 729493,
+                    "no": 730608,
+                    "trip_id": "0SZIdPRE",
+                    "sub": "無標題",
+                    "name": "無名",
+                    "email": "",
+                    "com": "樓上島萌沒聽過認真就輸了嗎？",
+                    "root": null,
+                    "created_at": "2016-04-04T21:17:33.000Z",
+                    "poll": {
+                        "subject": "",
+                        "voted": false,
+                        "items": []
+                    },
+                    "rate": {
+                        "like": 0,
+                        "dislike": 0,
+                        "rated": false
+                    },
+                    "embeds": [],
+                    "images": [
+                        {
+                            "image_src": "1459804653146.jpg",
+                            "image_height": 865,
+                            "image_width": 1280,
+                            "thumb_src": "1459804653146s.jpg",
+                            "thumb_width": 125,
+                            "thumb_height": 85
+                        }
+                    ]
+                },
+                {
+                    "id": 2689865,
+                    "board_id": 83,
+                    "resto": 729493,
+                    "no": 730178,
+                    "trip_id": "WGUDWmT.",
+                    "sub": "無標題",
+                    "name": "無名",
+                    "email": "",
+                    "com": "&gt;誒誒= =別這麼玻璃心啦www<br />&gt;當你反罵我白痴時 你的程度已經讓大家知道了<br />説的好像先罵的人很偉大似的<br /><br />&gt;歷史沒發生過的並不代表不會發生<br />如果一定要這樣說的話 明天出門 你也可能會死<br />所以今天之內一定要一定要把錢花光 不然白存的<br /><br />國華掏空時,多少保戶惶恐解約,失去7%保單後悔衝動<br />人活著都是在冒險,做任何投資也是在冒險<br />不削別人的說法,就一定要來各三字經嗎你<br /><br />&gt;保險賣的產品稱不上儲蓄<br />我管你稱不稱的上,反正時間到我領錢<br />萬一得癌症或意外身亡,殘破的身軀可以留一大筆錢給家人 這樣就好<br />&gt;保險現在很愛推一種商品<br />我可不是現在才買的 ok 我才不管現在業務怎麼推銷<br />這裡的文章洗很快 還有xx廚洗暴衣動畫<br />我也沒興趣跟你講 你一開始別亂罵人就好 <br />匿名版不代表一定要罵人,明天才有勇氣出門<br /><br />知識要配上口德",
+                    "root": null,
+                    "created_at": "2016-04-04T15:32:23.000Z",
+                    "poll": {
+                        "subject": "",
+                        "voted": false,
+                        "items": []
+                    },
+                    "rate": {
+                        "like": 0,
+                        "dislike": 0,
+                        "rated": false
+                    },
+                    "embeds": [],
+                    "images": []
+                },
+                {
+                    "id": 2689832,
+                    "board_id": 83,
+                    "resto": 729493,
+                    "no": 730164,
+                    "trip_id": "En7.kous",
+                    "sub": "無標題",
+                    "name": "無名",
+                    "email": "",
+                    "com": "&gt;&gt;No.730137<br />誒誒= =別這麼玻璃心啦www<br />當你反罵我白痴時 你的程度已經讓大家知道了<br /><br />所以重點你還是沒搞清楚嘛<br />你有沒有損失是一回事<br />歷史沒發生過的並不代表不會發生<br />公司不會倒跟有沒有人接手承擔債務是一回事<br />你的想法就跟老一輩的人在房地產吃到甜頭對你們說<br />買房穩賺不賠 有錢一定要買房 房子只會不斷漲價一樣的屁話<br />等到時吃到鱉再來後悔莫及<br />任何投資理財都一樣 沒有所謂的絕對這回事<br /><br />還有 保險現在很愛推一種商品<br />業務員很喜歡跟人問說:你要不要來存錢?<br />這種說法其實已經違規了<br />金管會對儲蓄的定義很嚴刻<br />儲蓄就是儲蓄<br />保險賣的產品稱不上儲蓄",
+                    "root": null,
+                    "created_at": "2016-04-04T15:05:22.000Z",
+                    "poll": {
+                        "subject": "",
+                        "voted": false,
+                        "items": []
+                    },
+                    "rate": {
+                        "like": 0,
+                        "dislike": 0,
+                        "rated": false
+                    },
+                    "embeds": [],
+                    "images": []
+                }
+            ].reverse();
+
+            const moeThread = document.getElementById('thread');
+
+            moeThread.addEventListener('quoteLinkClick', (e) => {
+                alert(`quote link ${e.detail.no} clicked`);
+            });
+
+            moeThread.addEventListener('threadHeaderNoClick', (e) => {
+                alert(`thread header no ${e.detail.no} clicked`);
+            });
+
+            moeThread.addEventListener('threadHeaderReplyCountClick', (e) => {
+                alert(`thread header reply count ${e.detail.no} clicked`);
+            });
+
+            moeThread.addEventListener('threadMoreRepliesClick', (e) => {
+                alert(`thread more replies ${e.detail.no} clicked`);
+            });
+
+            moeThread.addEventListener('postHeaderNoClick', (e) => {
+                alert(`post header no ${e.detail.no} clicked`);
+            });
+
+            moeThread.addEventListener('pollItemClick', e => {
+                alert(`item ${e.detail.item} of poll ${e.detail.board_id}:${e.detail.no} clicked`);
+            })
+
+            moeThread.addEventListener('postActionMenuItemClick', e => {
+                alert(`post action ${e.detail.action} ${e.detail.board_id}:${e.detail.no} clicked`);
+            })
+          </script>
+        </template>
+      </demo-snippet>
+    </div>
+  </body>
+</html>

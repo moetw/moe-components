@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>moe-poll demo</title>
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+    <script type="module">
+      import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+      import '@polymer/iron-demo-helpers/demo-snippet';
+    </script>
+
+    <script type="module" src="../moe-poll.js"></script>
+
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+      </style>
+    </custom-style>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+      <h3>Basic moe-poll demo</h3>
+      <demo-snippet>
+        <template>
+          <moe-poll id="poll1"></moe-poll>
+          <hr />
+          <moe-poll id="poll2"></moe-poll>
+          <script>
+            const poll1 = document.getElementById("poll1");
+            poll1.subject = "Test Poll 1";
+            poll1.items = [
+                {text: "Item 1", votes: 123},
+                {text: "Item 2", votes: 234},
+                {text: "Item 3", votes: 345},
+                {text: "Item 4", votes: 456},
+            ];
+            poll1.voted = true;
+
+            const poll2 = document.getElementById("poll2");
+            poll2.subject = "Test Poll 2";
+            poll2.items = [
+                {text: "Item 1", votes: 123},
+                {text: "Item 2", votes: 234},
+                {text: "Item 3", votes: 345},
+                {text: "Item 4", votes: 456},
+            ];
+            poll2.voted = false;
+          </script>
+        </template>
+      </demo-snippet>
+    </div>
+  </body>
+</html>

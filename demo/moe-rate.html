@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>moe-rate demo</title>
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+    <script type="module">
+      import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+      import '@polymer/iron-demo-helpers/demo-snippet';
+    </script>
+
+    <script type="module" src="../moe-rate.js"></script>
+
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+      </style>
+    </custom-style>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+      <h3>Basic moe-rate demo</h3>
+      <demo-snippet>
+        <template>
+          <moe-rate id="medium" like="123456" dislike="654321"></moe-rate>
+          <hr />
+          <moe-rate like="123456" dislike="654321" class="small"></moe-rate>
+          <hr />
+          <moe-rate like="123456" dislike="654321" class="x-small"></moe-rate>
+          <hr />
+          <moe-rate like="123456" dislike="654321" class="xx-small"></moe-rate>
+
+          <script>
+              document.getElementById("medium").addEventListener("onLikeClick", function() {
+                  alert(`like clicked! (${this.like} likes and ${this.dislike} dislikes)`);
+                  this.like++;
+                  this.disabled = true;
+              });
+          </script>
+        </template>
+      </demo-snippet>
+    </div>
+  </body>
+</html>

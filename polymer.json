@@ -1,0 +1,35 @@
+{
+  "npm": true,
+  "moduleResolution": "node",
+  "lint": {
+    "rules": [
+      "polymer-3"
+    ]
+  },
+  "fragments": [
+    "./color.js",
+    "./moe-page.js",
+    "./moe-poll.js",
+    "./moe-post-image.js",
+    "./moe-rate.js",
+    "./moe-styles.js",
+    "./moe-thread.js"
+  ],
+  "builds": [
+    {
+      "name": "bundle",
+      "browserCapabilities": ["es2015", "serviceworker", "push"],
+      "js": {"minify": true, "compile": false},
+      "css": {"minify": true},
+      "html": {"minify": true},
+      "bundle": true,
+      "addServiceWorker": true,
+      "addPushManifest": true,
+      "swPrecacheConfig": "sw-precache-config.js",
+      "insertPrefetchLinks": false
+    }
+  ],
+  "extraDependencies": [
+    "node_modules/@webcomponentsjs/**"
+  ]
+}
