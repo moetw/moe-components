@@ -13,7 +13,7 @@ import '@polymer/iron-icons/communication-icons';
 import '@polymer/iron-image/iron-image.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/iron-list/iron-list'
-import moment from 'moment';
+import moment from 'moment/src/moment';
 import './moe-styles.js';
 import './moe-rate.js';
 import './moe-poll.js';
@@ -168,6 +168,7 @@ class MoeThread extends PolymerElement {
         --iron-icon-width: 1.5em;
         padding: 0 0.2em;
     }
+
 </style>
 
 <paper-card id="thread-card">

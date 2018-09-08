@@ -63,10 +63,8 @@ class MoePostImage extends PolymerElement {
     }
 
     _onMouseMove(e) {
-        window.requestAnimationFrame(() => {
-            this._updateIhoverSize(e);
-            this._updateIhoverPosition(e);
-        });
+        this._updateIhoverSize(e);
+        this._updateIhoverPosition(e);
     }
 
     _updateIhoverSize(e) {
@@ -90,13 +88,12 @@ class MoePostImage extends PolymerElement {
 
         if (e.clientX > doc.clientWidth / 2) {
             ihover.style.left = e.clientX - ihover.offsetWidth - this.ihoverPadding + "px";
-            ihover.style.top = e.clientY - ihover.offsetHeight / 2 + "px";
         } else {
             ihover.style.left = e.clientX + this.ihoverPadding + "px";
-            ihover.style.top = e.clientY - ihover.offsetHeight / 2 + "px";
         }
 
-        console.log(e.pageX, e.pageY, ihover.style.left, ihover.style.top);
+        let top = Math.min(Math.max(e.clientY - ihover.offsetHeight / 2, 0), doc.clientHeight - ihover.offsetHeight);
+        ihover.style.top = top + "px";
     }
 }
 

@@ -1,4 +1,6 @@
 import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
+import '@polymer/paper-spinner/paper-spinner-lite'
+import '@polymer/paper-styles/paper-styles';
 import FetchQL from 'fetchql'
 import './moe-styles.js';
 import './moe-thread.js';
@@ -14,7 +16,24 @@ moe-thread {
     margin-top: 2em;
     width: 100%;
 }
+.loading {
+   	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+}
+.loading .loading-text {
+    margin-left: 0.5em;
+}
 </style>
+<template is="dom-if" if="[[loading]]">
+    <div class="loading">
+        <paper-spinner-lite active></paper-spinner-lite>
+        <div class="loading-text">Loading...</div>
+    </div>
+</template>
 <template is="dom-repeat" items="[[threads]]" as="thread">
     <moe-thread 
         is-admin="[[isAdmin]]" 
@@ -57,6 +76,10 @@ moe-thread {
             },
             repliesPerThread: {
                 type: Number
+            },
+            loading: {
+                type: Boolean,
+                value: true
             }
         };
     }
@@ -67,6 +90,7 @@ moe-thread {
         const fetchQL = new FetchQL({
             url: this.graphqlServer
         });
+        this.set('loading', true);
         fetchQL
             .query({
                 operationName: '',
@@ -77,7 +101,8 @@ moe-thread {
                     replies: (t.replies || []).reverse()
                 })));
             })
-            .catch(err => console.log(err));
+            .catch(err => console.log(err))
+            .finally(() => this.set('loading', false));
     }
 
     _queryThreads(board_id, threadsOffset, threadsLimit, repliesOffset, repliesLimit) {

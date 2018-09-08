@@ -95,47 +95,49 @@ class MoePoll extends PolymerElement {
 
 </style>
 
-<!-- unvoted -->
-<template is="dom-if" if="{{!voted}}">
-    <div class="poll_container">
-        <div class="vote">
-            <div class="poll_title">
-                <iron-icon icon="social:poll"></iron-icon>[[subject]]
-            </div>						
-            <div class="pool">
-                <div class="poll_list">
-                    <template is="dom-repeat" items="{{itemsProcessed}}">
-                        <moe-poll-item text="{{item.text}}" on-click="_onPollItemClick"></moe-poll-item>
-                    </template>
+<div>
+    <!-- unvoted -->
+    <template is="dom-if" if="{{!voted}}">
+        <div class="poll_container">
+            <div class="vote">
+                <div class="poll_title">
+                    <iron-icon icon="social:poll"></iron-icon>[[subject]]
+                </div>						
+                <div class="pool">
+                    <div class="poll_list">
+                        <template is="dom-repeat" items="{{itemsProcessed}}">
+                            <moe-poll-item text="{{item.text}}" on-click="_onPollItemClick"></moe-poll-item>
+                        </template>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div align="right" class="poll_total">( 目前有 <span>[[totalVotes]]</span> 名投票者 ) </div>
-    </div>    
-</template>
-
-<!-- voted -->
-<template is="dom-if" if="{{voted}}">
-    <div class="poll_container">
-        <div class="vote poll_result">
-            <div class="poll_title">
-                <iron-icon icon="social:poll"></iron-icon>[[subject]]
-            </div>					
-            <div class="progress poll_result_list">
-                <template is="dom-repeat" items="{{itemsProcessed}}">
-                    <div>
-                        <div><span class="poll_result_item_caption">[[item.text]]</span></div>
-                        <div class="barCon poll_result_item_stats">						    		
-                            <div class="bar" style="width: {{item.percentage}}%;"></div>
-                            <div class="barData"><span class="percent">[[item.percentage]]%</span><span class="count">[[item.votes]]</span></div>
-                        </div>						    							    	
-                    </div>
-                </template>
-            </div>
             <div align="right" class="poll_total">( 目前有 <span>[[totalVotes]]</span> 名投票者 ) </div>
-        </div>
-    </div>    
-</template>
+        </div>    
+    </template>
+    
+    <!-- voted -->
+    <template is="dom-if" if="{{voted}}">
+        <div class="poll_container">
+            <div class="vote poll_result">
+                <div class="poll_title">
+                    <iron-icon icon="social:poll"></iron-icon>[[subject]]
+                </div>					
+                <div class="progress poll_result_list">
+                    <template is="dom-repeat" items="{{itemsProcessed}}">
+                        <div>
+                            <div><span class="poll_result_item_caption">[[item.text]]</span></div>
+                            <div class="barCon poll_result_item_stats">						    		
+                                <div class="bar" style="width: {{item.percentage}}%;"></div>
+                                <div class="barData"><span class="percent">[[item.percentage]]%</span><span class="count">[[item.votes]]</span></div>
+                            </div>						    							    	
+                        </div>
+                    </template>
+                </div>
+                <div align="right" class="poll_total">( 目前有 <span>[[totalVotes]]</span> 名投票者 ) </div>
+            </div>
+        </div>    
+    </template>
+</div>
     `;
     }
 
