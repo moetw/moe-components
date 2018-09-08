@@ -174,8 +174,10 @@ class MoeThread extends PolymerElement {
 <paper-card id="thread-card">
     <!-- thread cover -->
     <div class="cover">
-        <moe-embeds embeds="{{firstpost.embeds}}"></moe-embeds>
-        <template is="dom-if" if="firstpost.poll.items && firstpost.poll.items.length > 0">
+        <template is="dom-if" if="[[showFirstPostEmebeds]]">
+            <moe-embeds embeds="{{firstpost.embeds}}"></moe-embeds>
+        </template>
+        <template is="dom-if" if="[[showFirstPostPoll]]">
             <div class="firstpost-poll-container">
                 <moe-poll board-id="{{firstpost.board_id}}" no="{{firstpost.no}}" subject="{{firstpost.poll.subject}}" items="{{firstpost.poll.items}}" voted="{{firstpost.poll.voted}}"></moe-poll>
             </div>
@@ -235,6 +237,7 @@ class MoeThread extends PolymerElement {
                                     class="thumb" />
                             </a>
                         </template>
+                        <!-- TODO: show reply embeds -->
                         <moe-post-comment comment="{{reply.com}}" />
                     </div>
                     <moe-post-header post="{{reply}}"></moe-post-header>
@@ -284,8 +287,24 @@ class MoeThread extends PolymerElement {
             },
             replies: {
                 type: Array
+            },
+            showFirstPostPoll: {
+                type: Boolean,
+                computed: '_computeShowFirstPostPoll(firstpost)'
+            },
+            showFirstPostEmebeds: {
+                type: Boolean,
+                computed: '_computeShowFirstPostEmbeds(firstpost)'
             }
         };
+    }
+
+    _computeShowFirstPostEmbeds(firstpost) {
+        return firstpost.embeds && firstpost.embeds.length > 0;
+    }
+
+    _computeShowFirstPostPoll(firstpost) {
+        return firstpost.poll && firstpost.poll.items && firstpost.poll.items.length > 0;
     }
 
     _computeOmittedReplyCount(replyCount, replies) {

@@ -2485,8 +2485,10 @@ window.JSCompiler_renameProperty=function(e){return e};let workingURL,resolveDoc
 <paper-card id="thread-card">
     <!-- thread cover -->
     <div class="cover">
-        <moe-embeds embeds="{{firstpost.embeds}}"></moe-embeds>
-        <template is="dom-if" if="firstpost.poll.items && firstpost.poll.items.length > 0">
+        <template is="dom-if" if="[[showFirstPostEmebeds]]">
+            <moe-embeds embeds="{{firstpost.embeds}}"></moe-embeds>
+        </template>
+        <template is="dom-if" if="[[showFirstPostPoll]]">
             <div class="firstpost-poll-container">
                 <moe-poll board-id="{{firstpost.board_id}}" no="{{firstpost.no}}" subject="{{firstpost.poll.subject}}" items="{{firstpost.poll.items}}" voted="{{firstpost.poll.voted}}"></moe-poll>
             </div>
@@ -2546,6 +2548,7 @@ window.JSCompiler_renameProperty=function(e){return e};let workingURL,resolveDoc
                                     class="thumb" />
                             </a>
                         </template>
+                        <!-- TODO: show reply embeds -->
                         <moe-post-comment comment="{{reply.com}}" />
                     </div>
                     <moe-post-header post="{{reply}}"></moe-post-header>
@@ -2554,7 +2557,7 @@ window.JSCompiler_renameProperty=function(e){return e};let workingURL,resolveDoc
         </div>
     </div>
 </paper-card>
-    `}static get properties(){return{isAdmin:{type:Boolean,value:!1,reflectToAttribute:!0},no:{type:Number},replyCount:{type:Number},omittedReplyCount:{type:Number,computed:"_computeOmittedReplyCount(replyCount, replies)",reflectToAttribute:!0},showMoreReplies:{type:Boolean,computed:"_computeShowMoreReplies(omittedReplyCount)",reflectToAttribute:!0},flagAdminSticky:{type:Boolean},flagAdminThreadStop:{type:Boolean},flagAdminSage:{type:Boolean},firstpost:{type:Object,reflectToAttribute:!0},replies:{type:Array}}}_computeOmittedReplyCount(e,t){return e-t.length}_computeShowMoreReplies(e){return e>0}_onThreadHeaderNoClick(){this.dispatchEvent(new CustomEvent("threadHeaderNoClick",{composed:!0,bubbles:!0,detail:{no:this.get("no")}}))}_onThreadHeaderReplyCountClick(){this.dispatchEvent(new CustomEvent("threadHeaderReplyCountClick",{composed:!0,bubbles:!0,detail:{no:this.get("no")}}))}_onMoreRepliesClick(){this.dispatchEvent(new CustomEvent("threadMoreRepliesClick",{composed:!0,bubbles:!0,detail:{no:this.get("no")}}))}}class MoePostHeader extends PolymerElement{static get template(){return html`
+    `}static get properties(){return{isAdmin:{type:Boolean,value:!1,reflectToAttribute:!0},no:{type:Number},replyCount:{type:Number},omittedReplyCount:{type:Number,computed:"_computeOmittedReplyCount(replyCount, replies)",reflectToAttribute:!0},showMoreReplies:{type:Boolean,computed:"_computeShowMoreReplies(omittedReplyCount)",reflectToAttribute:!0},flagAdminSticky:{type:Boolean},flagAdminThreadStop:{type:Boolean},flagAdminSage:{type:Boolean},firstpost:{type:Object,reflectToAttribute:!0},replies:{type:Array},showFirstPostPoll:{type:Boolean,computed:"_computeShowFirstPostPoll(firstpost)"},showFirstPostEmebeds:{type:Boolean,computed:"_computeShowFirstPostEmbeds(firstpost)"}}}_computeShowFirstPostEmbeds(e){return e.embeds&&e.embeds.length>0}_computeShowFirstPostPoll(e){return e.poll&&e.poll.items&&e.poll.items.length>0}_computeOmittedReplyCount(e,t){return e-t.length}_computeShowMoreReplies(e){return e>0}_onThreadHeaderNoClick(){this.dispatchEvent(new CustomEvent("threadHeaderNoClick",{composed:!0,bubbles:!0,detail:{no:this.get("no")}}))}_onThreadHeaderReplyCountClick(){this.dispatchEvent(new CustomEvent("threadHeaderReplyCountClick",{composed:!0,bubbles:!0,detail:{no:this.get("no")}}))}_onMoreRepliesClick(){this.dispatchEvent(new CustomEvent("threadMoreRepliesClick",{composed:!0,bubbles:!0,detail:{no:this.get("no")}}))}}class MoePostHeader extends PolymerElement{static get template(){return html`
 <style>
 :host {
     display: block;
