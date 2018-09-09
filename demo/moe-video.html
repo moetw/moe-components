@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>moe-video demo</title>
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+    <script type="module">
+        import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+        import '@polymer/iron-demo-helpers/demo-snippet';
+    </script>
+
+    <script type="module" src="../moe-video.js"></script>
+
+    <custom-style>
+        <style is="custom-style" include="demo-pages-shared-styles">
+        </style>
+    </custom-style>
+</head>
+<body>
+<div class="vertical-section-container centered">
+    <h3>Basic moe-video demo</h3>
+    <demo-snippet>
+        <template>
+            <moe-video class="single"></moe-video>
+            <moe-video class="multi"></moe-video>
+            <script>
+                (function () {
+                    setTimeout(function() {
+                        document.querySelector('moe-video.single').data = [{"type":"youtube","title":"\u9b6f\u86cb\u7cbe\u83ef \u7f9e\u6065\u4ea4\u53cb\u5e73\u53f0 2016\/04\/02","thumb":"https:\/\/i.ytimg.com\/vi\/7HUUbEbvs3E\/hqdefault.jpg","url":"http:\/\/youtu.be\/7HUUbEbvs3E","res_id":"7HUUbEbvs3E"}];
+                    }, 500);
+                    setTimeout(function() {
+                        document.querySelector('moe-video.multi').data = [
+                            {"type":"youtube","title":"\u3010\u7f55\u89c1\u7684\u661f\u9645\u4e89\u9738\u9ed1\u5386\u53f2\u3011\u56e7\u7684\u547c\u5524193\u671f","thumb":"https:\/\/i.ytimg.com\/vi\/vUukfLfqPIc\/hqdefault.jpg","url":"http:\/\/youtu.be\/vUukfLfqPIc","res_id":"vUukfLfqPIc"},
+                            {"type":"youtube","title":"Dark Souls III Great Sword of Artorias - MAN AT ARMS: REFORGED","thumb":"https:\/\/i.ytimg.com\/vi\/MPqj6WaTFOE\/hqdefault.jpg","url":"http:\/\/youtu.be\/MPqj6WaTFOE","res_id":"MPqj6WaTFOE"},
+                            {"type":"youtube","title":"Dark Souls III Great Sword of Artorias - MAN AT ARMS: REFORGED","thumb":"https:\/\/i.ytimg.com\/vi\/MPqj6WaTFOE\/hqdefault.jpg","url":"http:\/\/youtu.be\/MPqj6WaTFOE","res_id":"MPqj6WaTFOE"},
+                            {"type":"youtube","title":"Dark Souls III Great Sword of Artorias - MAN AT ARMS: REFORGED","thumb":"https:\/\/i.ytimg.com\/vi\/MPqj6WaTFOE\/hqdefault.jpg","url":"http:\/\/youtu.be\/MPqj6WaTFOE","res_id":"MPqj6WaTFOE"},
+                            {"type":"youtube","title":"Dark Souls III Great Sword of Artorias - MAN AT ARMS: REFORGED","thumb":"https:\/\/i.ytimg.com\/vi\/MPqj6WaTFOE\/hqdefault.jpg","url":"http:\/\/youtu.be\/MPqj6WaTFOE","res_id":"MPqj6WaTFOE"},
+                            {"type":"youtube","title":"Dark Souls III Great Sword of Artorias - MAN AT ARMS: REFORGED","thumb":"https:\/\/i.ytimg.com\/vi\/MPqj6WaTFOE\/hqdefault.jpg","url":"http:\/\/youtu.be\/MPqj6WaTFOE","res_id":"MPqj6WaTFOE"},
+                        ];
+                    }, 0);
+                })();
+            </script>
+        </template>
+    </demo-snippet>
+</div>
+</body>
+</html>

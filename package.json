@@ -5,6 +5,7 @@
     "build": "$(npm bin)/rollup -c rollup.config.js"
   },
   "dependencies": {
+    "@polymer/google-youtube": "git+https://github.com/moetw/google-youtube.git",
     "@polymer/iron-flex-layout": "^3.0.0-pre.25",
     "@polymer/iron-icon": "^3.0.0-pre.25",
     "@polymer/iron-icons": "^3.0.0-pre.25",
