@@ -356,13 +356,13 @@ body::-webkit-scrollbar-corner{
                 <paper-ripple style="pointer-events: none;"></paper-ripple>
             </div>
         </template>
-        <template is="dom-if" if="{{playing}}">
+        <template is="dom-if" if="{{playing}}" restamp="true">
             <google-youtube
                     id="youtube"
                     height="100%"
                     width="100%"
                     class="fit"
-                    video-id="{{playingVideoId}}"
+                    video-id="[[playingVideoId]]"
                     autoplay="1"
                     on-google-youtube-state-change="_handleStateChanged">
             </google-youtube>
@@ -371,20 +371,20 @@ body::-webkit-scrollbar-corner{
     <template is="dom-if" if="{{showList}}">
         <div id="list" class="layout vertical">
             <div id="listToolbar" class="layout horizontal center">
-                <paper-icon-button icon="av:skip-previous" action-type="prev" on-tap="_handlePlayControl"> </paper-icon-button>
+                <paper-icon-button icon="av:skip-previous" action-type="prev" on-click="_handlePlayControl"> </paper-icon-button>
                 <div>
                     <span>[[selectedVideoIndexDisplay]]</span><span id="listLength">{{data.length}}</span>
                 </div>
-                <paper-icon-button icon="av:skip-next" action-type="next" on-tap="_handlePlayControl"> </paper-icon-button>
+                <paper-icon-button icon="av:skip-next" action-type="next" on-click="_handlePlayControl"> </paper-icon-button>
                 
                 <template is="dom-if" if="[[playing]]">
-                    <paper-icon-button icon="icons:close" action-type="stop" on-tap="_handlePlayControl"></paper-icon-button>
+                    <paper-icon-button icon="icons:close" action-type="stop" on-click="_handlePlayControl"></paper-icon-button>
                 </template>
             </div>
             <div id="videoSelectorScroller" class="layout flex vertical scroll">
                 <iron-selector id="videoSelector" selected="{{selectedVideoIndex}}">
                     <template is="dom-repeat" id="videoList" items="[[data]]" as="item">
-                        <div class="chip layout horizontal video-selector-item" on-tap="_handleChipTap" data-index="[[index]]">
+                        <div class="chip layout horizontal video-selector-item" on-click="_handleChipTap" data-index="[[index]]">
                             <iron-image  src="[[item.thumb]]" style="width: 80px; height: 60px;" sizing="cover"></iron-image>
                             <div class="chip-title flex">[[item.title]]</div>
                             <paper-ripple recenters style="pointer-events: none;"></paper-ripple>
@@ -397,7 +397,7 @@ body::-webkit-scrollbar-corner{
     
     <!--close button -->
     <template is="dom-if" if="[[playing]]">
-        <paper-icon-button icon="icons:close" action-type="stop" on-tap="_handlePlayControl" hidden="{{showList}}" style="color: maroon;"></paper-icon-button>
+        <paper-icon-button icon="icons:close" action-type="stop" on-click="_handlePlayControl" hidden="{{showList}}" style="color: maroon;"></paper-icon-button>
     </template>
 </div>
 `;

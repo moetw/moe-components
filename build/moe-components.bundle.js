@@ -3112,13 +3112,13 @@ body::-webkit-scrollbar-corner{
                 <paper-ripple style="pointer-events: none;"></paper-ripple>
             </div>
         </template>
-        <template is="dom-if" if="{{playing}}">
+        <template is="dom-if" if="{{playing}}" restamp="true">
             <google-youtube
                     id="youtube"
                     height="100%"
                     width="100%"
                     class="fit"
-                    video-id="{{playingVideoId}}"
+                    video-id="[[playingVideoId]]"
                     autoplay="1"
                     on-google-youtube-state-change="_handleStateChanged">
             </google-youtube>
@@ -3127,20 +3127,20 @@ body::-webkit-scrollbar-corner{
     <template is="dom-if" if="{{showList}}">
         <div id="list" class="layout vertical">
             <div id="listToolbar" class="layout horizontal center">
-                <paper-icon-button icon="av:skip-previous" action-type="prev" on-tap="_handlePlayControl"> </paper-icon-button>
+                <paper-icon-button icon="av:skip-previous" action-type="prev" on-click="_handlePlayControl"> </paper-icon-button>
                 <div>
                     <span>[[selectedVideoIndexDisplay]]</span><span id="listLength">{{data.length}}</span>
                 </div>
-                <paper-icon-button icon="av:skip-next" action-type="next" on-tap="_handlePlayControl"> </paper-icon-button>
+                <paper-icon-button icon="av:skip-next" action-type="next" on-click="_handlePlayControl"> </paper-icon-button>
                 
                 <template is="dom-if" if="[[playing]]">
-                    <paper-icon-button icon="icons:close" action-type="stop" on-tap="_handlePlayControl"></paper-icon-button>
+                    <paper-icon-button icon="icons:close" action-type="stop" on-click="_handlePlayControl"></paper-icon-button>
                 </template>
             </div>
             <div id="videoSelectorScroller" class="layout flex vertical scroll">
                 <iron-selector id="videoSelector" selected="{{selectedVideoIndex}}">
                     <template is="dom-repeat" id="videoList" items="[[data]]" as="item">
-                        <div class="chip layout horizontal video-selector-item" on-tap="_handleChipTap" data-index="[[index]]">
+                        <div class="chip layout horizontal video-selector-item" on-click="_handleChipTap" data-index="[[index]]">
                             <iron-image  src="[[item.thumb]]" style="width: 80px; height: 60px;" sizing="cover"></iron-image>
                             <div class="chip-title flex">[[item.title]]</div>
                             <paper-ripple recenters style="pointer-events: none;"></paper-ripple>
@@ -3153,7 +3153,7 @@ body::-webkit-scrollbar-corner{
     
     <!--close button -->
     <template is="dom-if" if="[[playing]]">
-        <paper-icon-button icon="icons:close" action-type="stop" on-tap="_handlePlayControl" hidden="{{showList}}" style="color: maroon;"></paper-icon-button>
+        <paper-icon-button icon="icons:close" action-type="stop" on-click="_handlePlayControl" hidden="{{showList}}" style="color: maroon;"></paper-icon-button>
     </template>
 </div>
 `}static get properties(){return{data:{type:Array,value:()=>[],observer:"_dataChanged"},width:{type:String},height:{type:String},showList:{type:Boolean,computed:"_computeShowList(data)"},listLength:{type:Number,value:0},playing:{type:Boolean,value:!1,notify:!0,reflectToAttribute:!0},playingVideoId:{type:String,reflectToAttribute:!0,notify:!0},prevPlayedVideo:{type:String},showPlaceHolder:{type:Boolean,computed:"_computeShowPlaceHolder(playing)"},placeHolderStyle:{type:String,computed:"_computePlaceHolderStyle(selectedVideoIndex)"},startVideoIndex:{type:Number,value:0},selectedVideoIndex:{type:Number,reflectToAttribute:!0},selectedVideoIndexDisplay:{type:Number,computed:"_computeSelectedVideoIndexDisplay(selectedVideoIndex)"},holderHref:{type:String,reflectToAttribute:!0,computed:"_computeHolderHref(selectedVideoIndex)"},holderTitle:{type:String,reflectToAttribute:!0,computed:"_computeHolderTitle(selectedVideoIndex)"},playSupported:{type:Boolean},playIcon:{type:String,computed:"_computePlayIcon(data)"},mobile:{type:Boolean,reflectToAttribute:!0}}}play(e){if(void 0!==e&&""!==e)this.mobile&&(this._checkPlaySupport(),this.playSupported&&(this.set("playing",!0),this.set("playingVideoId",e),this.listen(document.querySelector("#youtube"),"google-youtube-ready","_mobilePlay"))),this.set("playing",!0),this.set("playingVideoId",e);else{if(!this.data||!_.get(this.data,"0.res_id"))return;this.play(this.data[0].res_id)}}stop(e){this.set("prevPlayedVideo",this.playingVideoId),this.set("playingVideoId",""),this.set("playing",!1)}_dataChanged(){void 0!==this.data&&void 0!==this.data[0]&&(this.selectedVideoIndex=this.startVideoIndex?this.startVideoIndex:0,this.listLength=this.data.length,this.listLength>1&&this.set("list-toggle",!0))}_computePlaceHolderStyle(e){return"background-image: url("+this.data[e].thumb+");"}_handleStateChanged(e){0===_.get(e,"detail.data")&&this._nextVideo()}_handleHolderTap(e){this.play(_.get(this.data,`${this.selectedVideoIndex}.res_id`))}_handleChipTap(e){this.play(e.model.item.res_id)}_handlePlayControl(e){switch(e.currentTarget.getAttribute("action-type")){case"next":this._nextVideo();break;case"prev":this._prevVideo();break;case"stop":this.stop()}}_nextVideo(){this.selectedVideoIndex<this.data.length-1?this.selectedVideoIndex++:this.selectedVideoIndex=0;var e=_.get(this.data,this.selectedVideoIndex+".res_id");e?this.play(e):console.warn("videoId not found at data[selectedVideoIndex]: "+this.selectedVideoIndex)}_prevVideo(){this.selectedVideoIndex>0?this.selectedVideoIndex--:this.selectedVideoIndex=this.data.length-1,this.play(this.data[this.selectedVideoIndex].res_id)}_computeShowList(e){return(e||[]).length>1}_computePlayIcon(e){return e[0]&&void 0!==e?"av:play-arrow":"refresh"}_computeContainerClass(e){return e?"layout vertical":"layout horizontal"}_computeSelectedVideoIndexDisplay(e){return e+1}_computeShowPlaceHolder(e){return!e}_computeHolderHref(e){return"https://www.youtube.com/watch?v="+this.data[e].res_id}_computeHolderTitle(e){return this.data[e].title}_computeStartIndex(e){return e}_checkPlaySupport(){this.async(function(){this.playSupported=document.querySelector("#youtube").playsupported},1)}_mobilePlay(e){}}window.customElements.define("moe-video",MoeVideo);
