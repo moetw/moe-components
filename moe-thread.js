@@ -13,11 +13,13 @@ import '@polymer/iron-icons/communication-icons';
 import '@polymer/iron-image/iron-image.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/iron-list/iron-list'
-import moment from 'moment/src/moment';
+import moment from './moment';
+
 import './moe-styles.js';
 import './moe-rate.js';
 import './moe-poll.js';
 import './moe-post-image.js';
+import './moe-video.js';
 
 /**
  * `moe-thread`
@@ -30,7 +32,6 @@ import './moe-post-image.js';
 class MoeThread extends PolymerElement {
     static get template() {
         return html`
-<script src="https://www.youtube.com/player_api"></script>
 <style>
     :host {
         display: block;
@@ -124,16 +125,19 @@ class MoeThread extends PolymerElement {
         justify-content: space-between;
         height: auto;
         min-height: 5em;
-        padding: 1em;
     }
     .reply .post-body {
         @apply --layout-self-stretch;
+        padding: 1em 1em 0 1em;
     }
     .replies .reply:nth-child(even) {
         background-color: var(--moe-thread-reply-even-background-color);        
     }
     .replies .reply:nth-child(odd) {
         background-color: var(--moe-thread-reply-odd-background-color);        
+    }
+    .reply moe-post-header {
+        padding: 0 1em 1em 1em;
     }
     
     moe-post-image {
@@ -154,7 +158,9 @@ class MoeThread extends PolymerElement {
         background-color: var(--moe-thread-more-replies-button-background-color);
         margin: 0;
         padding: 1em;
-        position: relative;
+        position: sticky;
+        top: 0px;
+        z-index: 100;
     }
     .more-replies .more-replies-text {
         color: var(--moe-thread-more-replies-button-text-color);
@@ -168,18 +174,17 @@ class MoeThread extends PolymerElement {
         --iron-icon-width: 1.5em;
         padding: 0 0.2em;
     }
-
 </style>
 
 <paper-card id="thread-card">
     <!-- thread cover -->
     <div class="cover">
         <template is="dom-if" if="[[showFirstPostEmebeds]]">
-            <moe-embeds embeds="{{firstpost.embeds}}"></moe-embeds>
+            <moe-embeds embeds="[[firstpost.embeds]]"></moe-embeds>
         </template>
         <template is="dom-if" if="[[showFirstPostPoll]]">
             <div class="firstpost-poll-container">
-                <moe-poll board-id="{{firstpost.board_id}}" no="{{firstpost.no}}" subject="{{firstpost.poll.subject}}" items="{{firstpost.poll.items}}" voted="{{firstpost.poll.voted}}"></moe-poll>
+                <moe-poll board-id="[[firstpost.board_id]]" no="[[firstpost.no]]" subject="[[firstpost.poll.subject]]" items="[[firstpost.poll.items]]" voted="[[firstpost.poll.voted]]"></moe-poll>
             </div>
         </template>
     </div>
@@ -199,24 +204,24 @@ class MoeThread extends PolymerElement {
     <div class="body">
         <!-- firstpost -->
         <div class="firstpost">
-            <moe-post-action-menu-button class="post-action-button" board-id="{{firstpost.board_id}}" no="{{firstpost.no}}" is-first-post="true" is-admin="{{isAdmin}}"></moe-post-action-menu-button>
+            <moe-post-action-menu-button class="post-action-button" board-id="[[firstpost.board_id]]" no="[[firstpost.no]]" is-first-post="true" is-admin="[[isAdmin]]"></moe-post-action-menu-button>
             <div class="post-subject">[[firstpost.sub]]</div>
             <div class="post-body">
-                <template is="dom-repeat" items="{{firstpost.images}}" as="image">
-                    <a target="_blank" href="{{image.image_src}}">
+                <template is="dom-repeat" items="[[firstpost.images]]" as="image">
+                    <a target="_blank" href="[[image.image_src]]">
                         <moe-post-image 
                             image-src="[[image.image_src]]" image-width="[[image.image_width]]" image-height="[[image.image_height]]"
-                            thumb-src="{{image.thumb_src}}" thumb-width="{{image.thumb_width}}" thumb-height="{{image.thumb_height}}" 
+                            thumb-src="[[image.thumb_src]]" thumb-width="[[image.thumb_width]]" thumb-height="[[image.thumb_height]]" 
                             class="thumb" />
                     </a>
                 </template>
-                <moe-post-comment comment="{{firstpost.com}}" />
+                <moe-post-comment comment="[[firstpost.com]]" />
             </div>
             <div style="clear: both"></div>
-            <moe-post-header post="{{firstpost}}"></moe-post-header>
+            <moe-post-header post="[[firstpost]]"></moe-post-header>
         </div>
         
-        <template is="dom-if" if="{{showMoreReplies}}">
+        <template is="dom-if" if="[[showMoreReplies]]">
             <div class="more-replies" on-click="_onMoreRepliesClick">
                 <div class="more-replies-text"><iron-icon icon="expand-more"></iron-icon>展開 [[omittedReplyCount]] 篇被省略的回應</div>            
                 <paper-ripple></paper-ripple>
@@ -225,22 +230,24 @@ class MoeThread extends PolymerElement {
         
         <!-- replies -->
         <div class="replies">
-            <template is="dom-repeat" items="{{replies}}" as="reply" index-as="reply_i">
+            <template is="dom-repeat" items="[[replies]]" as="reply" index-as="reply_i">
                 <div class="reply">
+                    <moe-embeds embeds="[[reply.embeds]]"></moe-embeds>
                     <div class="post-body">
-                        <moe-post-action-menu-button class="post-action-button" board-id="{{firstpost.board_id}}" no="{{reply.no}}"></moe-post-action-menu-button>
-                        <template is="dom-repeat" items="{{item.images}}" as="image">
-                            <a target="_blank" href="{{image.image_src}}">
+                        <moe-post-action-menu-button class="post-action-button" board-id="[[firstpost.board_id]]" no="[[reply.no]]"></moe-post-action-menu-button>
+                        
+                        <template is="dom-repeat" items="[[reply.images]]" as="image">
+                            <a target="_blank" href="[[image.image_src]]">
                                 <moe-post-image 
                                     image-src="[[image.image_src]]" image-width="[[image.image_width]]" image-height="[[image.image_height]]"
-                                    thumb-src="{{image.thumb_src}}" thumb-width="{{image.thumb_width}}" thumb-height="{{image.thumb_height}}" 
+                                    thumb-src="[[image.thumb_src]]" thumb-width="[[image.thumb_width]]" thumb-height="[[image.thumb_height]]" 
                                     class="thumb" />
                             </a>
                         </template>
                         <!-- TODO: show reply embeds -->
-                        <moe-post-comment comment="{{reply.com}}" />
+                        <moe-post-comment comment="[[reply.com]]" />
                     </div>
-                    <moe-post-header post="{{reply}}"></moe-post-header>
+                    <moe-post-header post="[[reply]]"></moe-post-header>
                 </div>                
             </template>
         </div>
@@ -439,6 +446,7 @@ class MoePostComment extends PolymerElement {
 :host {
     display: block;
     height: auto;
+    word-break: break-all;
 }
 
 .highlight-quote {
@@ -639,43 +647,56 @@ class MoeEmbeds extends PolymerElement {
 <style>
 :host {
     display: block;
+    width: 100%;
+    min-height: 360px;
+    max-height: 360px;
 }
-#ytplayer {
-    height: 360px;
+:host([mobile]) {
+    min-height: 200px;
+    max-height: 360px;
+}
+moe-video {
+    --moe-video-width: 100%;
+    --moe-video-height: 360px;
+    --moe-video-mobile-height: 200px;
+    --moe-video-mobile-with-list-height: 400px;
 }
 </style>
-<div id="ytplayer">
-</div>
-`
+<moe-video id="video"></moe-video>
+`;
     }
-    
+
     static get properties() {
         return {
             embeds: {
                 type: Array,
                 observer: '_onEmbedsChange'
+            },
+            mobile: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
             }
         };
     }
 
+    ready() {
+        super.ready();
+        this._mediaQuery();
+        window.addEventListener('resize', () => this._mediaQuery());
+    }
+
+    _mediaQuery() {
+        this.set('mobile', window.matchMedia('(max-width: 600px)').matches);
+    }
+
     _onEmbedsChange(newValue) {
-        this.$.ytplayer.innerHTML = '';
         const embeds = newValue || [];
-        const ids = embeds.map(embed => {
-            const data = JSON.parse(embed.data);
-            return data.res_id;
-        });
-        if (ids.length > 0) {
-            const playlist = ids.length > 1 ? encodeURIComponent(ids.slice(1).join(",")) : '';
-            const player = document.createElement('iframe');
-            player.allowFullscreen = true;
-            player.lazyLoad = true;
-            player.type = "text/html";
-            player.width = "100%";
-            player.height = "360";
-            player.src = `//www.youtube.com/embed/${ids[0]}?enablejsapi=1&playsinline=1&playlist=${playlist}`;
-            player.frameBorder = 0;
-            this.$.ytplayer.appendChild(player);
+        if (embeds.length) {
+            this.style.display = 'block';
+            this.$.video.data = embeds.map(embed => JSON.parse(embed.data));
+        } else {
+            this.style.display = 'none';
         }
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "moe-components",
-  "main": "moe-components.js",
+  "main": "build/moe-components.bundle.js",
   "scripts": {
     "build": "$(npm bin)/rollup -c rollup.config.js"
   },

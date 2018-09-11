@@ -12,9 +12,8 @@
     <script type="module">
         import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
         import '@polymer/iron-demo-helpers/demo-snippet';
+        import '../moe-page.js';
     </script>
-
-    <script type="module" src="../moe-page.js"></script>
 
     <custom-style>
         <style is="custom-style" include="demo-pages-shared-styles">
@@ -27,8 +26,17 @@
     <demo-snippet>
         <template>
             <moe-page id="page" graphql-server="http://0.0.0.0:4000/graphql" board-id="83" page="0" threads-per-page="10" replies-per-thread="3"></moe-page>
-            <script type="module">
-                const page = document.getElementById('page');
+            <script>
+                window.addEventListener("load", function(event) {
+                    const page = document.querySelector('#page');
+                    page.imageServers = {
+                        'DEV_SRC': (file, subdomain, alias) => `https://dev.imgs.moe/my/${subdomain}/${alias}/src/${file}`,
+                        'DEV_THUMB': (file, subdomain, alias) => `https://dev.imgs.moe/my/${subdomain}/${alias}/thumb/${file}`,
+                        'BCDN_SRC': (file, subdomain, alias) => `https://mymoe.b-cdn.net/my/${subdomain}/${alias}/src/${file}`,
+                        'BCDN_THUMB': (file, subdomain, alias) => `https://mymoe.b-cdn.net/my/${subdomain}/${alias}/thumb/${file}`,
+                    };
+                    page.load();
+                });
             </script>
         </template>
     </demo-snippet>

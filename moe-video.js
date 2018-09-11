@@ -24,6 +24,8 @@ class MoeVideo extends PolymerElement {
         -ms-user-select: none;
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         -webkit-touch-callout: none;
+        width: var(--moe-video-width, 640px);
+        height: var(--moe-video-height, 360px);
     }
     
     .flex {
@@ -56,11 +58,11 @@ class MoeVideo extends PolymerElement {
 
     #container {
         margin: 0;
-        width: 640px;
-        height: 360px;
+        width: 100%;
+        height: 100%;
         @apply(--layout-horizontal);
     }
-    :host[list-toggle] #container{
+    :host([list-toggle]) #container{
         width: 730px;
         height: 360px;
     }
@@ -154,11 +156,9 @@ class MoeVideo extends PolymerElement {
 
     #list {
         width: 250px;
-        min-height: 250px;
         background: rgba(50, 50, 50, 1);
         color: rgb(200, 200, 200);
     }
-
     #listToolbar {
         --paper-toolbar-background: none;
         --paper-toolbar-color: rgb(200, 200, 200);
@@ -184,11 +184,9 @@ class MoeVideo extends PolymerElement {
         height: 60px;
         overflow: hidden;
     }
-
     .chip + .chip {
         margin-top: 3px;
     }
-
     .chip.iron-selected {
         color: white;
         background: rgba(255, 255, 255, 0.1);
@@ -197,16 +195,12 @@ class MoeVideo extends PolymerElement {
         padding-left: 0;
         transition: background 0.4s linear;
     }
-
     .chip:hover {
         background: rgba(0, 0, 0, 0.1);
     }
-
     .chip.iron-selected:hover {
         background: rgba(255, 255, 255, 0.1);
-    ;
     }
-
     .chip-title {
         box-sizing: border-box;
         font-size: 12px;
@@ -221,133 +215,117 @@ class MoeVideo extends PolymerElement {
     /**
     *   Mobile Style
     */
-
     #container.layout.vertical {
         @apply(--layout-vertical);
     }
-    :host[mobile] {
+    :host([mobile]) {
         width: 100%;
-        height: 75vw;
+        height: var(--moe-video-mobile-height, 200px);
     }
-    :host[mobile][list-toggle] {
-        width: 100%;
-        height: 150vw;
+    :host([mobile][show-list]) {
+        height: var(--moe-video-mobile-with-list-height, 400px);
     }
-    :host[mobile] #container {
+    :host([mobile]) #container {
         width: 100%;
         height: 100%;
     }
-    :host[mobile] #video {
+    :host([mobile]) #video {
         width: 100%;
-        height: 10vw;
+        flex: 1 1 auto;
     }
-    :host[mobile] #list {
+    :host([mobile]) #list {
         width: 100%;
+        flex: 1 1 auto;
     }
-    
-    /* Scrollbar */
+
+    /**
+    *   Scrollbar
+    */
     ::-webkit-scrollbar{
-    height:16px;
-    overflow:visible;
-    width:16px;
-}
-
-::-webkit-scrollbar-button{
-    height:0;
-    width:0;
-}
-
-::-webkit-scrollbar-track{
-    background-clip:padding-box;
-    border:solid transparent;
-    border-width:0 0 0 4px;
-}
-
-::-webkit-scrollbar-track:horizontal{
-    border-width:4px 0 0;
-}
-
-::-webkit-scrollbar-track:hover{
-    background-color:rgba(0,0,0,.05);
-    box-shadow:inset 1px 0 0 rgba(0,0,0,.1);
-}
-
-::-webkit-scrollbar-track:horizontal:hover{
-    box-shadow:inset 0 1px 0 rgba(0,0,0,.1);
-}
-
-::-webkit-scrollbar-track:active{
-    background-color:rgba(0,0,0,.05);
-    box-shadow:inset 1px 0 0 rgba(0,0,0,.14),inset -1px 0 0 rgba(0,0,0,.07);
-}
-
-::-webkit-scrollbar-track:horizontal:active{
-    box-shadow:inset 0 1px 0 rgba(0,0,0,.14),inset 0 -1px 0 rgba(0,0,0,.07);
-}
-
-::-webkit-scrollbar-thumb{
-    background-color: rgba(255,255,255,.25);
-    background-clip:padding-box;
-    border:solid transparent;
-    border-width:1px 1px 1px 6px;
-    min-height:28px;
-    padding:100px 0 0;
-    box-shadow:inset 1px 1px 0 rgba(0,0,0,.1),inset 0 -1px 0 rgba(0,0,0,.07);
-}
-
-::-webkit-scrollbar-thumb:horizontal{
-    border-width:6px 1px 1px;
-    padding:0 0 0 100px;
-    box-shadow:inset 1px 1px 0 rgba(0,0,0,.1),inset -1px 0 0 rgba(0,0,0,.07);
-}
-
-::-webkit-scrollbar-thumb:hover{
-    background-color:rgba(255,255,255,.35);
-    box-shadow:inset 1px 1px 1px rgba(255,255,255,.25);
-}
-
-::-webkit-scrollbar-thumb:active{
-    background-color:rgba(255,255,255,.6);
-    box-shadow:inset 1px 1px 3px rgba(0,0,0,0.35);
-}
-::-webkit-scrollbar-corner{
-    background:transparent;
-}
-
-body::-webkit-scrollbar-track-piece{
-    background-clip:padding-box;
-    background-color:#f5f5f5;
-    border:solid #fff;
-    border-width:0 0 0 3px;
-    box-shadow:inset 1px 0 0 rgba(0,0,0,.14),inset -1px 0 0 rgba(0,0,0,.07);
-}
-
-body::-webkit-scrollbar-track-piece:horizontal{
-    border-width:3px 0 0;
-    box-shadow:inset 0 1px 0 rgba(0,0,0,.14),inset 0 -1px 0 rgba(0,0,0,.07);
-}
-
-body::-webkit-scrollbar-thumb{
-    border-width:1px 1px 1px 5px;
-}
-
-body::-webkit-scrollbar-thumb:horizontal{
-    border-width:5px 1px 1px;
-}
-
-body::-webkit-scrollbar-corner{
-    background-clip:padding-box;
-    background-color:#f5f5f5;
-    border:solid #fff;
-    border-width:3px 0 0 3px;
-    box-shadow:inset 1px 1px 0 rgba(0,0,0,.14);
-}
-
+        height:16px;
+        overflow:visible;
+        width:16px;
+    }
+    ::-webkit-scrollbar-button{
+        height:0;
+        width:0;
+    }
+    ::-webkit-scrollbar-track{
+        background-clip:padding-box;
+        border:solid transparent;
+        border-width:0 0 0 4px;
+    }
+    ::-webkit-scrollbar-track:horizontal{
+        border-width:4px 0 0;
+    }
+    ::-webkit-scrollbar-track:hover{
+        background-color:rgba(0,0,0,.05);
+        box-shadow:inset 1px 0 0 rgba(0,0,0,.1);
+    }
+    ::-webkit-scrollbar-track:horizontal:hover{
+        box-shadow:inset 0 1px 0 rgba(0,0,0,.1);
+    }
+    ::-webkit-scrollbar-track:active{
+        background-color:rgba(0,0,0,.05);
+        box-shadow:inset 1px 0 0 rgba(0,0,0,.14),inset -1px 0 0 rgba(0,0,0,.07);
+    }
+    ::-webkit-scrollbar-track:horizontal:active{
+        box-shadow:inset 0 1px 0 rgba(0,0,0,.14),inset 0 -1px 0 rgba(0,0,0,.07);
+    }
+    ::-webkit-scrollbar-thumb{
+        background-color: rgba(255,255,255,.25);
+        background-clip:padding-box;
+        border:solid transparent;
+        border-width:1px 1px 1px 6px;
+        min-height:28px;
+        padding:100px 0 0;
+        box-shadow:inset 1px 1px 0 rgba(0,0,0,.1),inset 0 -1px 0 rgba(0,0,0,.07);
+    }
+    ::-webkit-scrollbar-thumb:horizontal{
+        border-width:6px 1px 1px;
+        padding:0 0 0 100px;
+        box-shadow:inset 1px 1px 0 rgba(0,0,0,.1),inset -1px 0 0 rgba(0,0,0,.07);
+    }
+    ::-webkit-scrollbar-thumb:hover{
+        background-color:rgba(255,255,255,.35);
+        box-shadow:inset 1px 1px 1px rgba(255,255,255,.25);
+    }
+    ::-webkit-scrollbar-thumb:active{
+        background-color:rgba(255,255,255,.6);
+        box-shadow:inset 1px 1px 3px rgba(0,0,0,0.35);
+    }
+    ::-webkit-scrollbar-corner{
+        background:transparent;
+    }
+    body::-webkit-scrollbar-track-piece{
+        background-clip:padding-box;
+        background-color:#f5f5f5;
+        border:solid #fff;
+        border-width:0 0 0 3px;
+        box-shadow:inset 1px 0 0 rgba(0,0,0,.14),inset -1px 0 0 rgba(0,0,0,.07);
+    }
+    body::-webkit-scrollbar-track-piece:horizontal{
+        border-width:3px 0 0;
+        box-shadow:inset 0 1px 0 rgba(0,0,0,.14),inset 0 -1px 0 rgba(0,0,0,.07);
+    }
+    body::-webkit-scrollbar-thumb{
+        border-width:1px 1px 1px 5px;
+    }
+    body::-webkit-scrollbar-thumb:horizontal{
+        border-width:5px 1px 1px;
+    }
+    body::-webkit-scrollbar-corner{
+        background-clip:padding-box;
+        background-color:#f5f5f5;
+        border:solid #fff;
+        border-width:3px 0 0 3px;
+        box-shadow:inset 1px 1px 0 rgba(0,0,0,.14);
+    }
 </style>
 
 <!--<iron-media-query query="(max-width: 600px)" query-matches="{{mobile}}"></iron-media-query>-->
 
-<div id="container" class="layout horizontal">
+<div id="container" class$="[[layoutClasses]]">
     <div id="video" class="flex relative">
         <template is="dom-if" if="{{showPlaceHolder}}">
             <div id="placeholder" class="fit" on-click="_handleHolderTap" style="[[placeHolderStyle]]">
@@ -407,7 +385,7 @@ body::-webkit-scrollbar-corner{
         return {
             data: {
                 type: Array,
-                value() { return [];},
+                value: [],
                 observer: '_dataChanged'
             },
             width: {
@@ -418,6 +396,7 @@ body::-webkit-scrollbar-corner{
             },
             showList: {
                 type: Boolean,
+                reflectToAttribute: true,
                 computed: '_computeShowList(data)'
             },
             listLength: {
@@ -443,7 +422,6 @@ body::-webkit-scrollbar-corner{
                 type: String
             },
             showPlaceHolder: {
-                // true 沒有影片被選擇
                 type: Boolean,
                 computed: '_computeShowPlaceHolder(playing)'
             },
@@ -487,8 +465,23 @@ body::-webkit-scrollbar-corner{
             mobile: {
                 type: Boolean,
                 reflectToAttribute: true
+            },
+            layoutClasses: {
+                type: String,
+                reflectToAttribute: true,
+                computed: '_computeLayoutClasses(mobile)'
             }
         };
+    }
+
+    ready() {
+        super.ready();
+        this._mediaQuery();
+        window.addEventListener('resize', () => this._mediaQuery());
+    }
+
+    _mediaQuery() {
+        this.set('mobile', window.matchMedia('(max-width: 600px)').matches);
     }
 
     /**
@@ -509,16 +502,16 @@ body::-webkit-scrollbar-corner{
             this._checkPlaySupport();
             if(this.playSupported) {
                 // console.log( 'Play() Supported:' + this.playSupported);
-                this.set( 'playing', true );
+                this.set('playing', true);
                 this.set('playingVideoId', id);
-                this.listen( document.querySelector('#youtube') , 'google-youtube-ready', '_mobilePlay' );
+                // this.listen(document.querySelector('#youtube'), 'google-youtube-ready', '_mobilePlay');
             }
         }
         this.set( 'playing', true );
         this.set('playingVideoId', id);
     }
 
-    stop(id) {
+    stop() {
         this.set('prevPlayedVideo', this.playingVideoId);
         this.set('playingVideoId', '');
         this.set('playing', false);
@@ -557,7 +550,7 @@ body::-webkit-scrollbar-corner{
     }
 
     _handlePlayControl(e) {
-        var action = e.currentTarget.getAttribute('action-type');
+        const action = e.currentTarget.getAttribute('action-type');
         switch(action) {
             case 'next':
                 this._nextVideo();
@@ -595,6 +588,10 @@ body::-webkit-scrollbar-corner{
         this.play(this.data[this.selectedVideoIndex].res_id);
     }
 
+    _computeLayoutClasses(mobile) {
+        return mobile ? 'layout vertical' : 'layout horizontal';
+    }
+
     _computeShowList(data) {
         return (data || []).length > 1;
     }
@@ -608,10 +605,10 @@ body::-webkit-scrollbar-corner{
     }
 
     _computeContainerClass(mobile) {
-        if( mobile ) {
-            return 'layout vertical'
+        if (mobile) {
+            return 'layout vertical';
         } else {
-            return 'layout horizontal'
+            return 'layout horizontal';
         }
     }
 
@@ -636,9 +633,7 @@ body::-webkit-scrollbar-corner{
     }
 
     _checkPlaySupport() {
-        this.async( function() {
-            this.playSupported = document.querySelector('#youtube').playsupported;
-        } ,1);
+        // this.playSupported = this.shadowRoot.querySelector('#youtube').playsupported;
     }
 
     _mobilePlay(e) {

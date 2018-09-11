@@ -13,7 +13,7 @@ class MoePage extends PolymerElement {
     display: block;
 }
 moe-thread {
-    margin-top: 2em;
+    margin-top: 32px;
     width: 100%;
 }
 .loading {
@@ -54,6 +54,9 @@ moe-thread {
             graphqlServer: {
                 type: String,
             },
+            imageServers: {
+                type: Object
+            },
             isAdmin: {
                 type: Boolean,
                 value: false,
@@ -63,7 +66,8 @@ moe-thread {
             threads: {
                 type: Array,
                 value: [],
-                reflectToAttribute: true
+                reflectToAttribute: true,
+                notify: true
             },
             boardId: {
                 type: Number
@@ -86,6 +90,23 @@ moe-thread {
 
     ready() {
         super.ready();
+    }
+
+    load() {
+        var board;
+
+        const postTransformer = (p) => Object.assign({}, p, {
+            images: p.images.map(imageTransformer)
+        });
+
+        const imageTransformer = (image) => {
+            const imageResolver = (sv) => (typeof this.imageServers[sv] === 'function' ? this.imageServers[sv] : (f) => f);
+            return Object.assign({}, image, {
+                image_src: imageResolver(image.image_server)(image.image_src, board.user.subdomain, board.alias),
+                thumb_src: imageResolver(image.thumb_server)(image.thumb_src, board.user.subdomain, board.alias),
+            });
+        };
+
         const query = this._queryThreads(this.boardId, this.page * this.threadsPerPage, this.threadsPerPage, 0, this.repliesPerThread);
         const fetchQL = new FetchQL({
             url: this.graphqlServer
@@ -97,8 +118,10 @@ moe-thread {
                 query
             })
             .then(resp => {
+                board = resp.data.getBoardById;
                 this.set('threads', resp.data.page.threads.map(t => Object.assign({}, t, {
-                    replies: (t.replies || []).reverse()
+                    first_post: postTransformer(t.first_post),
+                    replies: (t.replies || []).reverse().map(postTransformer)
                 })));
             })
             .catch(err => console.log(err))
@@ -107,6 +130,14 @@ moe-thread {
 
     _queryThreads(board_id, threadsOffset, threadsLimit, repliesOffset, repliesLimit) {
         return `{
+  getBoardById(id: 83) {
+    id
+    alias
+    user {
+      id
+      subdomain
+    }
+  }
   page(board_id:${board_id}) {
     board_id
     threads(offset:${threadsOffset},limit:${threadsLimit}) {
@@ -141,9 +172,11 @@ fragment PostFields on Post {
     data
   }
   images {
+    image_server
     image_src
     image_height
     image_width
+    thumb_server
     thumb_src
     thumb_height
     thumb_width
