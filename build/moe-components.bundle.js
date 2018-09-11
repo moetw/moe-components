@@ -3100,7 +3100,7 @@ paper-item:hover {
 }
 :host([mobile]) {
     min-height: 200px;
-    max-height: 360px;
+    max-height: 400px;
 }
 moe-video {
     --moe-video-width: 100%;
