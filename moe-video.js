@@ -57,10 +57,11 @@ class MoeVideo extends PolymerElement {
     }
 
     #container {
+        @apply(--layout-horizontal);
         margin: 0;
         width: 100%;
         height: 100%;
-        @apply(--layout-horizontal);
+        position: relative;
     }
     :host([list-toggle]) #container{
         width: 730px;
@@ -167,9 +168,23 @@ class MoeVideo extends PolymerElement {
     #listToolbar > {
         display: inline-block;
     }
-    #listToolbar paper-icon-button[icon='icons:close'] {
-        margin-left: auto;
-        display: block;
+    paper-icon-button[icon='icons:close'] {
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        left: -16px;
+        top: -16px;
+        color: var(--google-grey-700);
+        background: white;
+        border: 1px solid #ededed;
+        border-radius: 50%;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
     }
     #listLength::before {
         content: '/';
@@ -355,9 +370,7 @@ class MoeVideo extends PolymerElement {
                 </div>
                 <paper-icon-button icon="av:skip-next" action-type="next" on-click="_handlePlayControl"> </paper-icon-button>
                 
-                <template is="dom-if" if="[[playing]]">
-                    <paper-icon-button icon="icons:close" action-type="stop" on-click="_handlePlayControl"></paper-icon-button>
-                </template>
+                
             </div>
             <div id="videoSelectorScroller" class="layout flex vertical scroll">
                 <iron-selector id="videoSelector" selected="{{selectedVideoIndex}}">
@@ -375,7 +388,7 @@ class MoeVideo extends PolymerElement {
     
     <!--close button -->
     <template is="dom-if" if="[[playing]]">
-        <paper-icon-button icon="icons:close" action-type="stop" on-click="_handlePlayControl" hidden="{{showList}}" style="color: maroon;"></paper-icon-button>
+        <paper-icon-button icon="icons:close" action-type="stop" on-click="_handlePlayControl"></paper-icon-button>
     </template>
 </div>
 `;
