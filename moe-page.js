@@ -130,7 +130,7 @@ moe-thread {
 
     _queryThreads(board_id, threadsOffset, threadsLimit, repliesOffset, repliesLimit) {
         return `{
-  getBoardById(id: 83) {
+  getBoardById(id: ${board_id}) {
     id
     alias
     user {

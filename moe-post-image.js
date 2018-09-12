@@ -78,8 +78,6 @@ class MoePostImage extends PolymerElement {
         } else {
             this.$.ihover.style.maxWidth = imgRect.left - this.ihoverPadding * 2 + "px";
         }
-
-        console.log(`doc height = ${doc.clientHeight}, doc width = ${doc.clientWidth}`)
     }
 
     _updateIhoverPosition(e) {

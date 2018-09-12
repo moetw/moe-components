@@ -5,8 +5,8 @@ import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-styles/paper-styles.js';
-import '@polymer/paper-styles/color.js';
 import '@polymer/paper-ripple/paper-ripple.js';
+import '@polymer/paper-tooltip/paper-tooltip';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/iron-icons/av-icons';
 import '@polymer/iron-icons/communication-icons';
@@ -14,12 +14,15 @@ import '@polymer/iron-image/iron-image.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/iron-list/iron-list'
 import moment from './moment';
+import DOMPurify from 'dompurify';
+import 'resize-observer/dist/resize-observer';
 
 import './moe-styles.js';
 import './moe-rate.js';
 import './moe-poll.js';
 import './moe-post-image.js';
 import './moe-video.js';
+import './moe-icons.js';
 
 /**
  * `moe-thread`
@@ -97,7 +100,14 @@ class MoeThread extends PolymerElement {
     .post-subject { 
         @apply --paper-font-title;
     }
-    .post-body { @apply --paper-font-body1; }
+    .post-body { 
+        @apply --paper-font-body1;
+        max-height: 30em;
+        overflow: hidden;
+    }
+    .post-body.expanded {
+        max-height: none;
+    }
     
     .firstpost {
         display: block;
@@ -174,6 +184,22 @@ class MoeThread extends PolymerElement {
         --iron-icon-width: 1.5em;
         padding: 0 0.2em;
     }
+    
+    paper-tooltip {
+        --paper-tooltip-delay-out: 0s;
+        --paper-tooltip-delay-in: 0s;
+        --paper-tooltip-duration-out: 0s;
+        --paper-tooltip-duration-in: 0s;
+    }
+    
+    #showMore {
+        display: block;
+        text-align: center;
+        margin: auto;
+    }
+    #showMore:hover {
+        cursor: pointer;
+    }
 </style>
 
 <paper-card id="thread-card">
@@ -205,8 +231,22 @@ class MoeThread extends PolymerElement {
         <!-- firstpost -->
         <div class="firstpost">
             <moe-post-action-menu-button class="post-action-button" board-id="[[firstpost.board_id]]" no="[[firstpost.no]]" is-first-post="true" is-admin="[[isAdmin]]"></moe-post-action-menu-button>
-            <div class="post-subject">[[firstpost.sub]]</div>
-            <div class="post-body">
+            <div class="post-subject">
+                <template is="dom-if" if="[[flagAdminSticky]]">
+                    <iron-icon id="icon-thread-pin" icon="moe:thread-pin"></iron-icon>
+                    <paper-tooltip for="icon-thread-pin">本討論串已置頂</paper-tooltip>
+                </template>
+                <template is="dom-if" if="[[flagAdminSage]]">
+                    <iron-icon id="icon-thread-sage" icon="moe:thread-sage"></iron-icon>
+                    <paper-tooltip for="icon-thread-sage">本討論串已強制下沉</paper-tooltip>                
+                </template>
+                <template is="dom-if" if="[[flagAdminThreadStop]]">
+                    <iron-icon id="icon-thread-stop" icon="moe:thread-stop"></iron-icon>
+                    <paper-tooltip for="icon-thread-stop">本討論串已禁止回應</paper-tooltip>
+                </template>
+                [[firstpost.sub]]
+            </div>
+            <div id="firstpostPostBody" class="post-body">
                 <template is="dom-repeat" items="[[firstpost.images]]" as="image">
                     <a target="_blank" href="[[image.image_src]]">
                         <moe-post-image 
@@ -217,6 +257,9 @@ class MoeThread extends PolymerElement {
                 </template>
                 <moe-post-comment comment="[[firstpost.com]]" />
             </div>
+            <template is="dom-if" if="[[displayShowMore]]">
+                <a id="showMore" on-click="_onShowMoreClick"><iron-icon icon="expand-more"></iron-icon>顯示更多</a>                            
+            </template>
             <div style="clear: both"></div>
             <moe-post-header post="[[firstpost]]"></moe-post-header>
         </div>
@@ -304,6 +347,18 @@ class MoeThread extends PolymerElement {
                 computed: '_computeShowFirstPostEmbeds(firstpost)'
             }
         };
+    }
+
+    ready() {
+        super.ready();
+        const observer = new ResizeObserver(() => {
+            this.set('displayShowMore', this.$.firstpostPostBody.scrollHeight > this.$.firstpostPostBody.clientHeight);
+        });
+        observer.observe(this.$.firstpostPostBody);
+    }
+
+    _onShowMoreClick() {
+        this.$.firstpostPostBody.classList.add('expanded');
     }
 
     _computeShowFirstPostEmbeds(firstpost) {
@@ -449,11 +504,17 @@ class MoePostComment extends PolymerElement {
     word-break: break-all;
 }
 
+#content {
+    line-height: 1.5em;
+}
+
 .highlight-quote {
     color: var(--moe-post-quote-text-color);
 }
+
 </style>
-<span id="html"></span>
+<span id="content"></span>
+<moe-pixmicat-pushpost id="pushpost" style="display:none"></moe-pixmicat-pushpost>
 `;
     }
 
@@ -467,7 +528,7 @@ class MoePostComment extends PolymerElement {
     }
 
     _refreshHtml(newValue) {
-        var processed = newValue;
+        let processed = DOMPurify.sanitize(newValue);
 
         // highlight quotes
         processed = this._highlightQuotes(processed);
@@ -475,19 +536,95 @@ class MoePostComment extends PolymerElement {
         // link quotes
         processed = this._linkQuotes(processed);
 
-        this.$.html.innerHTML = processed;
+        // mod_pushpost
+        processed = this._modPushpost(processed);
+
+        this.$.content.innerHTML = processed;
     }
 
     _highlightQuotes(text) {
-        const regex = /(^|<br \/>)((?:&gt;|＞).*?)(?=<br \/>|$)/gm;
-        const subst = `<span class="highlight-quote">$2</span>`;
+        const regex = /(^|<br(?: \/)?>)((?:&gt;|＞).*?)(?=<br(?: \/)?>|$)/gm;
+        const subst = '$1<span class="highlight-quote">$2</span>';
         return text.replace(regex, subst);
     }
 
     _linkQuotes(text) {
         const regex = /((?:&gt;|＞)+)(?:No\.)?(\d+)/i;
-        const subst = `<moe-quote-link no="$2">&gt;No.$2</moe-quote-link>`;
+        const subst = '<moe-quote-link no="$2">&gt;No.$2</moe-quote-link>';
         return text.replace(regex, subst);
+    }
+
+    _modPushpost(text) {
+        const regex = /\[MOD_PUSHPOST_USE\]<br>([\w\W]+$)/gm;
+        const matches = regex.exec(text);
+        if (matches) {
+            this.$.pushpost.innerHTML = matches[1];
+            this.$.pushpost.style.display = 'block';
+        }
+        return text.replace(regex, '');
+    }
+}
+
+class MoePixmicatPushpost extends PolymerElement {
+    static get template() {
+        return html`
+<style>
+:host {
+    display: block;
+    background: white;
+    padding: 1em;
+    font-size: small;
+    clear: left;
+}
+#content {
+    display: block;
+    line-height: 1.5em;
+    max-height: 7.5em;
+    overflow: hidden;
+}
+#content.expanded {
+    max-height: none;
+}
+::slotted(._h) {
+    color: var(--moe-post-header-id-text-color);
+}
+#showMore {
+    display: block;
+    text-align: center;
+    margin: auto;
+}
+#showMore:hover {
+    cursor: pointer;
+}
+</style>
+<div id="pushpost">
+    <div id="content"><slot></slot></div>
+    <template is="dom-if" if="[[displayShowMore]]">
+        <a id="showMore" on-click="_onShowMoreClick"><iron-icon icon="expand-more"></iron-icon>顯示更多</a>
+    </template>
+</div>
+`;
+    }
+
+    static get properties() {
+        return {
+            displayShowMore: {
+                type: Boolean,
+                value: false
+            }
+        };
+    }
+
+    ready() {
+        super.ready();
+        const ob = new ResizeObserver(() => {
+            this.set('displayShowMore', this.$.content.scrollHeight > this.$.content.clientHeight);
+        });
+        ob.observe(this.$.content);
+    }
+
+    _onShowMoreClick() {
+        this.$.content.classList.toggle('expanded');
     }
 }
 
@@ -583,8 +720,9 @@ paper-listbox {
         ];
 
         if (isAdmin && isFirstPost) {
-            items.push({text: '停止討論串', action: 'stopThread', icon: 'av:pause'});
-            items.push({text: '強制sage', action: 'forceSage', icon: 'arrow-downward'});
+            items.push({text: '禁止回應', action: 'stopThread', icon: 'moe:thread-stop'});
+            items.push({text: '強制sage', action: 'forceSage', icon: 'moe:thread-sage'});
+            items.push({text: '置頂', action: 'pinThread', icon: 'moe:thread-pin'});
         }
 
         return items;
@@ -706,5 +844,6 @@ window.customElements.define('moe-post-comment', MoePostComment);
 window.customElements.define('moe-post-header', MoePostHeader);
 window.customElements.define('moe-post-action-menu-button', MoePostActionMenuButton);
 window.customElements.define('moe-post-action-menu-item', MoePostActionMenuItem);
+window.customElements.define('moe-pixmicat-pushpost', MoePixmicatPushpost);
 window.customElements.define('moe-quote-link', MoeQuoteLink);
 window.customElements.define('moe-embeds', MoeEmbeds);
