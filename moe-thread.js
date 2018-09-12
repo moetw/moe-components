@@ -6,6 +6,7 @@ import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-styles/paper-styles.js';
 import '@polymer/paper-ripple/paper-ripple.js';
+import '@polymer/paper-button/paper-button';
 import '@polymer/paper-tooltip/paper-tooltip';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/iron-icons/av-icons';
@@ -104,9 +105,7 @@ class MoeThread extends PolymerElement {
         @apply --paper-font-body1;
         max-height: 30em;
         overflow: hidden;
-    }
-    .post-body.expanded {
-        max-height: none;
+        transition: max-height 0.5s;
     }
     
     .firstpost {
@@ -258,7 +257,7 @@ class MoeThread extends PolymerElement {
                 <moe-post-comment comment="[[firstpost.com]]" />
             </div>
             <template is="dom-if" if="[[displayShowMore]]">
-                <a id="showMore" on-click="_onShowMoreClick"><iron-icon icon="expand-more"></iron-icon>顯示更多</a>                            
+                <paper-button id="showMore" on-click="_onShowMoreClick"><iron-icon icon="expand-more"></iron-icon>顯示更多</paper-button>                            
             </template>
             <div style="clear: both"></div>
             <moe-post-header post="[[firstpost]]"></moe-post-header>
@@ -358,7 +357,7 @@ class MoeThread extends PolymerElement {
     }
 
     _onShowMoreClick() {
-        this.$.firstpostPostBody.classList.add('expanded');
+        this.$.firstpostPostBody.style.maxHeight = this.$.firstpostPostBody.scrollHeight + 'px';
     }
 
     _computeShowFirstPostEmbeds(firstpost) {
@@ -580,51 +579,21 @@ class MoePixmicatPushpost extends PolymerElement {
     display: block;
     line-height: 1.5em;
     max-height: 7.5em;
-    overflow: hidden;
-}
-#content.expanded {
-    max-height: none;
+    overflow-y: scroll;
 }
 ::slotted(._h) {
     color: var(--moe-post-header-id-text-color);
 }
-#showMore {
-    display: block;
-    text-align: center;
-    margin: auto;
-}
-#showMore:hover {
-    cursor: pointer;
-}
 </style>
 <div id="pushpost">
     <div id="content"><slot></slot></div>
-    <template is="dom-if" if="[[displayShowMore]]">
-        <a id="showMore" on-click="_onShowMoreClick"><iron-icon icon="expand-more"></iron-icon>顯示更多</a>
-    </template>
 </div>
 `;
     }
 
     static get properties() {
         return {
-            displayShowMore: {
-                type: Boolean,
-                value: false
-            }
         };
-    }
-
-    ready() {
-        super.ready();
-        const ob = new ResizeObserver(() => {
-            this.set('displayShowMore', this.$.content.scrollHeight > this.$.content.clientHeight);
-        });
-        ob.observe(this.$.content);
-    }
-
-    _onShowMoreClick() {
-        this.$.content.classList.toggle('expanded');
     }
 }
 
