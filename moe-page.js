@@ -23,15 +23,18 @@ moe-thread {
 	justify-content: center;
 	align-items: center;
 	align-content: center;
+	margin-top: 32px;
 }
 .loading .loading-text {
     margin-left: 0.5em;
 }
+.loading paper-spinner-lite {
+    --paper-spinner-color: var(--futaba-red-color);
+} 
 </style>
 <template is="dom-if" if="[[loading]]">
     <div class="loading">
         <paper-spinner-lite active></paper-spinner-lite>
-        <div class="loading-text">Loading...</div>
     </div>
 </template>
 <template is="dom-repeat" items="[[threads]]" as="thread">

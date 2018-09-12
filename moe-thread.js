@@ -160,6 +160,15 @@ class MoeThread extends PolymerElement {
         margin-bottom: 0.5em;
     }
     
+    @media only screen and (max-width: 600px) {
+        .firstpost .thumb {
+            display: block;
+            float: none;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+    
     .more-replies {
         @apply --layout-horizontal;
         @apply --layout-center-justified;
@@ -647,7 +656,7 @@ paper-listbox {
     z-index: 100;
 }
 </style>
-<paper-menu-button class="post-action-button" horizontal-align="right" >
+<paper-menu-button class="post-action-button" horizontal-align="right">
     <paper-icon-button icon="more-vert" slot="dropdown-trigger" alt="more-vert" ></paper-icon-button>
     <paper-listbox slot="dropdown-content">
         <template is="dom-repeat" items="{{items}}">

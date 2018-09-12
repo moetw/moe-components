@@ -3081,6 +3081,15 @@ window.JSCompiler_renameProperty=function(e){return e};let workingURL,resolveDoc
         margin-bottom: 0.5em;
     }
     
+    @media only screen and (max-width: 600px) {
+        .firstpost .thumb {
+            display: block;
+            float: none;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+    
     .more-replies {
         @apply --layout-horizontal;
         @apply --layout-center-justified;
@@ -3331,7 +3340,7 @@ paper-listbox {
     z-index: 100;
 }
 </style>
-<paper-menu-button class="post-action-button" horizontal-align="right" >
+<paper-menu-button class="post-action-button" horizontal-align="right">
     <paper-icon-button icon="more-vert" slot="dropdown-trigger" alt="more-vert" ></paper-icon-button>
     <paper-listbox slot="dropdown-content">
         <template is="dom-repeat" items="{{items}}">
@@ -3386,15 +3395,18 @@ moe-thread {
 	justify-content: center;
 	align-items: center;
 	align-content: center;
+	margin-top: 32px;
 }
 .loading .loading-text {
     margin-left: 0.5em;
 }
+.loading paper-spinner-lite {
+    --paper-spinner-color: var(--futaba-red-color);
+} 
 </style>
 <template is="dom-if" if="[[loading]]">
     <div class="loading">
         <paper-spinner-lite active></paper-spinner-lite>
-        <div class="loading-text">Loading...</div>
     </div>
 </template>
 <template is="dom-repeat" items="[[threads]]" as="thread">
