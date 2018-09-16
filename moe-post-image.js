@@ -15,7 +15,11 @@ class MoePostImage extends PolymerElement {
     display: none;
     padding: 0;
     margin: 0;
-    z-index: 100;
+    z-index: 999;
+}
+#img {
+    display: block;
+    margin: auto;
 }
 </style>
 <img id="img" src="[[thumbSrc]]" width="[[thumbWidth]]" height="[[thumbHeight]]" on-mouseover="_onMouseOver" on-mouseout="_onMouseOut" on-mousemove="_onMouseMove" />

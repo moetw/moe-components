@@ -12,7 +12,7 @@
     <script type="module">
         import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
         import '@polymer/iron-demo-helpers/demo-snippet';
-        import '../moe-page.js';
+        import '../moe-threads.js';
     </script>
 
     <custom-style>
@@ -25,7 +25,7 @@
     <h3>Basic moe-thread demo</h3>
     <demo-snippet>
         <template>
-            <moe-page id="page" graphql-server="https://dev.mymoe.moe/graphql" board-id="83" page="0" threads-per-page="10" replies-per-thread="3"></moe-page>
+            <moe-threads id="page" graphql-server="https://dev.mymoe.moe/graphql" board-id="83" page="0" threads-per-page="10" replies-per-thread="3"></moe-threads>
             <script>
                 window.addEventListener("load", function(event) {
                     const page = document.querySelector('#page');

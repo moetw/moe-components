@@ -6,12 +6,14 @@
   },
   "dependencies": {
     "@polymer/app-layout": "^3.0.0-pre.26",
+    "@polymer/app-route": "^3.0.0",
     "@polymer/google-youtube": "git+https://github.com/moetw/google-youtube.git",
     "@polymer/iron-flex-layout": "^3.0.0-pre.25",
     "@polymer/iron-icon": "^3.0.0-pre.25",
     "@polymer/iron-icons": "^3.0.0-pre.25",
     "@polymer/iron-iconset-svg": "^3.0.0-pre.25",
     "@polymer/iron-list": "^3.0.0-pre.25",
+    "@polymer/iron-pages": "^3.0.0",
     "@polymer/paper-button": "^3.0.0-pre.25",
     "@polymer/paper-card": "^3.0.0-pre.25",
     "@polymer/paper-checkbox": "^3.0.0-pre.25",
@@ -33,6 +35,8 @@
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
     "plastic-image": "^3.0.2",
+    "pwa-helpers": "^0.8.3",
+    "redux": "^4.0.0",
     "resize-observer": "^1.0.0-alpha.1",
     "simplebar": "^3.0.0-beta.4",
     "web-animations-js": "^2.3.1"

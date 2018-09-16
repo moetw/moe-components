@@ -1,11 +1,13 @@
 import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-spinner/paper-spinner-lite'
 import '@polymer/paper-styles/paper-styles';
+import '@polymer/paper-button/paper-button';
+import '@polymer/iron-icons/image-icons';
 import FetchQL from 'fetchql'
 import './moe-styles.js';
 import './moe-thread.js';
 
-class MoePage extends PolymerElement {
+class MoeThreads extends PolymerElement {
     static get template() {
         return html`
 <style>
@@ -31,6 +33,17 @@ moe-thread {
 .loading paper-spinner-lite {
     --paper-spinner-color: var(--futaba-red-color);
 } 
+
+#paginator {
+    @apply --layout-horizontal;
+    align-content: stretch;
+    margin-top: 36px;
+    color: var(--futaba-red-color)
+}
+
+#paginator > * {
+    flex: 1 1 auto;
+}
 </style>
 <template is="dom-if" if="[[loading]]">
     <div class="loading">
@@ -41,19 +54,39 @@ moe-thread {
     <moe-thread 
         is-admin="[[isAdmin]]" 
         no="[[thread.no]]" 
-        reply-count="[[thread.reply_count]]" 
-        flag-admin-sticky="[[thread.flag_admin_sticky]]"
-        flag-admin-thread-stop="[[thread.flag_admin_thread_stop]]"
-        flag-admin-sage="[[thread.flag_admin_sage]]"
-        firstpost="[[thread.first_post]]"
+        reply-count="[[thread.replyCount]]" 
+        flag-admin-sticky="[[thread.flagAdminSticky]]"
+        flag-admin-thread-stop="[[thread.flagAdminThreadStop]]"
+        flag-admin-sage="[[thread.flagAdminSage]]"
+        firstpost="[[thread.firstPost]]"
         replies="[[thread.replies]]">
     </moe-thread>
 </template>
+<div id="paginator">
+    <template is="dom-if" if="[[hasPrevPage]]">
+        <paper-button rel="prev" id="prevPageButton" on-click="loadPrevPage" disabled$="[[loading]]"><iron-icon icon="image:navigate-before"></iron-icon>上一頁</paper-button>
+    </template>
+    <template is="dom-if" if="[[hasNextPage]]">
+        <paper-button rel="next" id="nextPageButton" on-click="loadNextPage" disabled$="[[loading]]">下一頁<iron-icon icon="image:navigate-next"></iron-icon></paper-button>
+    </template>
+</div>
+
+<!-- Route -->
+<app-route pattern="/" route="{{route}}" data="{{routeData}}" active="{{active}}"></app-route>
+<app-route pattern="/:page" route="{{route}}" data="{{routeData}}" active="{{active}}"></app-route>
 `;
     }
 
     static get properties() {
         return {
+            route: {
+                type: Object,
+                notify: true
+            },
+            routeData: {
+                type: Object,
+                notify: true
+            },
             graphqlServer: {
                 type: String,
             },
@@ -76,7 +109,9 @@ moe-thread {
                 type: Number
             },
             page: {
-                type: Number
+                type: Number,
+                reflectToAttribute: true,
+                observer: '_observePage'
             },
             threadsPerPage: {
                 type: Number
@@ -87,16 +122,28 @@ moe-thread {
             loading: {
                 type: Boolean,
                 value: true
+            },
+            hasPrevPage: {
+                type: Boolean,
+                computed: '_computeHasPrevPage(page)'
+            },
+            hasNextPage: {
+                type: Boolean,
+                computed: '_computeHasNextPage(threads)'
             }
         };
     }
 
-    ready() {
-        super.ready();
+    static get observers() {
+        return [
+            '_observeRoutePage(route.path)'
+        ];
     }
 
     load() {
         var board;
+
+        window.scrollTo(0, 0);
 
         const postTransformer = (p) => Object.assign({}, p, {
             images: p.images.map(imageTransformer)
@@ -105,8 +152,8 @@ moe-thread {
         const imageTransformer = (image) => {
             const imageResolver = (sv) => (typeof this.imageServers[sv] === 'function' ? this.imageServers[sv] : (f) => f);
             return Object.assign({}, image, {
-                image_src: imageResolver(image.image_server)(image.image_src, board.user.subdomain, board.alias),
-                thumb_src: imageResolver(image.thumb_server)(image.thumb_src, board.user.subdomain, board.alias),
+                imageSrc: imageResolver(image.imageServer)(image.imageSrc, board.user.subdomain, board.alias),
+                thumbSrc: imageResolver(image.thumbServer)(image.thumbSrc, board.user.subdomain, board.alias),
             });
         };
 
@@ -123,12 +170,53 @@ moe-thread {
             .then(resp => {
                 board = resp.data.getBoardById;
                 this.set('threads', resp.data.page.threads.map(t => Object.assign({}, t, {
-                    first_post: postTransformer(t.first_post),
+                    firstPost: postTransformer(t.firstPost),
                     replies: (t.replies || []).reverse().map(postTransformer)
                 })));
             })
-            .catch(err => console.log(err))
+            .catch(err => console.log(err)) // TODO: error reporting
             .finally(() => this.set('loading', false));
+    }
+
+    reload() {
+        this.set('threads', []);
+        this.load();
+    }
+
+    loadPrevPage() {
+        if (this.hasPrevPage) {
+            this.set('routeData.page', this.page - 1);
+        }
+    }
+
+    loadNextPage() {
+        if (this.hasNextPage) {
+            this.set('routeData.page', this.page + 1);
+        }
+    }
+
+    _computeHasPrevPage(page) {
+        return page > 0;
+    }
+
+    _computeHasNextPage(threads) {
+        return threads.length > 0;
+    }
+
+    _observePage() {
+        this.set('threads', []);
+        this.load();
+    }
+
+    _observeRoutePage() {
+        console.log('moe-threads: _observeRoutePage', this.route, this.routeData);
+
+        const page = parseInt(this.routeData.page);
+        if (typeof page === 'number' && page >= 0) {
+            this.set('page', page);
+        } else {
+            this.set('route.path', '/0');
+        }
     }
 
     _queryThreads(board_id, threadsOffset, threadsLimit, repliesOffset, repliesLimit) {
@@ -141,16 +229,16 @@ moe-thread {
       subdomain
     }
   }
-  page(board_id:${board_id}) {
-    board_id
+  page(boardId:${board_id}) {
+    boardId
     threads(offset:${threadsOffset},limit:${threadsLimit}) {
-      board_id
+      boardId
       no
-      reply_count
-      flag_admin_sticky
-      flag_admin_thread_stop
-      flag_admin_sage
-      first_post {
+      replyCount
+      flagAdminSticky
+      flagAdminThreadStop
+      flagAdminSage
+      firstPost {
         ...PostFields
       }
       replies(offset:${repliesOffset},limit:${repliesLimit}) {
@@ -162,11 +250,11 @@ moe-thread {
 
 fragment PostFields on Post {
   id
-  board_id
+  boardId
   resto
   no
   sub
-  trip_id
+  tripId
   name
   email
   com
@@ -175,14 +263,14 @@ fragment PostFields on Post {
     data
   }
   images {
-    image_server
-    image_src
-    image_height
-    image_width
-    thumb_server
-    thumb_src
-    thumb_height
-    thumb_width
+    imageServer
+    imageSrc
+    imageHeight
+    imageWidth
+    thumbServer
+    thumbSrc
+    thumbHeight
+    thumbWidth
   }
   poll {
     subject
@@ -197,9 +285,9 @@ fragment PostFields on Post {
     dislike
     rated
   }
-  created_at
+  createdAt
 }`;
     }
 }
 
-window.customElements.define('moe-page', MoePage);
+window.customElements.define('moe-threads', MoeThreads);

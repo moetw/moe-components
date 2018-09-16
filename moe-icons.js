@@ -1,7 +1,6 @@
-import '@polymer/iron-icon/iron-icon.js';
-import '@polymer/iron-iconset-svg/iron-iconset-svg.js';
-
 import {html} from '@polymer/polymer/lib/utils/html-tag.js';
+
+import '@polymer/iron-iconset-svg/iron-iconset-svg.js';
 
 const template = html`<iron-iconset-svg name="moe" size="24">
 <svg><defs>
