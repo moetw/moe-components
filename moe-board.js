@@ -157,8 +157,8 @@ moe-threads {
     <iron-pages role="main" selected="[[routeData.page]]" attr-for-selected="name" selected-attribute="visible" fallback-selection="404">
         <div name=""></div>
         <moe-threads name="threads" id="threads" route="{{threadsRoute}}" graphql-server="[[graphqlServer]]" 
-                     board-id="[[boardId]]" threads-per-page="5" replies-per-thread="3"
-                     image-servers="[[imageServers]]"></moe-threads>
+                     board-id="[[boardId]]" board-alias="[[boardAlias]]" board-subdomain="[[boardSubdomain]]" 
+                     threads-per-page="5" replies-per-thread="1" image-servers="[[imageServers]]"></moe-threads>
         <div name="404"><h1>404</h1></div>
     </iron-pages>
     
@@ -203,7 +203,10 @@ moe-threads {
             boardId: {
                 type: Number
             },
-            boardName: {
+            boardAlias: {
+                type: String
+            },
+            boardSubdomain: {
                 type: String
             },
             page: {

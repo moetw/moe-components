@@ -1,35 +1,48 @@
 import {html, PolymerElement} from "@polymer/polymer/polymer-element";
-import '@polymer/paper-ripple';
-import '@polymer/paper-menu-button';
-import '@polymer/paper-icon-button';
-import '@polymer/paper-listbox';
-import '@polymer/paper-item';
+import '@polymer/paper-button';
+import '@polymer/paper-icon-button/paper-icon-button-light';
+import '@polymer/paper-styles/paper-styles';
 
 class MoePostMenuActionButton extends PolymerElement {
     static get template() {
         return html`
 <style>
 :host {
-    display: block;
+    display: inline-block;
+    position: relative;
+    padding: 8px;
+    outline: none;
 }
-paper-listbox {
-    min-width: 5em;
-    z-index: 100;
+.dropdown-content {
+    @apply --shadow-elevation-2dp;
+    
+    position: absolute;
+    right: 0.5em;
+    top: 0.5em;
+    border-radius: 2px;
+    background-color: var(--paper-menu-button-dropdown-background, var(--primary-background-color));
+    z-index: 999;
 }
 </style>
-<paper-menu-button class="post-action-button" horizontal-align="right">
-    <paper-icon-button icon="more-vert" slot="dropdown-trigger" alt="more-vert" ></paper-icon-button>
-    <paper-listbox slot="dropdown-content">
-        <template is="dom-repeat" items="{{items}}">
+<paper-icon-button-light icon="more-vert" slot="dropdown-trigger" alt="more-vert" on-click="_onMoreClick">
+    <button title="more-vert"><iron-icon icon="more-vert"></iron-icon></button>
+</paper-icon-button-light>
+<template is="dom-if" if="[[displayItem]]">
+    <div id="menu" class="dropdown-content">
+        <template is="dom-repeat" items="[[items]]">
             <moe-post-menu-action-item board-id="[[boardId]]" no="[[no]]" action="[[item.action]]" text="[[item.text]]"></moe-post-menu-action-item>
         </template>
-    </paper-listbox>
-</paper-menu-button>
+    </div>
+</template>
 `;
     }
 
     static get properties() {
         return {
+            displayItem: {
+                type: Boolean,
+                value: false
+            },
             items: {
                 type: Array,
                 computed: '_computeItems(isAdmin, isFirstPost)'
@@ -51,6 +64,13 @@ paper-listbox {
         };
     }
 
+    ready() {
+        super.ready();
+        this.addEventListener('blur', () => {
+            this.displayItem = false;
+        });
+    }
+
     _computeItems(isAdmin, isFirstPost) {
         const items = [
             {text: '回應', action: 'reply', icon: 'reply'},
@@ -67,6 +87,10 @@ paper-listbox {
         return items;
     }
 
+    _onMoreClick(e) {
+        this.displayItem = !this.displayItem;
+    }
+
     _onItemClick(e) {
         console.log(e.currentTarget);
     }
@@ -77,17 +101,22 @@ class MoePostMenuActionItem extends PolymerElement {
         return html`
 <style>
 :host {
-    display: block;
+    @apply --layout-horizontal;
+    @apply --layout-center;
+    @apply --paper-font-subhead;
 }
-paper-item:hover {
+paper-button {
+    margin: 0;
+    border-radius: 0;
+}
+paper-button:hover {
     cursor: pointer;
     background-color: var(--paper-grey-300);
 }
 </style>
-<paper-item on-click="_onClick">
+<paper-button on-click="_onClick">
     [[text]]
-    <paper-ripple></paper-ripple>
-</paper-item>
+</paper-button>
 `;
     }
 
@@ -109,15 +138,7 @@ paper-item:hover {
     }
 
     _onClick(e) {
-        this.dispatchEvent(new CustomEvent('postActionMenuItemClick', {
-            composed: true,
-            bubbles: true,
-            detail: {
-                board_id: this.boardId,
-                no: this.no,
-                action: this.action
-            }
-        }));
+        this.blur();
     }
 }
 

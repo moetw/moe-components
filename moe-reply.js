@@ -18,15 +18,17 @@ class MoeReply extends PolymerElement {
     @apply --layout-self-stretch;
     justify-content: space-between;
     height: auto;
-    
 }
 
 .post-body {
     @apply --layout-self-stretch; 
     @apply --paper-font-body1;
+    padding: 1em 1em 0 1em;
+}
+
+#comment { 
     min-height: 5em;
     max-height: 50vh;
-    padding: 1em 1em 0 1em;
     overflow: hidden;
     transition: max-height 0.5s;
 }
@@ -56,7 +58,8 @@ moe-post-menu-action-button {
 
 <moe-embeds embeds="[[embeds]]"></moe-embeds>
 <div class="post-body" id="postBody">
-    <moe-post-menu-action-button board-id="[[boardId]]" no="[[no]]"></moe-post-menu-action-button>
+    <!-- TODO: Optimize performance of moe-post-menu-action-button -->
+    <moe-post-menu-action-button board-id="[[boardId]]" no="[[no]]"></moe-post-menu-action-button> 
     
     <template is="dom-repeat" items="[[images]]" as="image">
         <a target="_blank" href="[[image.imageSrc]]">
@@ -110,11 +113,11 @@ moe-post-menu-action-button {
     }
 
     _onMoePostCommentProcessed() {
-        this.set('displayShowMore', this.$.postBody.scrollHeight > this.$.postBody.clientHeight);
+        this.set('displayShowMore', this.$.comment.scrollHeight > this.$.comment.clientHeight);
     }
 
     _onShowMoreClick() {
-        this.$.postBody.style.maxHeight = this.$.postBody.scrollHeight + 'px';
+        this.$.comment.style.maxHeight = this.$.comment.scrollHeight + 'px';
         this.set('displayShowMore', false);
     }
 }

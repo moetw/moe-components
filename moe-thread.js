@@ -27,6 +27,8 @@ import './moe-rate';
 import './moe-reply';
 import './moe-styles';
 import './moe-video';
+import './moe-graphql';
+import {MoeGraphQL} from "./moe-graphql";
 
 /**
  * `moe-thread`
@@ -131,7 +133,6 @@ class MoeThread extends PolymerElement {
         display: block;
     }
     
-    
     moe-post-image {
         position: relative;
     }
@@ -158,22 +159,32 @@ class MoeThread extends PolymerElement {
         @apply --layout-self-center;
         background-color: var(--moe-thread-more-replies-button-background-color);
         margin: 0;
-        padding: 1em;
         position: sticky;
         top: 0px;
         z-index: 100;
+        height: 3em;
     }
     .more-replies .more-replies-text {
+        @apply --layout-self-center;
         color: var(--moe-thread-more-replies-button-text-color);
     }
     .more-replies:hover {
         cursor: pointer;
         background-color: var(--moe-thread-more-replies-button-hover-background-color);
     }
+    .more-replies-loading:hover {
+        cursor: none;
+        background-color: var(--moe-thread-more-replies-button-background-color);
+    }
     .more-replies iron-icon {
         --iron-icon-height: 1.5em;
         --iron-icon-width: 1.5em;
         padding: 0 0.2em;
+    }
+    .more-replies paper-spinner-lite {
+        @apply --layout-self-center;
+        --paper-spinner-color: var(--moe-thread-more-replies-button-text-color);
+        position: absolute;
     }
     
     paper-tooltip {
@@ -280,10 +291,19 @@ class MoeThread extends PolymerElement {
         
         <!-- show more replies -->
         <template is="dom-if" if="[[showMoreReplies]]">
-            <div class="more-replies" on-click="_onMoreRepliesClick">
-                <div class="more-replies-text"><iron-icon icon="expand-more"></iron-icon>展開 [[omittedReplyCount]] 篇被省略的回應</div>            
-                <paper-ripple></paper-ripple>
-            </div>
+            <template is="dom-if" if="[[loadingMoreReplies]]">
+                <div class="more-replies more-replies-loading">
+                    <paper-spinner-lite active></paper-spinner-lite>
+                </div>                                    
+            </template>
+            
+            <template is="dom-if" if="[[notLoadingMoreReplies]]">
+                <div class="more-replies" on-click="_onMoreRepliesClick">
+                    <div class="more-replies-text">
+                        <iron-icon icon="expand-more"></iron-icon>展開 [[omittedReplyCount]] 篇被省略的回應
+                    </div>            
+                </div>
+            </template>
         </template>
         
         <!-- replies -->
@@ -292,12 +312,12 @@ class MoeThread extends PolymerElement {
                 <moe-reply board-id="[[reply.boardId]]" no="[[reply.no]]" embeds="[[reply.embeds]]"
                            images="[[reply.images]]" com="[[reply.com]]" trip-id="[[reply.tripId]]"
                            created-at="[[reply.createdAt]]">
-                </moe-reply>                
+                </moe-reply>
             </template>
         </div>
     </div>
 </paper-card>
-    `;
+<moe-graphql id="moeGraphQL" server="[[graphqlServer]]"></moe-graphql>`;
     }
 
     static get properties() {
@@ -310,6 +330,12 @@ class MoeThread extends PolymerElement {
             boardId: {
                 type: Number
             },
+            boardAlias: {
+                type: String
+            },
+            boardSubdomain: {
+                type: String
+            },
             no: {
                 type: Number
             },
@@ -318,13 +344,21 @@ class MoeThread extends PolymerElement {
             },
             omittedReplyCount: {
                 type: Number,
-                computed: '_computeOmittedReplyCount(replyCount, replies)',
+                computed: '_computeOmittedReplyCount(replyCount, replies.length)',
                 reflectToAttribute: true
             },
             showMoreReplies: {
                 type: Boolean,
                 computed: '_computeShowMoreReplies(omittedReplyCount)',
                 reflectToAttribute: true
+            },
+            loadingMoreReplies: {
+                type: Boolean,
+                value: false
+            },
+            notLoadingMoreReplies: {
+                type: Boolean,
+                computed: '_computeNotLoadingMoreReplies(loadingMoreReplies)'
             },
             flagAdminSticky: {
                 type: Boolean
@@ -349,7 +383,13 @@ class MoeThread extends PolymerElement {
             showFirstPostEmebeds: {
                 type: Boolean,
                 computed: '_computeShowFirstPostEmbeds(firstpost)'
-            }
+            },
+            graphqlServer: {
+                type: String
+            },
+            imageServers: {
+                type: Object
+            },
         };
     }
 
@@ -370,12 +410,16 @@ class MoeThread extends PolymerElement {
         return firstpost.poll && firstpost.poll.items && firstpost.poll.items.length > 0;
     }
 
-    _computeOmittedReplyCount(replyCount, replies) {
-        return replyCount - replies.length;
+    _computeOmittedReplyCount(replyCount, repliesLength) {
+        return replyCount - repliesLength;
     }
 
     _computeShowMoreReplies(omittedReplyCount) {
         return omittedReplyCount > 0;
+    }
+
+    _computeNotLoadingMoreReplies(loadingMoreReplies) {
+        return !loadingMoreReplies;
     }
 
     _onThreadHeaderNoClick() {
@@ -401,6 +445,10 @@ class MoeThread extends PolymerElement {
     }
 
     _onMoreRepliesClick() {
+        if (this.loadingMoreReplies) return;
+
+        this.set('loadingMoreReplies', true);
+
         this.dispatchEvent(new CustomEvent('threadMoreRepliesClick', {
             composed: true,
             bubbles: true,
@@ -409,6 +457,17 @@ class MoeThread extends PolymerElement {
                 no: this.get('no')
             }
         }));
+
+        this.$.moeGraphQL
+            .getMoreReplies(this.boardId, this.no, this.replies[0].no, 100)
+            .then(resp => {
+                this.set('replies', resp.data.getMoreReplies.map(p => this._postTransformer(p)).reverse().concat(this.replies));
+            })
+            .finally(() => this.set('loadingMoreReplies', false));
+    }
+
+    _postTransformer(post) {
+        return MoeGraphQL.postTransformer(this.boardSubdomain, this.boardAlias, this.imageServers, post);
     }
 }
 

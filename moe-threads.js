@@ -3,9 +3,9 @@ import '@polymer/paper-spinner/paper-spinner-lite'
 import '@polymer/paper-styles/paper-styles';
 import '@polymer/paper-button/paper-button';
 import '@polymer/iron-icons/image-icons';
-import FetchQL from 'fetchql'
 import './moe-styles.js';
 import './moe-thread.js';
+import {MoeGraphQL} from './moe-graphql';
 
 class MoeThreads extends PolymerElement {
     static get template() {
@@ -52,14 +52,17 @@ moe-thread {
 </template>
 <template is="dom-repeat" items="[[threads]]" as="thread">
     <moe-thread 
-        is-admin="[[isAdmin]]" 
+        is-admin="[[isAdmin]]"
+        board-id="[[boardId]]" board-alias="[[boardAlias]]" board-subdomain="[[boardSubdomain]]"
         no="[[thread.no]]" 
         reply-count="[[thread.replyCount]]" 
         flag-admin-sticky="[[thread.flagAdminSticky]]"
         flag-admin-thread-stop="[[thread.flagAdminThreadStop]]"
         flag-admin-sage="[[thread.flagAdminSage]]"
         firstpost="[[thread.firstPost]]"
-        replies="[[thread.replies]]">
+        replies="[[thread.replies]]"
+        graphql-server="[[graphqlServer]]"
+        image-servers="[[imageServers]]">
     </moe-thread>
 </template>
 <div id="paginator">
@@ -71,6 +74,9 @@ moe-thread {
     </template>
 </div>
 
+<!-- GraphQL -->
+<moe-graphql id="moeGraphQL" server="[[graphqlServer]]"></moe-graphql>
+
 <!-- Route -->
 <app-route pattern="/" route="{{route}}" data="{{routeData}}" active="{{active}}"></app-route>
 <app-route pattern="/:page" route="{{route}}" data="{{routeData}}" active="{{active}}"></app-route>
@@ -79,6 +85,16 @@ moe-thread {
 
     static get properties() {
         return {
+            boardId: {
+                type: Number
+            },
+            boardAlias: {
+                type: String
+            },
+            boardSubdomain: {
+                type: String
+            },
+
             route: {
                 type: Object,
                 notify: true
@@ -104,9 +120,6 @@ moe-thread {
                 value: [],
                 reflectToAttribute: true,
                 notify: true
-            },
-            boardId: {
-                type: Number
             },
             page: {
                 type: Number,
@@ -141,41 +154,23 @@ moe-thread {
     }
 
     load() {
-        var board;
-
         window.scrollTo(0, 0);
 
-        const postTransformer = (p) => Object.assign({}, p, {
-            images: p.images.map(imageTransformer)
-        });
-
-        const imageTransformer = (image) => {
-            const imageResolver = (sv) => (typeof this.imageServers[sv] === 'function' ? this.imageServers[sv] : (f) => f);
-            return Object.assign({}, image, {
-                imageSrc: imageResolver(image.imageServer)(image.imageSrc, board.user.subdomain, board.alias),
-                thumbSrc: imageResolver(image.thumbServer)(image.thumbSrc, board.user.subdomain, board.alias),
-            });
-        };
-
-        const query = this._queryThreads(this.boardId, this.page * this.threadsPerPage, this.threadsPerPage, 0, this.repliesPerThread);
-        const fetchQL = new FetchQL({
-            url: this.graphqlServer
-        });
         this.set('loading', true);
-        fetchQL
-            .query({
-                operationName: '',
-                query
-            })
+        this.$.moeGraphQL
+            .getThreads(this.boardId, this.page * this.threadsPerPage, this.threadsPerPage, 0, this.repliesPerThread)
             .then(resp => {
-                board = resp.data.getBoardById;
-                this.set('threads', resp.data.page.threads.map(t => Object.assign({}, t, {
-                    firstPost: postTransformer(t.firstPost),
-                    replies: (t.replies || []).reverse().map(postTransformer)
+                this.set('threads', resp.data.getThreads.map(t => Object.assign({}, t, {
+                    firstPost: this._postTransformer(t.firstPost),
+                    replies: (t.replies || []).reverse().map(reply => this._postTransformer(reply))
                 })));
             })
             .catch(err => console.log(err)) // TODO: error reporting
             .finally(() => this.set('loading', false));
+    }
+
+    _postTransformer(post) {
+        return MoeGraphQL.postTransformer(this.boardSubdomain, this.boardAlias, this.imageServers, post);
     }
 
     reload() {
@@ -217,76 +212,6 @@ moe-thread {
         } else {
             this.set('route.path', '/0');
         }
-    }
-
-    _queryThreads(board_id, threadsOffset, threadsLimit, repliesOffset, repliesLimit) {
-        return `{
-  getBoardById(id: ${board_id}) {
-    id
-    alias
-    user {
-      id
-      subdomain
-    }
-  }
-  page(boardId:${board_id}) {
-    boardId
-    threads(offset:${threadsOffset},limit:${threadsLimit}) {
-      boardId
-      no
-      replyCount
-      flagAdminSticky
-      flagAdminThreadStop
-      flagAdminSage
-      firstPost {
-        ...PostFields
-      }
-      replies(offset:${repliesOffset},limit:${repliesLimit}) {
-        ...PostFields
-      }
-    }
-  }
-}
-
-fragment PostFields on Post {
-  id
-  boardId
-  resto
-  no
-  sub
-  tripId
-  name
-  email
-  com
-  root
-  embeds {
-    data
-  }
-  images {
-    imageServer
-    imageSrc
-    imageHeight
-    imageWidth
-    thumbServer
-    thumbSrc
-    thumbHeight
-    thumbWidth
-  }
-  poll {
-    subject
-    items {
-      text
-      votes
-    }
-    voted
-  }
-  rate {
-    like
-    dislike
-    rated
-  }
-  createdAt
-}`;
     }
 }
 
