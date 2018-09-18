@@ -308,7 +308,7 @@ class MoeThread extends PolymerElement {
         
         <!-- replies -->
         <div class="replies">
-            <template id="repliesDomRepeat" is="dom-repeat" items="[[replies]]" as="reply" index-as="reply_i" initial-count="3" sort="_sortReplies">
+            <template id="repliesDomRepeat" is="dom-repeat" items="[[replies]]" as="reply" index-as="reply_i" initial-count="[[initialReplyCount]]" sort="_sortReplies">
                 <moe-reply board-id="[[reply.boardId]]" no="[[reply.no]]" embeds="[[reply.embeds]]"
                            images="[[reply.images]]" com="[[reply.com]]" trip-id="[[reply.tripId]]"
                            created-at="[[reply.createdAt]]">
@@ -341,6 +341,9 @@ class MoeThread extends PolymerElement {
             },
             replyCount: {
                 type: Number
+            },
+            initialReplyCount: {
+                type: Number,
             },
             omittedReplyCount: {
                 type: Number,

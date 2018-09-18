@@ -1,18 +1,20 @@
 import {html, PolymerElement} from "@polymer/polymer/polymer-element";
+import './moe-styles';
 
 class MoeQuoteLink extends PolymerElement {
     static get template() {
         return html`
 <style>
 :host {
-    display: inline-block;
-}
-span {
+    display: inline;
     color: var(--moe-post-quote-link-color);
 }
-span:hover {
+:host(:hover) {
     cursor: pointer;
     color: var(--moe-post-quote-link-hover-color);
+}
+span:before {
+    content: '>>';
 }
 </style>
 <span on-click="_onClick"><slot></slot></span>
@@ -27,7 +29,7 @@ span:hover {
         };
     }
 
-    _onClick() {
+    _onClick(e) {
         this.dispatchEvent(new CustomEvent('quoteLinkClick', {
             bubbles: true,
             composed: true,

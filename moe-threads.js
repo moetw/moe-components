@@ -62,7 +62,8 @@ moe-thread {
         firstpost="[[thread.firstPost]]"
         replies="[[thread.replies]]"
         graphql-server="[[graphqlServer]]"
-        image-servers="[[imageServers]]">
+        image-servers="[[imageServers]]"
+        initial-reply-count="[[repliesPerThread]]">
     </moe-thread>
 </template>
 <div id="paginator">

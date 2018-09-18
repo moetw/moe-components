@@ -362,7 +362,6 @@ app-drawer a paper-button:hover {
 
     ready() {
         super.ready();
-        this.$.drawer.open();
     }
 
     goHome() {

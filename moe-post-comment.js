@@ -1,5 +1,6 @@
 import {html, PolymerElement} from "@polymer/polymer/polymer-element";
 import DOMPurify from "dompurify";
+import './moe-quote-link';
 
 class MoePostComment extends PolymerElement {
     static get template() {
@@ -39,16 +40,18 @@ class MoePostComment extends PolymerElement {
 
         let processed = newValue;
 
-        // highlight quotes
-        processed = this._highlightQuotes(processed);
-
         // link quotes
         processed = this._linkQuotes(processed);
+
+        // highlight quotes
+        processed = this._highlightQuotes(processed);
 
         // mod_pushpost
         processed = this._modPushpost(processed);
 
-        this.$.content.innerHTML = DOMPurify.sanitize(processed);
+        this.$.content.innerHTML = DOMPurify.sanitize(processed, {
+            ALLOWED_TAGS: ['br', 'code', 'pre', 'span', 'div', 'moe-quote-link']
+        });
 
         this.$.content.querySelectorAll('img').forEach(img => {
             img.addEventListener('load', () => {
@@ -67,7 +70,7 @@ class MoePostComment extends PolymerElement {
 
     _linkQuotes(text) {
         const regex = /((?:&gt;|＞)+)(?:No\.)?(\d+)/i;
-        const subst = '<moe-quote-link no="$2">&gt;No.$2</moe-quote-link>';
+        const subst = '<moe-quote-link no="$2">No.$2</moe-quote-link>';
         return text.replace(regex, subst);
     }
 
