@@ -42,6 +42,10 @@ class MoeBoardLoader extends PolymerElement {
                 board.boardDescription = resp.data.getBoardById.description;
                 board.boardAlias = resp.data.getBoardById.alias;
                 board.boardSubdomain = resp.data.getBoardById.user.subdomain;
+                board.boardExternalLinks = [
+                    {title: '外部連結1', links: resp.data.getBoardById.config.topLinks},
+                    {title: '外部連結2', links: resp.data.getBoardById.config.descriptionLinks}
+                ];
                 board.graphqlServer = this.graphqlServer;
                 this.$.boardContainer.innerHTML = '';
                 this.$.boardContainer.appendChild(board);
@@ -51,7 +55,9 @@ class MoeBoardLoader extends PolymerElement {
     }
 
     _observeBoardId() {
-        this.load();
+        if (this.boardId) {
+            this.load();
+        }
     }
 }
 

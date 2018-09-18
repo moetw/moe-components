@@ -198,9 +198,14 @@ moe-thread {
         return threads.length > 0;
     }
 
-    _observePage() {
+    _observePage(newValue) {
         this.set('threads', []);
         this.load();
+        this.dispatchEvent(new CustomEvent('page-change', {
+            detail: {
+                page: newValue
+            }
+        }));
     }
 
     _observeRoutePage() {

@@ -1,8 +1,25 @@
 import {html} from '@polymer/polymer/lib/utils/html-tag.js';
+
 const template = html`
 <custom-style>
   <style is="custom-style">
     html {
+
+        /* http://mcg.mbitson.com/#!?mcgpalette0=%237e1012&themename=futaba */
+        --palette-50: rgb(240, 226, 227);
+        --palette-100: rgb(216, 183, 184);
+        --palette-200: rgb(191, 136, 137);
+        --palette-300: rgb(165, 88, 89);
+        --palette-400: rgb(145, 52, 54);
+        --palette-500: rgb(126, 16, 18);
+        --palette-600: rgb(118, 14, 16);
+        --palette-700: rgb(107, 12, 13);
+        --palette-800: rgb(97, 9, 10);
+        --palette-900: rgb(78, 5, 5);
+        --palette-A100:rgb(255, 130, 130);
+        --palette-A200:rgb(255, 79, 79);
+        --palette-A400:rgb(255, 28, 28);
+        --palette-A700:rgb(255, 3, 3);
 
         --futaba-red-color: #800000;
         --futaba-pink-color: #f0e0d6;   
@@ -40,7 +57,8 @@ const template = html`
         --moe-poll-background-color: #fffde5;
         --moe-poll-title-color: var(--futaba-red-color);
         --moe-poll-text-color: var(--futaba-red-color);
-        --moe-poll-unvoted-item-background-color: #ffe; 
+        --moe-poll-unvoted-item-background-color: #ffe;
+ 
     }
 
   </style>

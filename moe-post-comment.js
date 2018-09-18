@@ -28,15 +28,16 @@ class MoePostComment extends PolymerElement {
     static get properties() {
         return {
             comment: {
-                type: String
+                type: String,
+                observer: '_observeComment'
             }
         };
     }
 
-    ready() {
-        super.ready();
+    _observeComment(newValue) {
+        if (!newValue) return;
 
-        let processed = this.comment;
+        let processed = newValue;
 
         // highlight quotes
         processed = this._highlightQuotes(processed);

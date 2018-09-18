@@ -46,6 +46,16 @@ export class MoeGraphQL extends PolymerElement {
             id
             subdomain
         }
+        config {
+            topLinks {
+                link
+                text
+            }
+            descriptionLinks {
+                link
+                text
+            }
+        }
     }
 }`
         });

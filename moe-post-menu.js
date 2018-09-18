@@ -2,6 +2,7 @@ import {html, PolymerElement} from "@polymer/polymer/polymer-element";
 import '@polymer/paper-button';
 import '@polymer/paper-icon-button/paper-icon-button-light';
 import '@polymer/paper-styles/paper-styles';
+import '@polymer/iron-icon/iron-icon';
 
 class MoePostMenuActionButton extends PolymerElement {
     static get template() {
@@ -22,6 +23,7 @@ class MoePostMenuActionButton extends PolymerElement {
     border-radius: 2px;
     background-color: var(--paper-menu-button-dropdown-background, var(--primary-background-color));
     z-index: 999;
+    padding: 8px 0;
 }
 </style>
 <paper-icon-button-light icon="more-vert" slot="dropdown-trigger" alt="more-vert" on-click="_onMoreClick">
@@ -30,7 +32,7 @@ class MoePostMenuActionButton extends PolymerElement {
 <template is="dom-if" if="[[displayItem]]">
     <div id="menu" class="dropdown-content">
         <template is="dom-repeat" items="[[items]]">
-            <moe-post-menu-action-item board-id="[[boardId]]" no="[[no]]" action="[[item.action]]" text="[[item.text]]"></moe-post-menu-action-item>
+            <moe-post-menu-action-item board-id="[[boardId]]" no="[[no]]" action="[[item.action]]" text="[[item.text]]" icon="[[item.icon]]"></moe-post-menu-action-item>
         </template>
     </div>
 </template>
@@ -101,12 +103,18 @@ class MoePostMenuActionItem extends PolymerElement {
         return html`
 <style>
 :host {
-    @apply --layout-horizontal;
-    @apply --layout-center;
-    @apply --paper-font-subhead;
+    display: block;
+    color: black;
+    width: 120px;
 }
 paper-button {
+    @apply --layout-horizontal;
+    @apply --paper-font-subhead;
+    justify-content: space-around;
+    text-align: left;
     margin: 0;
+    padding-right: 16px;
+    padding-left: 16px;
     border-radius: 0;
 }
 paper-button:hover {
@@ -115,7 +123,8 @@ paper-button:hover {
 }
 </style>
 <paper-button on-click="_onClick">
-    [[text]]
+    <iron-icon icon="[[icon]]"></iron-icon>
+    <span>[[text]]</span>
 </paper-button>
 `;
     }
@@ -132,6 +141,9 @@ paper-button:hover {
                 type: String
             },
             text: {
+                type: String
+            },
+            icon: {
                 type: String
             }
         };

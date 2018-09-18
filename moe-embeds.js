@@ -55,7 +55,7 @@ moe-video {
         const embeds = newValue || [];
         if (embeds.length) {
             this.style.display = 'block';
-            this.$.video.data = embeds.map(embed => JSON.parse(embed.data));
+            this.$.video.set('data', embeds.map(embed => JSON.parse(embed.data)));
         } else {
             this.style.display = 'none';
         }

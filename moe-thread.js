@@ -308,7 +308,7 @@ class MoeThread extends PolymerElement {
         
         <!-- replies -->
         <div class="replies">
-            <template is="dom-repeat" items="[[replies]]" as="reply" index-as="reply_i">
+            <template id="repliesDomRepeat" is="dom-repeat" items="[[replies]]" as="reply" index-as="reply_i" initial-count="3" sort="_sortReplies">
                 <moe-reply board-id="[[reply.boardId]]" no="[[reply.no]]" embeds="[[reply.embeds]]"
                            images="[[reply.images]]" com="[[reply.com]]" trip-id="[[reply.tripId]]"
                            created-at="[[reply.createdAt]]">
@@ -461,13 +461,33 @@ class MoeThread extends PolymerElement {
         this.$.moeGraphQL
             .getMoreReplies(this.boardId, this.no, this.replies[0].no, 100)
             .then(resp => {
-                this.set('replies', resp.data.getMoreReplies.map(p => this._postTransformer(p)).reverse().concat(this.replies));
+                resp.data.getMoreReplies.map(p => this._postTransformer(p)).forEach(reply => {
+                    this.replies.unshift(reply);
+                });
+
+                this.notifySplices('replies', [{
+                    index: 0,
+                    removed: [],
+                    addedCount: resp.data.getMoreReplies.length,
+                    object: this.replies,
+                    type: 'splice'
+                }]);
             })
             .finally(() => this.set('loadingMoreReplies', false));
     }
 
     _postTransformer(post) {
         return MoeGraphQL.postTransformer(this.boardSubdomain, this.boardAlias, this.imageServers, post);
+    }
+
+    _sortReplies(a, b) {
+        if (a.no < b.no) {
+            return -1;
+        } else if (a.no > b.no) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
 

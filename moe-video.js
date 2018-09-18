@@ -338,18 +338,18 @@ class MoeVideo extends PolymerElement {
     }
 </style>
 
-<!--<iron-media-query query="(max-width: 600px)" query-matches="{{mobile}}"></iron-media-query>-->
+<!--<iron-media-query query="(max-width: 600px)" query-matches="[[mobile]]"></iron-media-query>-->
 
 <div id="container" class$="[[layoutClasses]]">
     <div id="video" class="flex relative">
-        <template is="dom-if" if="{{showPlaceHolder}}">
-            <div id="placeholder" class="fit" on-click="_handleHolderTap" style="[[placeHolderStyle]]">
+        <template is="dom-if" if="[[showPlaceHolder]]">
+            <div id="placeholder" class="fit" on-click="_handleHolderTap" style$="[[placeHolderStyle]]">
                 <a id="videoLink" href="[[holderHref]]" target="_blank">[[holderTitle]]</a>
                 <iron-icon id="playIcon" icon="[[playIcon]]"></iron-icon>
                 <paper-ripple style="pointer-events: none;"></paper-ripple>
             </div>
         </template>
-        <template is="dom-if" if="{{playing}}" restamp="true">
+        <template is="dom-if" if="[[playing]]" restamp="true">
             <google-youtube
                     id="youtube"
                     height="100%"
@@ -361,16 +361,14 @@ class MoeVideo extends PolymerElement {
             </google-youtube>
         </template>
     </div>
-    <template is="dom-if" if="{{showList}}">
+    <template is="dom-if" if="[[showList]]">
         <div id="list" class="layout vertical">
             <div id="listToolbar" class="layout horizontal center">
                 <paper-icon-button icon="av:skip-previous" action-type="prev" on-click="_handlePlayControl"> </paper-icon-button>
                 <div>
-                    <span>[[selectedVideoIndexDisplay]]</span><span id="listLength">{{data.length}}</span>
+                    <span>[[selectedVideoIndexDisplay]]</span><span id="listLength">[[data.length]]</span>
                 </div>
-                <paper-icon-button icon="av:skip-next" action-type="next" on-click="_handlePlayControl"> </paper-icon-button>
-                
-                
+                <paper-icon-button icon="av:skip-next" action-type="next" on-click="_handlePlayControl"> </paper-icon-button>                
             </div>
             <div id="videoSelectorScroller" class="layout flex vertical scroll">
                 <iron-selector id="videoSelector" selected="{{selectedVideoIndex}}">
@@ -399,7 +397,8 @@ class MoeVideo extends PolymerElement {
             data: {
                 type: Array,
                 value: [],
-                observer: '_dataChanged'
+                observer: '_dataChanged',
+                notify: true
             },
             width: {
                 type: String
@@ -440,7 +439,7 @@ class MoeVideo extends PolymerElement {
             },
             placeHolderStyle: {
                 type: String,
-                computed: "_computePlaceHolderStyle(selectedVideoIndex)"
+                computed: "_computePlaceHolderStyle(selectedVideoIndex, data)"
             },
             startVideoIndex: {
                 type: Number,
@@ -541,10 +540,14 @@ class MoeVideo extends PolymerElement {
         if (this.listLength > 1) {
             this.set('list-toggle', true);
         }
+        this.set('selectedVideoIndex', 0);
+        this.set('playing', false);
     }
 
-    _computePlaceHolderStyle(selectedVideoIndex) {
-        return "background-image: url(" + this.data[selectedVideoIndex].thumb + ");";
+    _computePlaceHolderStyle(selectedVideoIndex, data) {
+        if (data.length > 0 && selectedVideoIndex >= 0) {
+            return "background-image: url(" + this.data[selectedVideoIndex].thumb + ");";
+        }
     }
 
     _handleStateChanged(ev) {

@@ -35,7 +35,7 @@ app-header {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: #7E1012;
+    background-color: var(--palette-500);
     color: #fff;
     height: 319px;
     z-index: 100;
@@ -58,15 +58,24 @@ app-header paper-icon-button {
 }
 
 app-toolbar.board-toolbar {
-    background-color: #7E1012;
+    @apply --layout-horizontal;
+    @apply --layout-end-justified;
+    background-color: var(--palette-500);
     z-index: 101;
+}
+
+[main-title] {
+    width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 app-toolbar.board-title {
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-around;
-    background-color: #974F50;
+    background-color: var(--palette-400);
     height: 175px;
     padding-left: 24px;
     padding-bottom: 30px;
@@ -90,7 +99,7 @@ app-toolbar.board-title {
 }
 
 app-toolbar.board-top-menu {
-    background-color: #7E1012;
+    background-color: var(--palette-300);
     padding-left: 60px;
     height: 50px;
 }
@@ -124,14 +133,102 @@ moe-threads {
     margin: 0 32px 32px 32px;
 }
 
+@media (max-width: 600px) {
+    moe-threads {
+        margin: 0 16px 32px 16px;
+    }     
+}
+
+app-drawer {
+    color: var(--paper-grey-900);
+    --app-drawer-width: 280px;
+}
+
+app-drawer #drawerHeader {
+    @apply --layout-vertical;
+    @apply --layout-center-justified;
+    height: 72px;
+}
+
+app-drawer h1,h2 {
+    width: 100%;
+    margin: 0;
+    padding: 0 24px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+app-drawer h1 {
+    @apply --paper-font-title;
+    font-weight: bold;
+}
+
+app-drawer h1:hover {
+    cursor: pointer;
+}
+
+app-drawer h2 {
+    @apply --paper-font-caption;
+}
+
+app-drawer h3 {
+    @apply --paper-font-common-base;
+    @apply --layout-horizontal;
+    @apply --layout-end;
+    font-weight: 400;
+    font-size: 18px;
+    color: rgb(32, 33, 36);
+    padding: 40px 0 12px 24px;
+    margin: 0;
+    line-height: 27px;
+}
+
+app-drawer hr {
+    margin: 0;
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+}
+
+app-drawer a {
+    @apply --layout-horizontal;
+    @apply --layout-center-justified;
+    text-decoration: none;
+    width: 100%;
+}
+
+app-drawer a paper-button {
+    @apply --layout-horizontal;
+    @apply --layout-justified;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgb(95, 99, 104);
+    margin: 0 0;
+    width: 100%;
+    padding: 12px 0 12px 24px;
+}
+
+app-drawer ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 40px;
+}
+
+app-drawer a paper-button:hover {
+    background-color: var(--paper-grey-300);
+}
+
 </style>
 <app-header-layout fullbleed>
     <app-header slot="header" condenses reveals shadow effects="waterfall parallax-background blend-background" style="width: 100%">
         <app-toolbar class="board-toolbar">
             <paper-icon-button icon="menu" on-click="_onMenuButtonClick"></paper-icon-button>
-            <div main-title>
+            <div main-title on-click="_onToolBarTitleClick">
                 [[boardName]]
-                <template is="dom-if" if="[[showSubCaption]]">/[[subCaption]]</template>                
+                <template is="dom-if" if="[[showSubCaption]]">
+                    <iron-icon icon="chevron-right"></iron-icon>[[subCaption]]
+                </template>                
             </div>
             <paper-icon-button icon="refresh" on-click="_onRefreshButotnClicked"></paper-icon-button>
             <paper-menu-button allow-outside-scroll horizontal-align="right">
@@ -145,8 +242,8 @@ moe-threads {
         </app-toolbar>
         <app-toolbar class="board-title">
             <div board-title-1 main-title>[[boardName]]</div>
-            <div board-title-2>125 online users</div>
-            <div board-title-3>Your ID: 1Nu1E47h</div>
+            <div board-title-2>[[boardDescription]]</div>
+            <div board-title-3>256個線上使用者</div>
             <div>&nbsp;</div>
         </app-toolbar>
         <app-toolbar class="board-top-menu">
@@ -158,28 +255,37 @@ moe-threads {
         <div name=""></div>
         <moe-threads name="threads" id="threads" route="{{threadsRoute}}" graphql-server="[[graphqlServer]]" 
                      board-id="[[boardId]]" board-alias="[[boardAlias]]" board-subdomain="[[boardSubdomain]]" 
-                     threads-per-page="5" replies-per-thread="1" image-servers="[[imageServers]]"></moe-threads>
+                     threads-per-page="5" replies-per-thread="3" image-servers="[[imageServers]]"
+                     on-page-change="_onThreadsPageChange"></moe-threads>
         <div name="404"><h1>404</h1></div>
     </iron-pages>
     
     <footer>
         <div>Disclaimer: All trademarks and copyrights on this page are owned by their respective parties. Images uploaded are the responsibility of the Poster. Comments are owned by the Poster.</div>
-        <div>mymoe.moe</div>
     </footer>
 
     <paper-fab id="fab-create" icon="create"></paper-fab>
 </app-header-layout>
 
-<!-- TODO Implement drawer -->
-<!--
 <app-drawer id="drawer" swipe-open>
-    <paper-listbox>
-        <paper-item>Item 1<paper-ripple></paper-ripple></paper-item>
-        <paper-item>Item 2<paper-ripple></paper-ripple></paper-item>
-        <paper-item>Item 3<paper-ripple></paper-ripple></paper-item>
-    </paper-listbox>
+    <div id="drawerHeader">
+        <h1 on-click="_onBoardNameClick">[[boardName]]</h1>
+        <h2>[[boardDescription]]</h2>
+    </div>
+    <template is="dom-repeat" items="[[boardExternalLinks]]" as="boardExternalLink">
+        <hr />
+        <h3><span>[[boardExternalLink.title]]</span></h3>
+        <ul>
+            <template is="dom-repeat" items="[[boardExternalLink.links]]" as="externalLink">
+                <li>
+                    <a href$="[[externalLink.link]]" rel="nofollow" target="_blank">
+                        <paper-button>[[externalLink.text]]</paper-button>
+                    </a>
+                </li>
+            </template>
+        </ul>
+    </template>
 </app-drawer>
--->
 
 <!-- Route -->
 <app-location route="{{route}}"></app-location>
@@ -208,6 +314,9 @@ moe-threads {
             },
             boardSubdomain: {
                 type: String
+            },
+            boardExternalLinks: {
+                type: Array
             },
             page: {
                 type: String
@@ -253,9 +362,15 @@ moe-threads {
 
     ready() {
         super.ready();
-        this.addEventListener('moePageChanged', e => {
-            this.set('subCaption', `Page ${e.detail.page + 1}`);
-        });
+        this.$.drawer.open();
+    }
+
+    goHome() {
+        const forceReload = this.$.threads.page === 0;
+        this.set('route.path', '/threads/0');
+        if (forceReload) {
+            this.$.threads.reload();
+        }
     }
 
     _routePageChanged(page) {
@@ -269,7 +384,7 @@ moe-threads {
         }
     }
 
-    _onMenuButtonClick(e) {
+    _onToolBarTitleClick(e) {
         window.scroll({
             top: 0,
             left: 0,
@@ -277,12 +392,21 @@ moe-threads {
         });
     }
 
+    _onMenuButtonClick(e) {
+        this.$.drawer.open();
+    }
+
     _onRefreshButotnClicked() {
-        const forceReload = this.$.threads.page === 0;
-        this.set('route.path', '/threads/0');
-        if (forceReload) {
-            this.$.threads.reload();
-        }
+        this.goHome();
+    }
+
+    _onBoardNameClick() {
+        this.goHome();
+        this.$.drawer.close();
+    }
+
+    _onThreadsPageChange(e) {
+        this.set('subCaption', ` 第 ${e.detail.page} 頁`);
     }
 
     _computeShowSubCaption(subCaption) {
