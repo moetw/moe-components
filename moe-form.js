@@ -1,9 +1,12 @@
-import {html, PolymerElement} from '@polymer/polymer/lib/utils/html-tag.js';
+import {html, PolymerElement} from "@polymer/polymer/polymer-element";
 
 class MoeForm extends PolymerElement {
 
+    static get template() {
+        return html`
+
+`;
+    }
 }
 
-class MoeReplyForm extends PolymerElement {
-
-}
+window.customElements.define('moe-form', MoeForm);

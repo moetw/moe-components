@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>moe-form demo</title>
+
+    <script src="/node_modules/web-animations-js/web-animations-next-lite.min.js"></script>
+    <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script type="module" src="/node_modules/@polymer/font-roboto/roboto.js"></script>
+
+    <script type="module">
+        import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+        import '@polymer/iron-demo-helpers/demo-snippet';
+        import '@polymer/paper-dialog/paper-dialog.js';
+        import '@polymer/paper-button/paper-button.js';
+    </script>
+
+    <script type="module" src="../moe-reply-form.js"></script>
+
+    <custom-style>
+        <style is="custom-style" include="demo-pages-shared-styles">
+            paper-dialog {
+                position: fixed;
+                padding: 0;
+            }
+        </style>
+    </custom-style>
+</head>
+<body>
+<div class="vertical-section-container centered">
+    <h3>Basic moe-form demo</h3>
+    <demo-snippet>
+        <template>
+            <moe-reply-form id="reply-form" comment-max-length="1000" file-max-size="5242880" embed-request-server="https://alleyneblade.dev.mymoe.moe/queensblade/pixmicat.php?mode=module&load=mod_newform"></moe-reply-form>
+            <script>
+                document.querySelector("#reply-form").videoEmbeds = [
+                    {image:'https://i.ytimg.com/vi/ozYarKgydP8/hqdefault.jpg',title:'Fantasy Kaleidoscope - Marisa vs. Reimu Fight'},
+                    {image:'https://i.ytimg.com/vi/dhQpc62ZbNA/hqdefault.jpg',title:'Who is Hakurei Reimu?'},
+                    {image:'https://i.ytimg.com/vi/KVtTNN8jJXU/hqdefault.jpg',title:'Touhou Flash - Neko Miko Reimu (With English Lyrics)'},
+                    {image:'https://i.ytimg.com/vi/fbCMmLV0uMI/hqdefault.jpg',title:'[Touhou] Reimu [Night of Nights]'},
+                    {image:'https://i.ytimg.com/vi/9ZMJ9_kdb9Q/hqdefault.jpg',title:'【東方MMD】 Reimu and Remilia: The Truce Hurts 「Tom and Jerry parody」 『Animated by どてらぽっと』'},
+                    {image:'https://i.ytimg.com/vi/pLA0yIOzsW0/hqdefault.jpg',title:"Reimu's Day"},
+                ];
+            </script>
+        </template>
+    </demo-snippet>
+</div>
+</body>
+</html>
