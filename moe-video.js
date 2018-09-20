@@ -8,7 +8,7 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icons/av-icons';
 import '@polymer/google-youtube/google-youtube';
-import 'lodash/lodash';
+import get from 'lodash/get';
 
 class MoeVideo extends PolymerElement {
 
@@ -503,7 +503,7 @@ class MoeVideo extends PolymerElement {
         // if undeinfed
         // play 0
         if( id === undefined || id === '') {
-            if (!this.data || !_.get(this.data, '0.res_id')) {
+            if (!this.data || !get(this.data, '0.res_id')) {
                 return;
             }
             this.play(this.data[0].res_id);
@@ -552,13 +552,13 @@ class MoeVideo extends PolymerElement {
 
     _handleStateChanged(ev) {
         // ended
-        if(_.get(ev, 'detail.data') === 0) {
+        if(get(ev, 'detail.data') === 0) {
             this._nextVideo();
         }
     }
 
     _handleHolderTap(e){
-        this.play(_.get(this.data, `${this.selectedVideoIndex}.res_id`));
+        this.play(get(this.data, `${this.selectedVideoIndex}.res_id`));
     }
 
     _handleChipTap(e) {
@@ -587,7 +587,7 @@ class MoeVideo extends PolymerElement {
             this.selectedVideoIndex = 0;
         }
 
-        var videoId = _.get(this.data, this.selectedVideoIndex + ".res_id");
+        var videoId = get(this.data, this.selectedVideoIndex + ".res_id");
         if (videoId) {
             this.play(videoId);
         } else {

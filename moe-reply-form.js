@@ -89,7 +89,7 @@ paper-dialog-scrollable {
         </template>
         <span id="imageUploadsMessage"></span>
     </div>
-    <moe-form-video-embed-input id="videoEmbedInput" hidden="[[videoEmbedInputHidden]]" on-submit="_onVideoEmbedInputSubmit" on-cancel="_onVideoEmbedInputCancel"></moe-form-video-embed-input>
+    <moe-form-video-embed-input id="videoEmbedInput" hidden on-submit="_onVideoEmbedInputSubmit" on-cancel="_onVideoEmbedInputCancel"></moe-form-video-embed-input>
     <moe-form-video-embeds embeds="{{videoEmbeds}}" id="videoEmbeds"></moe-form-video-embeds>
     <div id="actions">
         <paper-button raised id="buttonSubmit">送出</paper-button>
@@ -137,10 +137,6 @@ paper-dialog-scrollable {
                 type: Array,
                 notify: true
             },
-            videoEmbedInputHidden: {
-                type: Boolean,
-                value: true
-            },
             embedRequestServer: {
                 type: String
             }
@@ -177,8 +173,13 @@ paper-dialog-scrollable {
     /** Video Embed */
 
     _onVideoEmbedButtonClick(e) {
-        this.videoEmbedInputHidden = !this.videoEmbedInputHidden;
-        this.$.videoEmbedInput.reset();
+        if (this.$.videoEmbedInput.hasAttribute('hidden')) {
+            this.$.videoEmbedInput.removeAttribute('hidden');
+            this.$.videoEmbedInput.focus();
+        } else {
+            this.$.videoEmbedInput.setAttribute('hidden', "true");
+            this.$.videoEmbedInput.reset();
+        }
     }
 
     _onVideoEmbedInputSubmit(e) {
@@ -199,7 +200,7 @@ paper-dialog-scrollable {
     }
 
     _onVideoEmbedInputCancel(e) {
-        this.videoEmbedInputHidden = true;
+        this.$.videoEmbedInput.setAttribute('hidden', "true");
     }
 
     _computeVideoEmbedButtonDisabled(videoEmbedInputDisplay) {

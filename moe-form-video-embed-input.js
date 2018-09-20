@@ -12,6 +12,9 @@ class MoeFormVideoEmbedInput extends PolymerElement {
     @apply --layout-horizontal;
     @apply --layout-center;
 }
+:host([hidden]) {
+    display: none;
+}
 paper-input {
     @apply --layout-flex-auto;
 }
@@ -19,29 +22,19 @@ paper-icon-button {
     @apply --layout-self-end;    
 }
 </style>
-<paper-icon-button icon="cancel" on-click="cancel"></paper-icon-button>
+<paper-icon-button icon="cancel" on-click="cancel" disabled$="[[disabled]]"></paper-icon-button>
 <paper-input id="input" label="影片網址 (Youtube)" disabled$="[[disabled]]" on-keypress="_onVideoEmbedInputKeypress" pattern="^https?://.+$" error-message="必須為HTTP網址" auto-validate></paper-input>
-<paper-icon-button icon="send" on-click="submit"></paper-icon-button>
+<paper-icon-button icon="add" on-click="submit" disabled$="[[disabled]]"></paper-icon-button>
 `;
     }
 
     static get properties() {
         return {
-            hidden: {
-                type: Boolean,
-                value: false
-            },
             disabled: {
                 type: Boolean,
                 value: false
             }
         };
-    }
-
-    static get observers() {
-        return [
-            '_observeHidden(hidden)'
-        ];
     }
 
     reset() {
@@ -54,7 +47,7 @@ paper-icon-button {
     }
 
     submit() {
-        if (!this.valid()) {
+        if (!this.valid() || this.disabled) {
             return false;
         }
 
@@ -76,15 +69,6 @@ paper-icon-button {
     _onVideoEmbedInputKeypress(e) {
         if (e.code === 'Enter') {
             this.submit();
-        }
-    }
-
-    _observeHidden(hidden) {
-        if (hidden) {
-            this.style.display = 'none';
-        } else {
-            this.style.display = 'flex';
-            this.focus();
         }
     }
 }
