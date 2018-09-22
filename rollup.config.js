@@ -5,7 +5,7 @@ export default {
     input: 'moe-components.js',
     output: {
         file: 'build/moe-components.bundle.js',
-        format: 'esm',
+        format: 'umd',
         sourcemap: true
     },
     plugins: [
