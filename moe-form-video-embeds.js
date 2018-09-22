@@ -21,7 +21,7 @@ moe-form-video-embed {
 }
 </style>
 <template is="dom-repeat" items="[[embeds]]" as="embed">
-    <moe-form-video-embed index="[[index]]" image="[[embed.image]]" title="[[embed.title]]" on-remove="_onEmbedRemove"></moe-form-video-embed> 
+    <moe-form-video-embed index="[[index]]" image="[[embed.image]]" title="[[embed.title]]" on-remove="_onEmbedRemove" disabled$="[[disabled]]"></moe-form-video-embed> 
 </template>
 `;
     }
@@ -30,11 +30,17 @@ moe-form-video-embed {
         return {
             embeds: {
                 type: Array,
-                notify: true
+                notify: true,
+                value: []
             },
             embedsSet: {
                 type: Object,
                 value: new Set()
+            },
+            disabled: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
             }
         };
     }

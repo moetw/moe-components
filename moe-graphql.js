@@ -39,13 +39,10 @@ export class MoeGraphQL extends PolymerElement {
             query: `{
     getBoardById(boardId: ${boardId}) {
         id
+        subdomain
         alias
         name
         description
-        user {
-            id
-            subdomain
-        }
         config {
             topLinks {
                 link
@@ -56,6 +53,8 @@ export class MoeGraphQL extends PolymerElement {
                 text
             }
         }
+        embedRequestServer
+        replyRequestServer
     }
 }`
         });
@@ -85,6 +84,24 @@ ${this.FRAGMENT_POST_FIELDS}`
         });
     }
 
+    getReplyAck(boardId, threadNo, no) {
+        return this.fetchQL.query({
+            operationName: '',
+            query: `{
+    getThreadByNo(boardId:${boardId},no:${threadNo}) {
+        boardId
+        no
+        replyCount
+    }
+    getPostByNo(boardId:${boardId},no:${no}) {
+        ...PostFields
+    }
+}
+
+${this.FRAGMENT_POST_FIELDS}`
+        });
+    }
+
     getMoreReplies(boardId, no, before, limit) {
         return this.fetchQL.query({
             operationName: '',
@@ -99,7 +116,7 @@ ${this.FRAGMENT_POST_FIELDS}`
         return `fragment PostFields on Post {
   id
   boardId
-  resto
+  threadNo
   no
   sub
   tripId

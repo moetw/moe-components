@@ -18,12 +18,24 @@
     </script>
 
     <script type="module" src="../moe-reply-form.js"></script>
+    <script type="module" src="../moe-form-dialog.js"></script>
 
     <custom-style>
         <style is="custom-style" include="demo-pages-shared-styles">
-            paper-dialog {
-                position: fixed;
-                padding: 0;
+            moe-form-dialog {
+                width: 500px;
+                top: 0px;
+                left: 0px;
+            }
+
+            @media (max-width: 500px) {
+                moe-form-dialog {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    top: 0;
+                    left: 0;
+                }
             }
         </style>
     </custom-style>
@@ -33,7 +45,9 @@
     <h3>Basic moe-form demo</h3>
     <demo-snippet>
         <template>
-            <moe-reply-form id="reply-form" comment-max-length="1000" file-max-size="5242880" embed-request-server="https://alleyneblade.dev.mymoe.moe/queensblade/pixmicat.php?mode=module&load=mod_newform"></moe-reply-form>
+            <moe-form-dialog>
+                <moe-reply-form id="reply-form" comment-max-length="1000" file-max-size="5242880" embed-request-server="https://alleyneblade.dev.mymoe.moe/queensblade/pixmicat.php?mode=module&load=mod_newform"></moe-reply-form>
+            </moe-form-dialog>
             <script>
                 document.querySelector("#reply-form").videoEmbeds = [
                     {image:'https://i.ytimg.com/vi/ozYarKgydP8/hqdefault.jpg',title:'Fantasy Kaleidoscope - Marisa vs. Reimu Fight'},

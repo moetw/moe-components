@@ -16,6 +16,7 @@
     "@polymer/iron-list": "^3.0.0-pre.25",
     "@polymer/iron-meta": "^3.0.1",
     "@polymer/iron-pages": "^3.0.0",
+    "@polymer/iron-resizable-behavior": "^3.0.1",
     "@polymer/paper-button": "^3.0.0-pre.25",
     "@polymer/paper-card": "^3.0.0-pre.25",
     "@polymer/paper-checkbox": "^3.0.0-pre.25",
@@ -40,8 +41,10 @@
     "lodash": "github:lodash/lodash#6018350ac10d5ce6a5b7db625140b82aeab804df",
     "moment": "^2.22.2",
     "plastic-image": "^3.0.2",
+    "polymer-redux": "github:tur-nr/polymer-redux#polymer-3",
     "pwa-helpers": "^0.8.3",
     "redux": "^4.0.0",
+    "reselect": "^3.0.1",
     "resize-observer": "^1.0.0-alpha.1",
     "simplebar": "^3.0.0-beta.4",
     "web-animations-js": "^2.3.1"
@@ -52,7 +55,7 @@
     "debug": "^3.1.0",
     "node-growl": "^0.1.1",
     "rollup": "^0.65.2",
-    "rollup-plugin-commonjs": "^9.1.6",
+    "rollup-plugin-commonjs": "^9.1.8",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-terser": "^2.0.2",
     "wct-browser-legacy": "^1.0.0"

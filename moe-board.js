@@ -15,9 +15,15 @@ import "@polymer/paper-ripple";
 import "@polymer/app-route/app-route";
 import "@polymer/app-route/app-location";
 import "@polymer/iron-pages/iron-pages";
-import "./moe-threads.js";
 
-class MoeBoard extends PolymerElement {
+import "./moe-threads.js";
+import './moe-form-dialog';
+import './moe-reply-form';
+import './pixmicat-request';
+import {ReduxMixin} from './redux/redux-mixin';
+import * as actions from './redux/redux-actions';
+
+class MoeBoard extends ReduxMixin(PolymerElement) {
     static get template() {
         return html`
 <style>
@@ -38,7 +44,7 @@ app-header {
     background-color: var(--palette-500);
     color: #fff;
     height: 319px;
-    z-index: 100;
+    z-index: 1;
     
     /* TODO: Enable background image styling */
     /**
@@ -61,7 +67,7 @@ app-toolbar.board-toolbar {
     @apply --layout-horizontal;
     @apply --layout-end-justified;
     background-color: var(--palette-500);
-    z-index: 101;
+    z-index: 3;
 }
 
 [main-title] {
@@ -80,7 +86,7 @@ app-toolbar.board-title {
     padding-left: 24px;
     padding-bottom: 30px;
     /* border-bottom: #CA8A44 2px solid; */
-    z-index: 99;
+    z-index: 2;
 }
 
 [board-title-1] {
@@ -108,7 +114,7 @@ app-toolbar.board-top-menu {
     position: fixed;
     right: 28px;
     bottom: 28px;
-    z-index: 999;
+    z-index: 3;
     --paper-fab-background: #F5B93E;
     --paper-fab-keyboard-focus-background: #F5B93E;
 }
@@ -129,13 +135,13 @@ footer {
 }
 
 moe-threads {
-    max-width: 800px;
-    margin: 0 32px 32px 32px;
+    max-width: 720px;
+    margin: 0 auto 32px auto;
 }
 
 @media (max-width: 600px) {
     moe-threads {
-        margin: 0 16px 32px 16px;
+        margin: 0 auto 32px auto;
     }     
 }
 
@@ -219,6 +225,23 @@ app-drawer a paper-button:hover {
     background-color: var(--paper-grey-300);
 }
 
+/** Dialog */
+moe-form-dialog {
+    width: 500px;
+    top: 0;
+    left: 0;
+}
+
+@media (max-width: 500px) {
+    moe-form-dialog {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        top: 0;
+        left: 0;
+    }
+}
+
 </style>
 <app-header-layout fullbleed>
     <app-header slot="header" condenses reveals shadow effects="waterfall parallax-background blend-background" style="width: 100%">
@@ -267,7 +290,7 @@ app-drawer a paper-button:hover {
     <paper-fab id="fab-create" icon="create"></paper-fab>
 </app-header-layout>
 
-<app-drawer id="drawer" swipe-open>
+<app-drawer id="leftDrawer" swipe-open>
     <div id="drawerHeader">
         <h1 on-click="_onBoardNameClick">[[boardName]]</h1>
         <h2>[[boardDescription]]</h2>
@@ -287,7 +310,25 @@ app-drawer a paper-button:hover {
     </template>
 </app-drawer>
 
-<!-- Route -->
+<!-- TODO: display full thread in right drawer -->
+<!--
+<app-drawer id="rightDrawer" swipe-open>
+</app-drawer>
+-->
+
+<!-- Forms -->
+<moe-form-dialog id="replyDialog" hidden>
+    <moe-reply-form id="replyForm" 
+                    board-id="[[boardId]]"
+                    comment-max-length="1000" 
+                    file-max-size="5242880"
+                    embed-request-server="[[embedRequestServer]]"
+                    on-submit="_onReplyFormSubmit"
+                    on-cancel="_onReplyFormCancel"></moe-reply-form>
+</moe-form-dialog>
+<pixmicat-request id="replyRequest" method="POST" server="[[replyRequestServer]]"></pixmicat-request>
+
+<!-- Routes -->
 <app-location route="{{route}}"></app-location>
 <app-route
     pattern="/:page"
@@ -304,6 +345,12 @@ app-drawer a paper-button:hover {
     static get properties() {
         return {
             graphqlServer: {
+                type: String
+            },
+            embedRequestServer: {
+                type: String
+            },
+            replyRequestServer: {
                 type: String
             },
             boardId: {
@@ -362,7 +409,80 @@ app-drawer a paper-button:hover {
 
     ready() {
         super.ready();
+
+        this.addEventListener('post-menu-button-reply-click', (e) => {
+            this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no);
+        });
+
+        this.addEventListener('post-header-no-click', (e) => {
+            this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no);
+        });
+
+        this.addEventListener('thread-header-no-click', (e) => {
+            this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no);
+        });
     }
+
+    /** Form */
+    showReplyForm(boardId, threadNo, replyTo) {
+        this.$.replyDialog.removeAttribute('hidden');
+        this.$.replyDialog.title = `回應 - No.${replyTo}`;
+        this.$.replyForm.setProperties({
+            boardId: boardId,
+            threadNo: threadNo,
+            replyTo: replyTo,
+            comment: `>>No.${replyTo}\n`
+        });
+        setTimeout(() => this.$.replyForm.focus(), 0);
+    }
+
+    _onReplyFormSubmit(e) {
+        this.$.replyForm.setProperties({
+            disabled: true,
+            loading: true
+        });
+
+        this.$.replyRequest.makeReply(
+            e.detail.boardId,
+            e.detail.threadNo,
+            e.detail.comment,
+            "password",
+            e.detail.file,
+            e.detail.videoEmbeds,
+        ).then(res => {
+            // hide form
+            this.$.replyDialog.setAttribute('hidden', 'hidden');
+            this.$.replyForm.reset();
+            // fetch post
+            this.$.threads.dispatchEvent(new CustomEvent('reply-ack', {
+                detail: {
+                    boardId: e.detail.boardId,
+                    threadNo: e.detail.threadNo,
+                    no: res.no
+                }
+            }));
+        }).catch(err => {
+            console.error(err);
+            alert(err.error);
+        }).finally(() => {
+            // remove loading status
+            this.$.replyForm.setProperties({
+                disabled: false,
+                loading: false
+            });
+        });
+    }
+
+    _onReplyFormCancel(e) {
+        if (this.$.replyForm.changed() && !confirm("確定要取消回應嗎？")) {
+            return;
+        }
+
+        this.$.replyDialog.setAttribute('hidden', "hidden");
+        this.$.replyForm.reset();
+    }
+
+    /** Routing */
 
     goHome() {
         const forceReload = this.$.threads.page === 0;
@@ -392,7 +512,7 @@ app-drawer a paper-button:hover {
     }
 
     _onMenuButtonClick(e) {
-        this.$.drawer.open();
+        this.$.leftDrawer.open();
     }
 
     _onRefreshButotnClicked() {
@@ -401,7 +521,7 @@ app-drawer a paper-button:hover {
 
     _onBoardNameClick() {
         this.goHome();
-        this.$.drawer.close();
+        this.$.leftDrawer.close();
     }
 
     _onThreadsPageChange(e) {

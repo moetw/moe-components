@@ -59,7 +59,7 @@ moe-post-menu-action-button {
 <moe-embeds embeds="[[embeds]]"></moe-embeds>
 <div class="post-body" id="postBody">
     <!-- TODO: Optimize performance of moe-post-menu-action-button -->
-    <moe-post-menu-action-button board-id="[[boardId]]" no="[[no]]"></moe-post-menu-action-button> 
+    <moe-post-menu-action-button board-id="[[boardId]]" thread-no="[[threadNo]]" no="[[no]]" flag-admin-thread-stop="[[flagAdminThreadStop]]"></moe-post-menu-action-button> 
     
     <template is="dom-repeat" items="[[images]]" as="image">
         <a target="_blank" href="[[image.imageSrc]]">
@@ -78,13 +78,16 @@ moe-post-menu-action-button {
     <paper-button id="showMore" on-click="_onShowMoreClick"><iron-icon icon="expand-more"></iron-icon>顯示更多</paper-button>                            
 </template>
 
-<moe-post-header board-id="[[boardId]]" no="[[no]]" trip-id="[[tripId]]" created-at="[[createdAt]]"></moe-post-header>
+<moe-post-header board-id="[[boardId]]" thread-no="[[threadNo]]" no="[[no]]" trip-id="[[tripId]]" created-at="[[createdAt]]"></moe-post-header>
 `;
     }
 
     static get properties() {
         return {
             boardId: {
+                type: Number
+            },
+            threadNo: {
                 type: Number
             },
             no: {
@@ -108,7 +111,12 @@ moe-post-menu-action-button {
             displayShowMore: {
                 type: Boolean,
                 value: false
+            },
+            flagAdminThreadStop: {
+                type: Boolean,
+                value: false
             }
+
         };
     }
 

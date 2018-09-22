@@ -22,7 +22,7 @@ class MoePostMenuActionButton extends PolymerElement {
     top: 0.5em;
     border-radius: 2px;
     background-color: var(--paper-menu-button-dropdown-background, var(--primary-background-color));
-    z-index: 999;
+    z-index: 2;
     padding: 8px 0;
 }
 </style>
@@ -32,7 +32,7 @@ class MoePostMenuActionButton extends PolymerElement {
 <template is="dom-if" if="[[displayItem]]">
     <div id="menu" class="dropdown-content">
         <template is="dom-repeat" items="[[items]]">
-            <moe-post-menu-action-item board-id="[[boardId]]" no="[[no]]" action="[[item.action]]" text="[[item.text]]" icon="[[item.icon]]"></moe-post-menu-action-item>
+            <moe-post-menu-action-item board-id="[[boardId]]" thread-no="[[threadNo]]" no="[[no]]" action="[[item.action]]" text="[[item.text]]" icon="[[item.icon]]" on-click="_onItemClick"></moe-post-menu-action-item>
         </template>
     </div>
 </template>
@@ -41,6 +41,15 @@ class MoePostMenuActionButton extends PolymerElement {
 
     static get properties() {
         return {
+            boardId: {
+                type: Number,
+            },
+            threadNo: {
+                type: Number
+            },
+            no: {
+                type: Number,
+            },
             displayItem: {
                 type: Boolean,
                 value: false
@@ -57,12 +66,6 @@ class MoePostMenuActionButton extends PolymerElement {
                 type: Boolean,
                 value: false
             },
-            boardId: {
-                type: Number,
-            },
-            no: {
-                type: Number,
-            },
         };
     }
 
@@ -74,11 +77,16 @@ class MoePostMenuActionButton extends PolymerElement {
     }
 
     _computeItems(isAdmin, isFirstPost) {
-        const items = [
-            {text: '回應', action: 'reply', icon: 'reply'},
+        const items = [];
+
+        if (!this.flagAdminThreadStop) {
+            items.push({text: '回應', action: 'reply', icon: 'reply'})
+        }
+
+        items.push(
             {text: '舉報', action: 'report', icon: 'report'},
-            {text: '刪除', action: 'delete', icon: 'delete'},
-        ];
+            {text: '刪除', action: 'delete', icon: 'delete'}
+        );
 
         if (isAdmin && isFirstPost) {
             items.push({text: '禁止回應', action: 'stopThread', icon: 'moe:thread-stop'});
@@ -94,7 +102,15 @@ class MoePostMenuActionButton extends PolymerElement {
     }
 
     _onItemClick(e) {
-        console.log(e.currentTarget);
+        this.dispatchEvent(new CustomEvent(`post-menu-button-${e.currentTarget.action}-click`, {
+            bubbles: true,
+            composed: true,
+            detail: {
+                boardId: this.boardId,
+                threadNo: this.threadNo,
+                no: this.no
+            }
+        }));
     }
 }
 
@@ -134,6 +150,9 @@ paper-button:hover {
             boardId: {
                 type: Number
             },
+            threadNo: {
+                type: Number
+            },
             no: {
                 type: Number
             },
@@ -145,6 +164,10 @@ paper-button:hover {
             },
             icon: {
                 type: String
+            },
+            flagAdminThreadStop: {
+                type: Boolean,
+                value: false
             }
         };
     }

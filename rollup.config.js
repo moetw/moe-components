@@ -12,7 +12,7 @@ export default {
         resolve(),
         terser({
             sourcemap: true,
-            warnings: true
+            warnings: 'verbose',
         })
     ]
 };

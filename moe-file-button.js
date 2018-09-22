@@ -27,7 +27,7 @@ iron-icon {
     padding-right: 0.5em;
 }
 </style>
-<paper-button>
+<paper-button disabled$="[[disabled]]">
     <iron-icon icon="image:photo"></iron-icon>
     上傳附圖
     <input id="file" type="file" accept$="[[accept]]" on-change="_onFileChange" />
@@ -50,7 +50,13 @@ iron-icon {
                 computed: '_computeFileSelected(file)',
                 notify: true
             },
-        };
+            disabled: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            }
+        }
+        ;
     }
 
     cancel() {

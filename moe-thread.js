@@ -1,4 +1,5 @@
 import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
+import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
 import '@polymer/paper-card/paper-card.js';
 import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -38,7 +39,7 @@ import {MoeGraphQL} from "./moe-graphql";
  * @polymer
  * @demo demo/index.html
  */
-class MoeThread extends PolymerElement {
+class MoeThread extends MutableData(PolymerElement) {
     static get template() {
         return html`
 <style>
@@ -47,11 +48,13 @@ class MoeThread extends PolymerElement {
     }
     
     #thread-card {
-        @apply --shadow-elevation-8dp;
+        @apply --shadow-elevation-6dp;
         @apply --shadow-transition;
         width: 100%;
     }
-    #thread-card:hover, #thread-card:focus, #thread-card:active {
+    
+    /** TODO: focus on reply */
+    :host([focus]) {
         @apply --shadow-elevation-16dp;
         @apply --shadow-transition;
     }
@@ -161,7 +164,7 @@ class MoeThread extends PolymerElement {
         margin: 0;
         position: sticky;
         top: 0px;
-        z-index: 100;
+        z-index: 1;
         height: 3em;
     }
     .more-replies .more-replies-text {
@@ -249,7 +252,7 @@ class MoeThread extends PolymerElement {
     <div class="body">
         <!-- firstpost -->
         <div class="firstpost">
-            <moe-post-menu-action-button board-id="[[firstpost.boardId]]" no="[[firstpost.no]]" is-first-post="true" is-admin="[[isAdmin]]"></moe-post-menu-action-button>
+            <moe-post-menu-action-button board-id="[[firstpost.boardId]]" thread-no="[[firstpost.no]]" no="[[firstpost.no]]" is-first-post="true" is-admin="[[isAdmin]]" flag-admin-thread-stop="[[flagAdminThreadStop]]"></moe-post-menu-action-button>
             <div class="post-subject">
                 <template is="dom-if" if="[[flagAdminSticky]]">
                     <iron-icon id="icon-thread-pin" icon="moe:thread-pin"></iron-icon>
@@ -308,10 +311,10 @@ class MoeThread extends PolymerElement {
         
         <!-- replies -->
         <div class="replies">
-            <template id="repliesDomRepeat" is="dom-repeat" items="[[replies]]" as="reply" index-as="reply_i" initial-count="[[initialReplyCount]]" sort="_sortReplies">
-                <moe-reply board-id="[[reply.boardId]]" no="[[reply.no]]" embeds="[[reply.embeds]]"
+            <template id="repliesDomRepeat" is="dom-repeat" mutable-data items="[[replies]]" as="reply" index-as="reply_i" initial-count="[[initialReplyCount]]" sort="_sortReplies">
+                <moe-reply board-id="[[reply.boardId]]" thread-no="[[no]]" no="[[reply.no]]" embeds="[[reply.embeds]]"
                            images="[[reply.images]]" com="[[reply.com]]" trip-id="[[reply.tripId]]"
-                           created-at="[[reply.createdAt]]">
+                           created-at="[[reply.createdAt]]" flag-admin-thread-stop="[[flagAdminThreadStop]]">
                 </moe-reply>
             </template>
         </div>
@@ -426,40 +429,24 @@ class MoeThread extends PolymerElement {
     }
 
     _onThreadHeaderNoClick() {
-        this.dispatchEvent(new CustomEvent('threadHeaderNoClick', {
+        this.dispatchEvent(new CustomEvent('thread-header-no-click', {
             composed: true,
             bubbles: true,
             detail: {
                 boardId: this.get('boardId'),
+                threadNo: this.get('no'),
                 no: this.get('no')
             }
         }));
     }
 
     _onThreadHeaderReplyCountClick() {
-        this.dispatchEvent(new CustomEvent('threadHeaderReplyCountClick', {
-            composed: true,
-            bubbles: true,
-            detail: {
-                boardId: this.get('boardId'),
-                no: this.get('no')
-            }
-        }));
     }
 
     _onMoreRepliesClick() {
         if (this.loadingMoreReplies) return;
 
         this.set('loadingMoreReplies', true);
-
-        this.dispatchEvent(new CustomEvent('threadMoreRepliesClick', {
-            composed: true,
-            bubbles: true,
-            detail: {
-                boardId: this.get('boardId'),
-                no: this.get('no')
-            }
-        }));
 
         this.$.moeGraphQL
             .getMoreReplies(this.boardId, this.no, this.replies[0].no, 100)
@@ -477,6 +464,19 @@ class MoeThread extends PolymerElement {
                 }]);
             })
             .finally(() => this.set('loadingMoreReplies', false));
+    }
+
+    _onReplyAck(e) {
+        if (e.detail.threadNo === this.no) {
+            this.$.moeGraphQL
+                .getReplyAck(e.detail.boardId, e.detail.threadNo, e.detail.no)
+                .then(resp => {
+                    this.set('replyCount', resp.data.getThreadByNo.replyCount);
+                    if (resp.data.getPostByNo) {
+                        this.push('replies', this._postTransformer(resp.data.getPostByNo));
+                    }
+                });
+        }
     }
 
     _postTransformer(post) {

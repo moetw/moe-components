@@ -46,7 +46,7 @@ paper-icon-button[icon="cancel"] {
 <div id="container">
     <iron-image width="210" height="118" src="[[image]]" sizing="cover"></iron-image>
     <div id="title">[[title]]</div>
-    <paper-icon-button icon="cancel" on-click="_onRemoveButtonClick"></paper-icon-button>
+    <paper-icon-button icon="cancel" on-click="_onRemoveButtonClick" disabled$="[[disabled]]"></paper-icon-button>
 </div>
 `;
     }
@@ -61,6 +61,11 @@ paper-icon-button[icon="cancel"] {
             },
             title: {
                 type: String
+            },
+            disabled: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
             }
         };
     }

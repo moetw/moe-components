@@ -3,12 +3,12 @@ import '@polymer/paper-input/paper-input';
 import '@polymer/paper-input/paper-textarea';
 import '@polymer/paper-button';
 import '@polymer/paper-icon-button';
+import '@polymer/paper-spinner/paper-spinner';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icons/image-icons';
 import '@polymer/iron-icons/av-icons';
 import '@polymer/iron-icon'
 import '@polymer/iron-flex-layout/iron-flex-layout';
-import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable';
 
 import './color';
 import './moe-file-button';
@@ -30,14 +30,6 @@ form {
     @apply --layout-vertical;
     margin: 0;
     padding: 0;
-}
-
-paper-dialog-scrollable {
-    --paper-dialog-scrollable: {
-        padding: 0;
-        overflow-x: hidden;
-        max-height: 500px;
-    }
 }
 
 #imageUploads {
@@ -66,33 +58,41 @@ paper-dialog-scrollable {
     margin-top: 0.5em;
     padding-top: 24px;
 }
-#buttonSubmit {
+#actions paper-button {
     padding-left: 3em;
     padding-right: 3em;
     font-weight: 800;
 }
-
+#buttonSubmit paper-spinner-light:not([active]) {
+    display: none;
+}
 #videoEmbeds {
     margin-top: 1em;
 }
+paper-spinner:not([active]) {
+    display: none;
+}
 </style>
 <form>
-    <h2>回應</h2>
-    <paper-textarea label="內文" char-counter maxlength="[[commentMaxLength]]" value="{{comment}}" rows="3" max-rows="3"></paper-textarea>
+    <paper-textarea id="comment" label="內文" char-counter maxlength="[[commentMaxLength]]" value="{{comment}}" rows="3" max-rows="3" disabled$="[[disabled]]"></paper-textarea>
     <div id="embedButtons">
-        <moe-file-button id="file" file="{{file}}" file-selected="{{fileSelected}}" file-max-size="[[fileMaxSize]]" on-change="_onFileChange"></moe-file-button>            
-        <paper-button on-click="_onVideoEmbedButtonClick"><iron-icon icon="av:movie"></iron-icon>附加影片</paper-button>
+        <moe-file-button id="file" file="{{file}}" file-selected="{{fileSelected}}" file-max-size="[[fileMaxSize]]" on-change="_onFileChange" disabled$="[[disabled]]"></moe-file-button>            
+        <paper-button on-click="_onVideoEmbedButtonClick" disabled$="[[disabled]]"><iron-icon icon="av:movie"></iron-icon>附加影片</paper-button>
     </div>
     <div id="imageUploads">
         <template is="dom-if" if="[[fileSelected]]">
-            <paper-icon-button icon="cancel" on-click="_onCancelImageUploadsClick"></paper-icon-button>
+            <paper-icon-button icon="cancel" on-click="_onCancelImageUploadsClick" disabled$="[[disabled]]"></paper-icon-button>
         </template>
         <span id="imageUploadsMessage"></span>
     </div>
-    <moe-form-video-embed-input id="videoEmbedInput" hidden on-submit="_onVideoEmbedInputSubmit" on-cancel="_onVideoEmbedInputCancel"></moe-form-video-embed-input>
-    <moe-form-video-embeds embeds="{{videoEmbeds}}" id="videoEmbeds"></moe-form-video-embeds>
+    <moe-form-video-embed-input id="videoEmbedInput" hidden on-submit="_onVideoEmbedInputSubmit" on-cancel="_onVideoEmbedInputCancel" disabled$="[[disabled]]"></moe-form-video-embed-input>
+    <moe-form-video-embeds embeds="{{videoEmbeds}}" id="videoEmbeds" disabled$="[[disabled]]"></moe-form-video-embeds>
     <div id="actions">
-        <paper-button raised id="buttonSubmit">送出</paper-button>
+        <paper-button id="buttonCancel" on-click="_onButtonCancelClick" disabled$="[[disabled]]">取消</paper-button>
+        <paper-button raised id="buttonSubmit" on-click="_onButtonSubmitClick" disabled$="[[disabled]]">
+            <div hidden$="[[loading]]">送出</div>
+            <paper-spinner active$="[[loading]]"></paper-spinner>
+        </paper-button>
     </div>
 </form>
 
@@ -102,12 +102,24 @@ paper-dialog-scrollable {
 
     static get properties() {
         return {
+            disabled: {
+                type: Boolean,
+                value: false
+            },
+            loading: {
+                type: Boolean,
+                value: false
+            },
+
+            /** Post properties */
             boardId: {
                 type: Number,
             },
+            threadNo: {
+                type: Number
+            },
             replyTo: {
-                type: Number,
-                observer: '_observeReplyTo'
+                type: Number
             },
 
             /** Comment */
@@ -143,10 +155,41 @@ paper-dialog-scrollable {
         };
     }
 
-    _observeReplyTo(newValue) {
-        if (newValue) {
-            this.set('comment', `>>No.${newValue}`);
-        }
+    /** Form control */
+
+    focus() {
+        this.$.comment.focus();
+
+        const len = this.$.comment.value.length;
+        this.$.comment.inputElement.textarea.setSelectionRange(len, len);
+    }
+
+    reset() {
+        this.$.comment.value = "";
+        this.$.file.cancel();
+        this.videoEmbeds = [];
+        this.$.videoEmbedInput.cancel();
+    }
+
+    changed() {
+        return (this.videoEmbeds && this.videoEmbeds.length) || (this.file) || (this.comment && this.comment.length > 0);
+    }
+
+    _onButtonSubmitClick() {
+        this.dispatchEvent(new CustomEvent('submit', {
+            detail: {
+                boardId: this.boardId,
+                threadNo: this.threadNo,
+                replyTo: this.replyTo,
+                comment: this.comment,
+                file: this.file,
+                videoEmbeds: this.videoEmbeds
+            }
+        }));
+    }
+
+    _onButtonCancelClick() {
+        this.dispatchEvent(new CustomEvent('cancel'));
     }
 
     /** Image Upload */

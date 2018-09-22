@@ -32,7 +32,8 @@ paper-icon-button {
         return {
             disabled: {
                 type: Boolean,
-                value: false
+                value: false,
+                reflectToAttribute: true
             }
         };
     }

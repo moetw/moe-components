@@ -1,4 +1,6 @@
 import {html, PolymerElement} from "@polymer/polymer/polymer-element";
+import '@polymer/paper-tooltip/paper-tooltip';
+
 import moment from "./moment";
 
 class MoePostHeader extends PolymerElement {
@@ -29,7 +31,7 @@ class MoePostHeader extends PolymerElement {
     cursor: pointer;
     background-color: var(--moe-post-header-no-hover-background-color);
 }
-.post-header-id, .post-header-date {
+.post-header-id, #post-header-date {
     flex: 0 1 auto;
     flex-basis: auto;
     text-align: right;
@@ -40,8 +42,16 @@ class MoePostHeader extends PolymerElement {
 .post-header-id {
     color: var(--moe-post-header-id-text-color);
 }
-.post-header-date {
+#post-header-date {
     color: var(--moe-post-header-date-text-color);    
+}
+
+paper-tooltip {
+    --paper-tooltip-delay-out: 0s;
+    --paper-tooltip-delay-in: 0s;
+    --paper-tooltip-duration-out: 0s;
+    --paper-tooltip-duration-in: 0s;
+    white-space: nowrap;
 }
 </style>
 <div class="post-header">
@@ -49,7 +59,8 @@ class MoePostHeader extends PolymerElement {
         <div class="post-header-no-chip">No.[[no]]<paper-ripple></paper-ripple></div>
     </div>
     <div class="post-header-id">ID:[[tripId]]</div>
-    <div class="post-header-date">[[formatCreatedAt(createdAt)]]</div>
+    <div id="post-header-date">[[formatCreatedAt(createdAt)]]</div>
+    <paper-tooltip for="post-header-date" offset="0">[[fullyFormatCreatedAt(createdAt)]]</paper-tooltip>
 </div>
 `;
     }
@@ -57,6 +68,9 @@ class MoePostHeader extends PolymerElement {
     static get properties() {
         return {
             boardId: {
+                type: Number
+            },
+            threadNo: {
                 type: Number
             },
             no: {
@@ -72,19 +86,20 @@ class MoePostHeader extends PolymerElement {
     }
 
     formatCreatedAt(created_at) {
-        return moment(created_at).fromNow();
+        return moment(created_at).calendar();
+    }
+
+    fullyFormatCreatedAt(created_at) {
+        return moment(created_at).toString();
     }
 
     _onPostHeaderNoClick(e) {
-        if (this.hideNo) {
-            return;
-        }
-
-        this.dispatchEvent(new CustomEvent('postHeaderNoClick', {
+        this.dispatchEvent(new CustomEvent('post-header-no-click', {
             composed: true,
             bubbles: true,
             detail: {
                 boardId: this.get('boardId'),
+                threadNo: this.get('threadNo'),
                 no: this.get('no')
             }
         }));

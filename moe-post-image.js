@@ -1,4 +1,5 @@
 import {html, PolymerElement} from "@polymer/polymer";
+import '@polymer/iron-image';
 
 class MoePostImage extends PolymerElement {
     static get template() {
@@ -15,7 +16,7 @@ class MoePostImage extends PolymerElement {
     display: none;
     padding: 0;
     margin: 0;
-    z-index: 999;
+    z-index: 4;
 }
 #img {
     display: block;
@@ -23,29 +24,35 @@ class MoePostImage extends PolymerElement {
 }
 </style>
 <img id="img" src="[[thumbSrc]]" width="[[thumbWidth]]" height="[[thumbHeight]]" on-mouseover="_onMouseOver" on-mouseout="_onMouseOut" on-mousemove="_onMouseMove" />
-<img id="ihover" />
+<img id="ihover" sizing="contain" />
 `;
     }
 
     static get properties() {
         return {
             imageSrc: {
-                type: String
+                type: String,
+                reflectToAttribute: true
             },
             imageHeight: {
-                type: Number
+                type: Number,
+                reflectToAttribute: true
             },
             imageWidth: {
-                type: Number
+                type: Number,
+                reflectToAttribute: true
             },
             thumbSrc: {
-                type: String
+                type: String,
+                reflectToAttribute: true
             },
             thumbHeight: {
-                type: Number
+                type: Number,
+                reflectToAttribute: true
             },
             thumbWidth: {
-                type: Number
+                type: Number,
+                reflectToAttribute: true
             },
             ihoverPadding: {
                 type: Number,
@@ -75,13 +82,25 @@ class MoePostImage extends PolymerElement {
         const imgRect = this.$.img.getBoundingClientRect();
         const doc = window.document.documentElement;
 
-        this.$.ihover.style.maxHeight = doc.clientHeight - this.ihoverPadding * 2 + "px";
-
+        let maxHeight, maxWidth;
+        maxHeight = doc.clientHeight - this.ihoverPadding * 2;
         if (e.clientX < doc.clientWidth / 2) {
-            this.$.ihover.style.maxWidth = doc.clientWidth - imgRect.right - this.ihoverPadding * 2 + "px";
+            maxWidth = doc.clientWidth - imgRect.right - this.ihoverPadding * 2;
         } else {
-            this.$.ihover.style.maxWidth = imgRect.left - this.ihoverPadding * 2 + "px";
+            maxWidth = imgRect.left - this.ihoverPadding * 2;
         }
+
+        let height, width;
+        if (this.imageWidth > this.imageHeight) {
+            width = Math.min(maxWidth, this.imageWidth);
+            height = this.imageHeight * (width / this.imageWidth);
+        } else {
+            height = Math.min(maxHeight, this.imageHeight);
+            width = this.imageWidth * (height / this.imageHeight);
+        }
+
+        this.$.ihover.height = `${height}`;
+        this.$.ihover.width = `${width}`;
     }
 
     _updateIhoverPosition(e) {
