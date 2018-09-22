@@ -1,0 +1,96 @@
+import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
+import '@polymer/paper-button';
+import '@polymer/iron-icons/iron-icons';
+import '@polymer/iron-icon';
+import '@polymer/iron-flex-layout/iron-flex-layout';
+
+import './moe-form-poll-item-input';
+
+class MoeFormPollItems extends PolymerElement {
+    static get template() {
+        return html`
+<style>
+:host {
+    display: block
+}
+#add {
+    @apply --layout-horizontal;
+    @apply --layout-center-center;
+    width: 100%;
+}
+#add > * {
+    height: 24px;
+    line-height: 24px;
+}
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+</style>
+<ul>
+    <template is="dom-repeat" items="[[items]]">
+        <li><moe-form-poll-item-input index="[[index]]" value="[[item.value]]" on-remove="_onItemRemove" disabled$="[[disabled]]"></moe-form-poll-item-input></li>
+    </template>
+</ul>
+<paper-button id="add" on-click="_onAddClick" disabled$="[[disabled]]">
+    <iron-icon icon="add"></iron-icon>
+    <div>新增選項</div>
+</paper-button>
+`;
+    }
+
+    static get properties() {
+        return {
+            items: {
+                type: Array,
+                value: [],
+                notify: true
+            },
+            minItems: {
+                type: Number,
+                value: 2
+            },
+            disabled: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            }
+        }
+    }
+
+    ready() {
+        super.ready();
+        if (this.items.length === 0) {
+            this.reset();
+        }
+    }
+
+    add(value="") {
+        this.push('items', {value});
+        setTimeout(() => {
+            this.shadowRoot.querySelector(`moe-form-poll-item-input[index="${this.items.length-1}"]`).focus();
+        }, 0);
+    }
+
+    reset() {
+        this.splice('items', 0, this.items.length);
+        for (let i = 0;i < this.minItems;i++) {
+            this.push('items', {value:''});
+        }
+    }
+
+    _onAddClick(e) {
+        this.add();
+    }
+
+    _onItemRemove(e) {
+        if (this.items.length <= 2) {
+            alert('至少要有2個選項');
+        } else {
+            this.splice('items', e.currentTarget.index, 1);
+        }
+    }
+}
+
+window.customElements.define('moe-form-poll-items', MoeFormPollItems);

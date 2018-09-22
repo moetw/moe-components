@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>moe-form demo</title>
+
+    <script src="/node_modules/web-animations-js/web-animations-next-lite.min.js"></script>
+    <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script type="module" src="/node_modules/@polymer/font-roboto/roboto.js"></script>
+
+    <script type="module">
+        import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
+        import '@polymer/iron-demo-helpers/demo-snippet';
+        import '@polymer/paper-dialog/paper-dialog.js';
+        import '@polymer/paper-button/paper-button.js';
+    </script>
+
+    <script type="module" src="../moe-form-poll-item-input.js"></script>
+    <script type="module" src="../moe-form-poll-items.js"></script>
+    <script type="module" src="../moe-form-poll-title-input.js"></script>
+
+    <custom-style>
+        <style is="custom-style" include="demo-pages-shared-styles">
+        </style>
+    </custom-style>
+</head>
+<body>
+<div class="vertical-section-container centered">
+    <h3>Basic moe-form demo</h3>
+    <demo-snippet>
+        <template>
+            <paper-button id="button">Insert Poll</paper-button>
+            <div id="container">
+                <moe-form-poll-title-input id="title"></moe-form-poll-title-input>
+                <moe-form-poll-items id="items"></moe-form-poll-items>
+            </div>
+            <script>
+                document.querySelector('#title').focus();
+
+                document.querySelector('#button').addEventListener('click', (e) => {
+                    document.querySelector('#container').removeAttribute('hidden');
+                    document.querySelector('#title').focus()
+                });
+
+                document.querySelector('#title').addEventListener('remove', (e) => {
+                    document.querySelector('#container').setAttribute('hidden', 'hidden');
+                    document.querySelector('#title').reset();
+                    document.querySelector('#items').reset();
+                });
+            </script>
+        </template>
+    </demo-snippet>
+</div>
+</body>
+</html>
