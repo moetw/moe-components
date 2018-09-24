@@ -73,6 +73,10 @@ moe-form-video-embed {
         setTimeout(() => this.scrollLeft = this.scrollWidth, 0);
     }
 
+    reset() {
+        this.splice('embeds', 0, this.embeds.length);
+    }
+
     _observeDisplay(embedsLength) {
         if (embedsLength > 0) {
             this.style.display = 'flex';

@@ -48,7 +48,7 @@ class MoeBoardLoader extends PolymerElement {
                 ];
                 board.graphqlServer = this.graphqlServer;
                 board.embedRequestServer = resp.data.getBoardById.embedRequestServer;
-                board.replyRequestServer = resp.data.getBoardById.replyRequestServer;
+                board.postServer = resp.data.getBoardById.postServer;
                 this.$.boardContainer.innerHTML = '';
                 this.$.boardContainer.appendChild(board);
             })

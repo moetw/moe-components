@@ -13,6 +13,9 @@ class MoeFormPollItems extends PolymerElement {
 :host {
     display: block
 }
+:host([hidden]) {
+    display: none;
+}
 #add {
     @apply --layout-horizontal;
     @apply --layout-center-center;
@@ -30,7 +33,7 @@ ul {
 </style>
 <ul>
     <template is="dom-repeat" items="[[items]]">
-        <li><moe-form-poll-item-input index="[[index]]" value="[[item.value]]" on-remove="_onItemRemove" disabled$="[[disabled]]"></moe-form-poll-item-input></li>
+        <li><moe-form-poll-item-input index="[[index]]" value="{{item}}" on-remove="_onItemRemove" disabled$="[[disabled]]"></moe-form-poll-item-input></li>
     </template>
 </ul>
 <paper-button id="add" on-click="_onAddClick" disabled$="[[disabled]]">
@@ -51,6 +54,10 @@ ul {
                 type: Number,
                 value: 2
             },
+            maxItems: {
+                type: Number,
+                value: 10
+            },
             disabled: {
                 type: Boolean,
                 value: false,
@@ -67,7 +74,12 @@ ul {
     }
 
     add(value="") {
-        this.push('items', {value});
+        if (this.items.length >= this.maxItems) {
+            alert(`最多只能有${this.maxItems}個選項`);
+            return false;
+        }
+
+        this.push('items', value);
         setTimeout(() => {
             this.shadowRoot.querySelector(`moe-form-poll-item-input[index="${this.items.length-1}"]`).focus();
         }, 0);
@@ -76,8 +88,12 @@ ul {
     reset() {
         this.splice('items', 0, this.items.length);
         for (let i = 0;i < this.minItems;i++) {
-            this.push('items', {value:''});
+            this.push('items', '');
         }
+    }
+
+    changed() {
+        return !this.items.every(item => item === '');
     }
 
     _onAddClick(e) {

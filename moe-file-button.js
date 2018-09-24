@@ -14,6 +14,9 @@ class MoeFileButton extends PolymerElement {
 :host {
     display: inline-block;
 }
+paper-button {
+    width: 100%;
+}
 input[type=file] {
     position: absolute;
     opacity: 0;
@@ -29,7 +32,7 @@ iron-icon {
 </style>
 <paper-button disabled$="[[disabled]]">
     <iron-icon icon="image:photo"></iron-icon>
-    上傳附圖
+    <div>圖片</div>
     <input id="file" type="file" accept$="[[accept]]" on-change="_onFileChange" />
 </paper-button>
 `;

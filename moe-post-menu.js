@@ -56,7 +56,7 @@ class MoePostMenuActionButton extends PolymerElement {
             },
             items: {
                 type: Array,
-                computed: '_computeItems(isAdmin, isFirstPost)'
+                computed: '_computeItems(isAdmin, isFirstPost, flagAdminThreadStop)'
             },
             isAdmin: {
                 type: Boolean,
@@ -66,6 +66,10 @@ class MoePostMenuActionButton extends PolymerElement {
                 type: Boolean,
                 value: false
             },
+            flagAdminThreadStop: {
+                type: Boolean,
+                value: false
+            }
         };
     }
 
@@ -76,10 +80,10 @@ class MoePostMenuActionButton extends PolymerElement {
         });
     }
 
-    _computeItems(isAdmin, isFirstPost) {
+    _computeItems(isAdmin, isFirstPost, flagAdminThreadStop) {
         const items = [];
 
-        if (!this.flagAdminThreadStop) {
+        if (!flagAdminThreadStop) {
             items.push({text: '回應', action: 'reply', icon: 'reply'})
         }
 
@@ -164,10 +168,6 @@ paper-button:hover {
             },
             icon: {
                 type: String
-            },
-            flagAdminThreadStop: {
-                type: Boolean,
-                value: false
             }
         };
     }

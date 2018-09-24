@@ -54,7 +54,7 @@ moe-thread {
         <paper-spinner-lite active></paper-spinner-lite>
     </div>
 </template>
-<template is="dom-repeat" mutable-data items="[[threads]]" as="thread">
+<template is="dom-repeat" mutable-data items="[[threads]]" as="thread" sort="_sortByBump">
     <moe-thread 
         is-admin="[[isAdmin]]"
         board-id="[[boardId]]" board-alias="[[boardAlias]]" board-subdomain="[[boardSubdomain]]"
@@ -173,10 +173,26 @@ moe-thread {
                 })
                 .catch(err => console.error(err));
         });
+
+        this.addEventListener('create-thread-ack', (e) => {
+            this.$.moeGraphQL.getThreadByNo(e.detail.boardId, e.detail.threadNo, 0, this.repliesPerThread)
+                .then(resp => {
+                    this.dispatch({
+                        type: actions.UNSHIFT_THREADS,
+                        thread: this._threadTransformer(resp.data.getThreadByNo)
+                    });
+                    window.scrollTo({top: 0, behavior: 'smooth'})
+                })
+                .catch(err => console.error(err));
+        });
     }
 
     load() {
-        window.scrollTo(0, 0);
+        window.scrollTo({
+            left: 0,
+            top: 0,
+            behavior: 'instant'
+        });
 
         this.set('loading', true);
         this.$.moeGraphQL
@@ -184,14 +200,18 @@ moe-thread {
             .then(resp => {
                 this.dispatch({
                     type: actions.UPDATE_THREADS,
-                    threads: resp.data.getThreads.map(t => Object.assign({}, t, {
-                        firstPost: this._postTransformer(t.firstPost),
-                        replies: (t.replies || []).reverse().map(reply => this._postTransformer(reply))
-                    }))
+                    threads: resp.data.getThreads.map(t => this._threadTransformer(t))
                 });
             })
             .catch(err => console.log(err)) // TODO: error reporting
             .finally(() => this.set('loading', false));
+    }
+
+    _threadTransformer(thread) {
+        return Object.assign({}, thread, {
+            firstPost: this._postTransformer(thread.firstPost),
+            replies: (thread.replies || []).reverse().map(reply => this._postTransformer(reply))
+        });
     }
 
     _postTransformer(post) {
@@ -242,6 +262,26 @@ moe-thread {
         } else {
             this.set('route.path', '/0');
         }
+    }
+
+    _sortByBump(a, b) {
+        a = a.firstPost;
+        b = b.firstPost;
+
+        if (!a.bumpedAt && !b.bumpedAt) {
+            return 0;
+        }
+
+        if (!a.bumpedAt && b.bumpedAt) {
+            return -1;
+        }
+
+        if (a.bumpedAt && !b.bumpedAt) {
+            return 1;
+        }
+
+        const aDate = new Date(a.bumpedAt), bDate = new Date(b.bumpedAt);
+        return aDate === bDate ? 0 : aDate < bDate ? 1 : 0;
     }
 }
 

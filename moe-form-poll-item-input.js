@@ -19,7 +19,7 @@ paper-input {
 }
 </style>
 <paper-icon-button icon="cancel" disabled$="[[disabled]]" on-click="_onCancelClick"></paper-icon-button>
-<paper-input id="input" label="投票選項 [[index]]" value="{{value}}" disabled$="[[disabled]]"></paper-input>
+<paper-input id="input" label="投票選項 [[index]]" value="{{value}}" disabled$="[[disabled]]" required></paper-input>
 `;
     }
 

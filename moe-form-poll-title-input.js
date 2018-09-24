@@ -13,13 +13,16 @@ class MoeFormPollTitleInput extends PolymerElement {
     @apply --layout-horizontal;
     @apply --layout-end;
 }
+:host([hidden]) {
+    display: none;
+}
 paper-input {
     @apply --layout-auto;
     width: 100%;
 }
 </style>
 <paper-icon-button icon="cancel" disabled$="[[disabled]]" on-click="_onCancelClick"></paper-icon-button>
-<paper-input id="input" label="投票主題" value="{{value}}" disabled$="[[disabled]]" autofocus></paper-input>
+<paper-input id="input" label="投票主題" value="{{value}}" disabled$="[[disabled]]" autofocus required></paper-input>
 `;
     }
 
@@ -46,8 +49,12 @@ paper-input {
         this.$.input.focus();
     }
 
+    cancel() {
+        this.dispatchEvent(new CustomEvent('cancel'));
+    }
+
     _onCancelClick(e) {
-        this.dispatchEvent(new CustomEvent('remove'));
+        this.cancel();
     }
 }
 

@@ -1,5 +1,7 @@
 import {html, PolymerElement} from "@polymer/polymer/polymer-element";
 
+import {Poll} from './poll';
+
 class PixmicatRequest extends PolymerElement {
     static get template() {
         return html`<style>:host{display:none;}</style>
@@ -47,12 +49,8 @@ class PixmicatRequest extends PolymerElement {
             return Promise.reject("Request in progress");
         }
 
-        const body = this._makeRegistFormData(boardId, null, comment, password, file, videoEmbeds, subject, email, name);
-        return this.$.ajax.generateRequest().send({
-            url: this.server,
-            body,
-            withCredentials: true
-        });
+        const formData = this._makeRegistFormData(boardId, null, comment, password, file, videoEmbeds, poll, subject, email, name);
+        return this._sendRequest(formData);
     }
 
     /**
@@ -73,7 +71,7 @@ class PixmicatRequest extends PolymerElement {
             return Promise.reject("Request in progress");
         }
 
-        const formData = this._makeRegistFormData(boardId, threadNo, comment, password, file, videoEmbeds, subject, email, name);
+        const formData = this._makeRegistFormData(boardId, threadNo, comment, password, file, videoEmbeds, null, subject, email, name);
         return this._sendRequest(formData);
     }
 
@@ -85,13 +83,14 @@ class PixmicatRequest extends PolymerElement {
      * @param {String} password
      * @param {File} file
      * @param {String[]} videoEmbeds
+     * @param {Poll} poll
      * @param {String} subject
      * @param {String} email
      * @param {String} name
      * @returns {FormData}
      * @private
      */
-    _makeRegistFormData(boardId, threadNo, comment, password, file, videoEmbeds, subject, email, name) {
+    _makeRegistFormData(boardId, threadNo, comment, password, file, videoEmbeds, poll, subject, email, name) {
         const body = new FormData();
 
         // User provided contents
@@ -105,6 +104,12 @@ class PixmicatRequest extends PolymerElement {
         if (videoEmbeds && videoEmbeds.length) {
             videoEmbeds.forEach(videoEmbed => {
                 body.append('resid[]', `${videoEmbed.data.type}:${videoEmbed.data.res_id}`);
+            });
+        }
+        if (poll && poll.isValid()) {
+            body.append('p_title', poll.title);
+            poll.items.forEach(item => {
+                body.append('p_item[]', item);
             });
         }
 

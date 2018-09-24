@@ -80,6 +80,9 @@ class MoePostComment extends PolymerElement {
         if (matches) {
             this.$.pushpost.innerHTML = matches[1];
             this.$.pushpost.style.display = 'block';
+        } else {
+            this.$.pushpost.innerHTML = '';
+            this.$.pushpost.style.display = 'none';
         }
         return text.replace(regex, '');
     }

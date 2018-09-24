@@ -8,7 +8,14 @@ const initial = {
     threadMap: {},
 
     // [${boardId}:${threadNo}]
-    pageThreadKeys: []
+    pageThreadKeys: [],
+
+    ui: {
+        scrollToThread: {
+            boardId: undefined,
+            threadNo: undefined
+        }
+    }
 };
 
 const reducer = function (state, action) {
@@ -25,9 +32,13 @@ const reducer = function (state, action) {
 
         // {thread}
         case actions.UPDATE_THREAD: {
-            const thread = action.thread;
-            const key = `${thread.boardId}:${thread.no}`;
-            Object.assign(state.threadMap[key], thread);
+            return updateThread(state, action.thread);
+        }
+
+        // {thread}
+        case actions.UNSHIFT_THREADS: {
+            state = updateThread(state, action.thread);
+            state.pageThreadKeys.unshift(threadKey(action.thread));
             return state;
         }
 
@@ -41,6 +52,16 @@ const reducer = function (state, action) {
 
         default: return state;
     }
+};
+
+const threadKey = (thread) => `${thread.boardId}:${thread.no}`;
+const updateThread = (state, thread) => {
+    if (state.threadMap[threadKey(thread)]) {
+        Object.assign(state.threadMap[threadKey(thread)], thread);
+    } else {
+        Object.assign(state.threadMap, {[threadKey(thread)]: thread})
+    }
+    return state;
 };
 
 const store = createStore(

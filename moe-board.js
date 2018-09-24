@@ -19,6 +19,7 @@ import "@polymer/iron-pages/iron-pages";
 import "./moe-threads.js";
 import './moe-form-dialog';
 import './moe-reply-form';
+import './moe-form';
 import './pixmicat-request';
 import {ReduxMixin} from './redux/redux-mixin';
 import * as actions from './redux/redux-actions';
@@ -148,6 +149,13 @@ moe-threads {
 app-drawer {
     color: var(--paper-grey-900);
     --app-drawer-width: 280px;
+}
+
+app-drawer #drawerScrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    width: 100%;
 }
 
 app-drawer #drawerHeader {
@@ -287,27 +295,29 @@ moe-form-dialog {
         <div>Disclaimer: All trademarks and copyrights on this page are owned by their respective parties. Images uploaded are the responsibility of the Poster. Comments are owned by the Poster.</div>
     </footer>
 
-    <paper-fab id="fab-create" icon="create"></paper-fab>
+    <paper-fab id="fab-create" icon="create" on-click="_onFabClick"></paper-fab>
 </app-header-layout>
 
 <app-drawer id="leftDrawer" swipe-open>
-    <div id="drawerHeader">
-        <h1 on-click="_onBoardNameClick">[[boardName]]</h1>
-        <h2>[[boardDescription]]</h2>
+    <div id="drawerScrollable">
+        <div id="drawerHeader">
+            <h1 on-click="_onBoardNameClick">[[boardName]]</h1>
+            <h2>[[boardDescription]]</h2>
+        </div>
+        <template is="dom-repeat" items="[[boardExternalLinks]]" as="boardExternalLink">
+            <hr />
+            <h3><span>[[boardExternalLink.title]]</span></h3>
+            <ul>
+                <template is="dom-repeat" items="[[boardExternalLink.links]]" as="externalLink">
+                    <li>
+                        <a href$="[[externalLink.link]]" rel="nofollow" target="_blank">
+                            <paper-button>[[externalLink.text]]</paper-button>
+                        </a>
+                    </li>
+                </template>
+            </ul>
+        </template>
     </div>
-    <template is="dom-repeat" items="[[boardExternalLinks]]" as="boardExternalLink">
-        <hr />
-        <h3><span>[[boardExternalLink.title]]</span></h3>
-        <ul>
-            <template is="dom-repeat" items="[[boardExternalLink.links]]" as="externalLink">
-                <li>
-                    <a href$="[[externalLink.link]]" rel="nofollow" target="_blank">
-                        <paper-button>[[externalLink.text]]</paper-button>
-                    </a>
-                </li>
-            </template>
-        </ul>
-    </template>
 </app-drawer>
 
 <!-- TODO: display full thread in right drawer -->
@@ -316,17 +326,30 @@ moe-form-dialog {
 </app-drawer>
 -->
 
-<!-- Forms -->
+<!-- Reply Form -->
 <moe-form-dialog id="replyDialog" hidden>
     <moe-reply-form id="replyForm" 
                     board-id="[[boardId]]"
                     comment-max-length="1000" 
-                    file-max-size="5242880"
+                    file-max-size="2097152"
                     embed-request-server="[[embedRequestServer]]"
                     on-submit="_onReplyFormSubmit"
                     on-cancel="_onReplyFormCancel"></moe-reply-form>
 </moe-form-dialog>
-<pixmicat-request id="replyRequest" method="POST" server="[[replyRequestServer]]"></pixmicat-request>
+<pixmicat-request id="replyRequest" method="POST" server="[[postServer]]"></pixmicat-request>
+
+<!-- Create Thread Form -->
+<moe-form-dialog id="createThreadDialog" dialog-title="建立討論串" hidden>
+    <moe-form id="createThreadForm" 
+              board-id="[[boardId]]"
+              comment-max-length="1000" 
+              file-max-size="2097152"
+              embed-request-server="[[embedRequestServer]]"
+              on-submit="_onCreateThreadFormSubmit"
+              on-cancel="_onCreateThreadFormCancel"
+              poll></moe-form>
+</moe-form-dialog>
+<pixmicat-request id="createThreadRequest" method="POST" server="[[postServer]]"></pixmicat-request>
 
 <!-- Routes -->
 <app-location route="{{route}}"></app-location>
@@ -350,7 +373,7 @@ moe-form-dialog {
             embedRequestServer: {
                 type: String
             },
-            replyRequestServer: {
+            postServer: {
                 type: String
             },
             boardId: {
@@ -423,10 +446,10 @@ moe-form-dialog {
         });
     }
 
-    /** Form */
+    /** Reply Form */
     showReplyForm(boardId, threadNo, replyTo) {
         this.$.replyDialog.removeAttribute('hidden');
-        this.$.replyDialog.title = `回應 - No.${replyTo}`;
+        this.$.replyDialog.dialogTitle = `回應 - No.${replyTo}`;
         this.$.replyForm.setProperties({
             boardId: boardId,
             threadNo: threadNo,
@@ -482,6 +505,65 @@ moe-form-dialog {
         this.$.replyForm.reset();
     }
 
+    /** Create Thread Form */
+    showCreateThreadForm(boardId) {
+        console.log(this.$.createThreadDialog);
+        this.$.createThreadDialog.removeAttribute('hidden');
+        this.$.createThreadDialog.setProperties({
+            boardId: boardId
+        });
+        setTimeout(() => this.$.createThreadForm.focus(), 0);
+    }
+
+    _onCreateThreadFormSubmit(e) {
+        this.$.createThreadForm.setProperties({
+            disabled: true,
+            loading: true
+        });
+
+        this.$.createThreadRequest.makeThread(
+            e.detail.boardId,
+            e.detail.comment,
+            "password",
+            e.detail.file,
+            e.detail.poll,
+            e.detail.videoEmbeds,
+        ).then(res => {
+            // hide form
+            this.$.createThreadDialog.setAttribute('hidden', 'hidden');
+            this.$.createThreadForm.reset();
+            // fetch post
+            this.$.threads.dispatchEvent(new CustomEvent('create-thread-ack', {
+                detail: {
+                    boardId: e.detail.boardId,
+                    threadNo: res.no
+                }
+            }));
+        }).catch(err => {
+            if (err.error) {
+                alert(`${err.error}`);
+            } else {
+                alert(`Unexpected error: ${err}`);
+                console.error(err);
+            }
+        }).finally(() => {
+            // remove loading status
+            this.$.createThreadForm.setProperties({
+                disabled: false,
+                loading: false
+            });
+        });
+    }
+
+    _onCreateThreadFormCancel(e) {
+        if (this.$.createThreadForm.changed() && !confirm("確定要取消建立討論串嗎？")) {
+            return;
+        }
+
+        this.$.createThreadDialog.setAttribute('hidden', "hidden");
+        this.$.createThreadForm.reset();
+    }
+
     /** Routing */
 
     goHome() {
@@ -530,6 +612,10 @@ moe-form-dialog {
 
     _computeShowSubCaption(subCaption) {
         return (typeof subCaption === 'string' && subCaption);
+    }
+
+    _onFabClick(e) {
+        this.showCreateThreadForm(this.boardId);
     }
 }
 

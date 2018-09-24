@@ -37,7 +37,10 @@ class MoeFormDialog extends PolymerElement {
 }
 </style>
 <div id="container">
-    <h2 class="handle"><iron-icon icon="moe:handle"></iron-icon>[[title]]</h2>
+    <h2 class="handle">
+        <iron-icon icon="moe:handle"></iron-icon>
+        <div>[[dialogTitle]]</div>
+    </h2>
     <slot id="form"></slot>
 </div>
 `;
@@ -45,10 +48,7 @@ class MoeFormDialog extends PolymerElement {
 
     static get properties() {
         return {
-            title: {
-                type: String,
-                value: 'Dialog'
-            },
+            dialogTitle: String,
             dragging: {
                 type: Boolean,
                 value: false
@@ -67,7 +67,10 @@ class MoeFormDialog extends PolymerElement {
     }
 
     static get observedAttributes() {
-        return ['hidden'];
+        return [
+            'hidden',
+            'dialog-title'
+        ];
     }
 
     ready() {
@@ -81,6 +84,10 @@ class MoeFormDialog extends PolymerElement {
     attributeChangedCallback(name, oldValue, newValue) {
         if (name === 'hidden' && oldValue !== null && newValue === null) {
             this.centralizeDialog();
+        }
+
+        if (name === 'dialog-title') {
+            this.dialogTitle = newValue;
         }
     }
 

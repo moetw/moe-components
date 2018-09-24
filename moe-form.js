@@ -6,6 +6,7 @@ import '@polymer/paper-icon-button';
 import '@polymer/paper-spinner/paper-spinner';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icons/image-icons';
+import '@polymer/iron-icons/social-icons';
 import '@polymer/iron-icons/av-icons';
 import '@polymer/iron-icon'
 import '@polymer/iron-flex-layout/iron-flex-layout';
@@ -15,6 +16,9 @@ import './moe-file-button';
 import './moe-form-video-embeds';
 import './moe-form-video-embed-input';
 import './moe-form-embed-request';
+import './moe-form-poll-title-input';
+import './moe-form-poll-items';
+import {Poll} from './poll';
 
 class MoeForm extends PolymerElement {
     static get template() {
@@ -31,6 +35,11 @@ form {
     margin: 0;
     padding: 0;
 }
+#inputs {
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 
 #imageUploads {
     @apply --layout-horizontal;
@@ -41,6 +50,7 @@ form {
     display: inline-block;
     text-overflow: ellipsis;
     overflow: hidden;
+    white-space: nowrap;
     width: 100%;
 }
 
@@ -49,6 +59,9 @@ form {
 }
 #embedButtons paper-button iron-icon {
     padding-right: 0.5em;
+}
+#embedButtons > * {
+    @apply --layout-flex-auto; /* fill */
 }
 
 #actions {
@@ -74,19 +87,26 @@ paper-spinner:not([active]) {
 }
 </style>
 <form>
-    <paper-textarea id="comment" label="內文" char-counter maxlength="[[commentMaxLength]]" value="{{comment}}" rows="3" max-rows="3" disabled$="[[disabled]]"></paper-textarea>
-    <div id="embedButtons">
-        <moe-file-button id="file" file="{{file}}" file-selected="{{fileSelected}}" file-max-size="[[fileMaxSize]]" on-change="_onFileChange" disabled$="[[disabled]]"></moe-file-button>            
-        <paper-button on-click="_onVideoEmbedButtonClick" disabled$="[[disabled]]"><iron-icon icon="av:movie"></iron-icon>附加影片</paper-button>
+    <div id="inputs">
+        <paper-textarea id="comment" label="內文" char-counter maxlength="[[commentMaxLength]]" value="{{comment}}" rows="3" max-rows="3" disabled$="[[disabled]]" spellcheck="true"></paper-textarea>
+        <div id="embedButtons">
+            <moe-file-button id="file" file="{{file}}" file-selected="{{fileSelected}}" file-max-size="[[fileMaxSize]]" on-change="_onFileChange" disabled$="[[disabled]]"></moe-file-button>            
+            <paper-button on-click="_onVideoEmbedButtonClick" disabled$="[[disabled]]"><iron-icon icon="av:movie"></iron-icon>影片</paper-button>
+            <paper-button on-click="_onPollButtonClick" disabled$="[[disabled]]" hidden$="[[pollDisabled]]"><iron-icon icon="social:poll"></iron-icon>投票</paper-button>
+        </div>
+        <div id="imageUploads">
+            <template is="dom-if" if="[[fileSelected]]">
+                <paper-icon-button icon="cancel" on-click="_onCancelImageUploadsClick" disabled$="[[disabled]]"></paper-icon-button>
+            </template>
+            <span id="imageUploadsMessage"></span>
+        </div>
+        <div id="poll" hidden$="[[pollDisabled]]">
+            <moe-form-poll-title-input id="pollTitleInput" value="{{pollTitle}}" hidden on-cancel="_onPollTitleInputCancel" disabled$="[[disabled]]"></moe-form-poll-title-input>
+            <moe-form-poll-items id="pollItems" items="{{pollItems}}" disabled$="[[disabled]]" hidden></moe-form-poll-items>
+        </div>
+        <moe-form-video-embed-input id="videoEmbedInput" hidden on-submit="_onVideoEmbedInputSubmit" on-cancel="_onVideoEmbedInputCancel" disabled$="[[disabled]]"></moe-form-video-embed-input>
+        <moe-form-video-embeds embeds="{{videoEmbeds}}" id="videoEmbeds" disabled$="[[disabled]]"></moe-form-video-embeds>
     </div>
-    <div id="imageUploads">
-        <template is="dom-if" if="[[fileSelected]]">
-            <paper-icon-button icon="cancel" on-click="_onCancelImageUploadsClick" disabled$="[[disabled]]"></paper-icon-button>
-        </template>
-        <span id="imageUploadsMessage"></span>
-    </div>
-    <moe-form-video-embed-input id="videoEmbedInput" hidden on-submit="_onVideoEmbedInputSubmit" on-cancel="_onVideoEmbedInputCancel" disabled$="[[disabled]]"></moe-form-video-embed-input>
-    <moe-form-video-embeds embeds="{{videoEmbeds}}" id="videoEmbeds" disabled$="[[disabled]]"></moe-form-video-embeds>
     <div id="actions">
         <paper-button id="buttonCancel" on-click="_onButtonCancelClick" disabled$="[[disabled]]">取消</paper-button>
         <paper-button raised id="buttonSubmit" on-click="_onButtonSubmitClick" disabled$="[[disabled]]">
@@ -127,7 +147,8 @@ paper-spinner:not([active]) {
             /** Comment */
             comment: {
                 type: String,
-                notify: true
+                notify: true,
+                value: ""
             },
             commentMaxLength: {
                 type: Number,
@@ -150,7 +171,8 @@ paper-spinner:not([active]) {
             /** Video Embed */
             videoEmbeds: {
                 type: Array,
-                notify: true
+                notify: true,
+                value: []
             },
             embedRequestServer: {
                 type: String
@@ -158,7 +180,23 @@ paper-spinner:not([active]) {
 
             /** Poll Embed */
             poll: {
-                type: Object
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            },
+            pollDisabled: {
+                type: Boolean,
+                computed: '_computePollDisabled(poll)'
+            },
+            pollTitle: {
+                type: String,
+                value: "",
+                notify: true
+            },
+            pollItems: {
+                type: Array,
+                value: [],
+                notify: true
             },
             pollRequestServer: {
                 type: String
@@ -176,14 +214,26 @@ paper-spinner:not([active]) {
     }
 
     reset() {
-        this.$.comment.value = "";
+        // reset comment and file
+        this.set('comment', "");
         this.$.file.cancel();
-        this.videoEmbeds = [];
+
+        // reset video embeds
+        this.$.videoEmbeds.reset();
         this.$.videoEmbedInput.cancel();
+
+        // reset poll
+        this.set('pollTitle', "");
+        this.$.pollItems.reset();
+        this.$.pollTitleInput.cancel();
     }
 
     changed() {
-        return (this.videoEmbeds && this.videoEmbeds.length) || (this.file) || (this.comment && this.comment.length > 0);
+        return (this.videoEmbeds && this.videoEmbeds.length) ||
+            this.pollTitle ||
+            this.$.pollItems.changed() ||
+            this.file ||
+            (this.comment && this.comment.length > 0);
     }
 
     _onButtonSubmitClick() {
@@ -196,7 +246,8 @@ paper-spinner:not([active]) {
                 replyTo: this.replyTo,
                 comment: this.comment,
                 file: this.file,
-                videoEmbeds: this.videoEmbeds
+                videoEmbeds: this.videoEmbeds,
+                poll: new Poll(this.pollTitle, this.pollItems)
             }
         }));
     }
@@ -231,13 +282,21 @@ paper-spinner:not([active]) {
 
     /** Video Embed */
 
+    resetVideoEmbeds() {
+        if (this.videoEmbeds.length === 0 || confirm("確定要刪除影片嗎？")) {
+            this.$.videoEmbedInput.setAttribute('hidden', "true");
+            this.$.videoEmbedInput.reset();
+            this.$.videoEmbeds.setAttribute('hidden', "true");
+            this.$.videoEmbeds.reset();
+        }
+    }
+
     _onVideoEmbedButtonClick(e) {
         if (this.$.videoEmbedInput.hasAttribute('hidden')) {
             this.$.videoEmbedInput.removeAttribute('hidden');
             this.$.videoEmbedInput.focus();
         } else {
-            this.$.videoEmbedInput.setAttribute('hidden', "true");
-            this.$.videoEmbedInput.reset();
+            this.resetVideoEmbeds();
         }
     }
 
@@ -259,11 +318,40 @@ paper-spinner:not([active]) {
     }
 
     _onVideoEmbedInputCancel(e) {
-        this.$.videoEmbedInput.setAttribute('hidden', "true");
+        this.resetVideoEmbeds();
     }
 
     _computeVideoEmbedButtonDisabled(videoEmbedInputDisplay) {
         return videoEmbedInputDisplay;
+    }
+
+    /** Poll */
+
+    resetPoll() {
+        if ((!this.$.pollItems.changed() && !this.pollTitle) || confirm("確定要刪除投票嗎？")) {
+            this.$.pollTitleInput.setAttribute('hidden', "true");
+            this.$.pollTitleInput.reset();
+            this.$.pollItems.setAttribute('hidden', "true");
+            this.$.pollItems.reset();
+        }
+    }
+
+    _onPollButtonClick(e) {
+        if (this.$.pollTitleInput.hasAttribute('hidden')) {
+            this.$.pollTitleInput.removeAttribute('hidden');
+            this.$.pollTitleInput.focus();
+            this.$.pollItems.removeAttribute('hidden');
+        } else {
+            this.resetPoll();
+        }
+    }
+
+    _onPollTitleInputCancel(e) {
+        this.resetPoll();
+    }
+
+    _computePollDisabled(poll) {
+        return !poll;
     }
 }
 

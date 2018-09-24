@@ -81,6 +81,10 @@ paper-tooltip {
             },
             createdAt: {
                 type: String
+            },
+            flagAdminThreadStop: {
+                type: Boolean,
+                value: false
             }
         };
     }
@@ -94,6 +98,10 @@ paper-tooltip {
     }
 
     _onPostHeaderNoClick(e) {
+        if (this.flagAdminThreadStop) {
+            return false;
+        }
+
         this.dispatchEvent(new CustomEvent('post-header-no-click', {
             composed: true,
             bubbles: true,

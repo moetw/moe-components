@@ -30,6 +30,9 @@ import './moe-styles';
 import './moe-video';
 import './moe-graphql';
 import {MoeGraphQL} from "./moe-graphql";
+import {ReduxMixin} from './redux/redux-mixin';
+import * as selectors from './redux/redux-selectors';
+import * as actions from "./redux/redux-actions";
 
 /**
  * `moe-thread`
@@ -39,7 +42,7 @@ import {MoeGraphQL} from "./moe-graphql";
  * @polymer
  * @demo demo/index.html
  */
-class MoeThread extends MutableData(PolymerElement) {
+class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     static get template() {
         return html`
 <style>
@@ -289,7 +292,7 @@ class MoeThread extends MutableData(PolymerElement) {
             </template>
             
             <div style="clear: both"></div>
-            <moe-post-header board-id="[[firstpost.boardId]]" no="[[firstpost.no]]" trip-id="[[firstpost.tripId]]" created-at="[[firstpost.createdAt]]" ></moe-post-header>
+            <moe-post-header board-id="[[firstpost.boardId]]" no="[[firstpost.no]]" trip-id="[[firstpost.tripId]]" created-at="[[firstpost.createdAt]]" flag-admin-thread-stop="[[flagAdminThreadStop]]"></moe-post-header>
         </div>
         
         <!-- show more replies -->
@@ -367,13 +370,16 @@ class MoeThread extends MutableData(PolymerElement) {
                 computed: '_computeNotLoadingMoreReplies(loadingMoreReplies)'
             },
             flagAdminSticky: {
-                type: Boolean
+                type: Boolean,
+                value: false
             },
             flagAdminThreadStop: {
-                type: Boolean
+                type: Boolean,
+                value: false
             },
             flagAdminSage: {
-                type: Boolean
+                type: Boolean,
+                value: false
             },
             firstpost: {
                 type: Object,
@@ -395,7 +401,7 @@ class MoeThread extends MutableData(PolymerElement) {
             },
             imageServers: {
                 type: Object
-            },
+            }
         };
     }
 
@@ -429,6 +435,10 @@ class MoeThread extends MutableData(PolymerElement) {
     }
 
     _onThreadHeaderNoClick() {
+        if (this.flagAdminThreadStop) {
+            return false;
+        }
+
         this.dispatchEvent(new CustomEvent('thread-header-no-click', {
             composed: true,
             bubbles: true,

@@ -54,7 +54,7 @@ export class MoeGraphQL extends PolymerElement {
             }
         }
         embedRequestServer
-        replyRequestServer
+        postServer
     }
 }`
         });
@@ -65,6 +65,30 @@ export class MoeGraphQL extends PolymerElement {
             operationName: '',
             query: `{
   getThreads(boardId:${boardId}, offset:${threadsOffset},limit:${threadsLimit}) {
+      boardId
+      no
+      replyCount
+      flagAdminSticky
+      flagAdminThreadStop
+      flagAdminSage
+      firstPost {
+        ...PostFields
+      }
+      replies(offset:${repliesOffset},limit:${repliesLimit}) {
+        ...PostFields
+      }
+  }
+}
+
+${this.FRAGMENT_POST_FIELDS}`
+        });
+    }
+
+    getThreadByNo(boardId, threadNo, repliesOffset, repliesLimit) {
+        return this.fetchQL.query({
+            operationName: '',
+            query: `{
+  getThreadByNo(boardId:${boardId}, no:${threadNo}) {
       boardId
       no
       replyCount
@@ -123,7 +147,6 @@ ${this.FRAGMENT_POST_FIELDS}`
   name
   email
   com
-  root
   embeds {
     data
   }
@@ -151,6 +174,7 @@ ${this.FRAGMENT_POST_FIELDS}`
     rated
   }
   createdAt
+  bumpedAt
 }`;
     }
 
