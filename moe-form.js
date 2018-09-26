@@ -10,6 +10,7 @@ import '@polymer/iron-icons/social-icons';
 import '@polymer/iron-icons/av-icons';
 import '@polymer/iron-icon'
 import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/paper-tooltip/paper-tooltip';
 
 import './color';
 import './moe-file-button';
@@ -20,7 +21,7 @@ import './moe-form-poll-title-input';
 import './moe-form-poll-items';
 import {Poll} from './poll';
 
-class MoeForm extends PolymerElement {
+export class MoeForm extends PolymerElement {
     static get template() {
         return html`
 <style>
@@ -34,11 +35,6 @@ form {
     @apply --layout-vertical;
     margin: 0;
     padding: 0;
-}
-#inputs {
-    max-height: 70vh;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 #imageUploads {
@@ -56,6 +52,7 @@ form {
 
 #embedButtons {
     @apply --layout-horizontal;
+    clear: both; /* to prevent the char-counter of paper-textarea from affecting layout */
 }
 #embedButtons paper-button iron-icon {
     padding-right: 0.5em;
@@ -88,6 +85,9 @@ paper-spinner:not([active]) {
 </style>
 <form>
     <div id="inputs">
+        <template is="dom-if" if="[[hasSubject]]">
+            <paper-input id="subject" label="主題" char-counter maxlength="[[subjectMaxLength]]" value="{{subject}}" disabled$="[[disabled]]" spellcheck="true"></paper-input>
+        </template>
         <paper-textarea id="comment" label="內文" char-counter maxlength="[[commentMaxLength]]" value="{{comment}}" rows="3" max-rows="3" disabled$="[[disabled]]" spellcheck="true"></paper-textarea>
         <div id="embedButtons">
             <moe-file-button id="file" file="{{file}}" file-selected="{{fileSelected}}" file-max-size="[[fileMaxSize]]" on-change="_onFileChange" disabled$="[[disabled]]"></moe-file-button>            
@@ -101,18 +101,11 @@ paper-spinner:not([active]) {
             <span id="imageUploadsMessage"></span>
         </div>
         <div id="poll" hidden$="[[pollDisabled]]">
-            <moe-form-poll-title-input id="pollTitleInput" value="{{pollTitle}}" hidden on-cancel="_onPollTitleInputCancel" disabled$="[[disabled]]"></moe-form-poll-title-input>
-            <moe-form-poll-items id="pollItems" items="{{pollItems}}" disabled$="[[disabled]]" hidden></moe-form-poll-items>
+            <moe-form-poll-title-input id="pollTitleInput" value="{{pollTitle}}" hidden on-cancel="_onPollTitleInputCancel" disabled$="[[disabled]]" max-length="[[pollTitleMaxLength]]"></moe-form-poll-title-input>
+            <moe-form-poll-items id="pollItems" items="{{pollItems}}" min-items="[[pollMinItems]]" max-items="[[pollMaxItems]]" max-length="[[pollItemMaxLength]]" disabled$="[[disabled]]" hidden></moe-form-poll-items>
         </div>
         <moe-form-video-embed-input id="videoEmbedInput" hidden on-submit="_onVideoEmbedInputSubmit" on-cancel="_onVideoEmbedInputCancel" disabled$="[[disabled]]"></moe-form-video-embed-input>
-        <moe-form-video-embeds embeds="{{videoEmbeds}}" id="videoEmbeds" disabled$="[[disabled]]"></moe-form-video-embeds>
-    </div>
-    <div id="actions">
-        <paper-button id="buttonCancel" on-click="_onButtonCancelClick" disabled$="[[disabled]]">取消</paper-button>
-        <paper-button raised id="buttonSubmit" on-click="_onButtonSubmitClick" disabled$="[[disabled]]">
-            <div hidden$="[[loading]]">送出</div>
-            <paper-spinner active$="[[loading]]"></paper-spinner>
-        </paper-button>
+        <moe-form-video-embeds embeds="{{videoEmbeds}}" id="videoEmbeds" max-embeds="[[videoMaxEmbeds]]" disabled$="[[disabled]]"></moe-form-video-embeds>
     </div>
 </form>
 
@@ -130,7 +123,9 @@ paper-spinner:not([active]) {
             loading: {
                 type: Boolean,
                 value: false,
-                reflectToAttribute: true
+                reflectToAttribute: true,
+                notify: true,
+                observer: '_observeLoading'
             },
 
             /** Post properties */
@@ -143,6 +138,20 @@ paper-spinner:not([active]) {
             replyTo: {
                 type: Number
             },
+
+            /** Subject */
+            hasSubject: {
+                type: Boolean,
+                value: false,
+                notify: true,
+                reflectToAttribute: true
+            },
+            subject: {
+                type: String,
+                notify: true,
+                value: ""
+            },
+            subjectMaxLength: Number,
 
             /** Comment */
             comment: {
@@ -169,6 +178,7 @@ paper-spinner:not([active]) {
             },
 
             /** Video Embed */
+            videoMaxEmbeds: Number,
             videoEmbeds: {
                 type: Array,
                 notify: true,
@@ -179,14 +189,18 @@ paper-spinner:not([active]) {
             },
 
             /** Poll Embed */
-            poll: {
+            hasPoll: {
                 type: Boolean,
                 value: false,
                 reflectToAttribute: true
             },
+            pollTitleMaxLength: Number,
+            pollItemMaxLength: Number,
+            pollMinItems: Number,
+            pollMaxItems: Number,
             pollDisabled: {
                 type: Boolean,
-                computed: '_computePollDisabled(poll)'
+                computed: '_computePollDisabled(hasPoll)'
             },
             pollTitle: {
                 type: String,
@@ -236,27 +250,17 @@ paper-spinner:not([active]) {
             (this.comment && this.comment.length > 0);
     }
 
-    _onButtonSubmitClick() {
-        this.dispatchEvent(new CustomEvent('submit', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                boardId: this.boardId,
-                threadNo: this.threadNo,
-                replyTo: this.replyTo,
-                comment: this.comment,
-                file: this.file,
-                videoEmbeds: this.videoEmbeds,
-                poll: new Poll(this.pollTitle, this.pollItems)
-            }
-        }));
-    }
-
-    _onButtonCancelClick() {
-        this.dispatchEvent(new CustomEvent('cancel', {
-            bubbles: true,
-            composed: true
-        }));
+    getFormData() {
+        return {
+            boardId: this.boardId,
+            threadNo: this.threadNo,
+            replyTo: this.replyTo,
+            subject: this.subject,
+            comment: this.comment,
+            file: this.file,
+            videoEmbeds: this.videoEmbeds,
+            poll: new Poll(this.pollTitle, this.pollItems)
+        };
     }
 
     /** Image Upload */
@@ -350,8 +354,23 @@ paper-spinner:not([active]) {
         this.resetPoll();
     }
 
-    _computePollDisabled(poll) {
-        return !poll;
+    _computePollDisabled(hasPoll) {
+        return !hasPoll;
+    }
+
+    /** Loading State */
+    _observeLoading(newValue, oldValue) {
+        if (newValue && !oldValue) {
+            this.dispatchEvent(new CustomEvent('on-loading-start', {
+                bubbles: true,
+                composed: true
+            }));
+        } else if (!newValue && oldValue) {
+            this.dispatchEvent(new CustomEvent('on-loading-end', {
+                bubbles: true,
+                composed: true
+            }));
+        }
     }
 }
 

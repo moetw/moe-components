@@ -35,21 +35,21 @@ class PixmicatRequest extends PolymerElement {
      *
      * @param {Number} boardId
      * @param {String} comment
-     * @param {String} password
      * @param {File} file
      * @param {Poll} poll
      * @param {String[]} videoEmbeds
      * @param {String} subject
      * @param {String} email
      * @param {String} name
+     * @param {String} password
      * @returns {Promise}
      */
-    makeThread(boardId, comment, password, file, poll=null, videoEmbeds=null, subject='', email='', name='') {
+    makeThread(boardId, comment, file=null, poll=null, videoEmbeds=null, subject='', email='', name='', password='') {
         if (this.inFlight()) {
             return Promise.reject("Request in progress");
         }
 
-        const formData = this._makeRegistFormData(boardId, null, comment, password, file, videoEmbeds, poll, subject, email, name);
+        const formData = this._makeRegistFormData(boardId, null, comment, file, videoEmbeds, poll, subject, email, name, password);
         return this._sendRequest(formData);
     }
 
@@ -58,20 +58,20 @@ class PixmicatRequest extends PolymerElement {
      * @param {Number} boardId
      * @param {Number} threadNo
      * @param {String} comment
-     * @param {String} password
      * @param {File} file
      * @param {String[]} videoEmbeds
      * @param {String} subject
      * @param {String} email
      * @param {String} name
+     * @param {String} password
      * @returns {Promise}
      */
-    makeReply(boardId, threadNo, comment, password, file=null, videoEmbeds=null, subject='', email='', name='') {
+    makeReply(boardId, threadNo, comment, file=null, videoEmbeds=null, subject='', email='', name='', password='') {
         if (this.inFlight()) {
             return Promise.reject("Request in progress");
         }
 
-        const formData = this._makeRegistFormData(boardId, threadNo, comment, password, file, videoEmbeds, null, subject, email, name);
+        const formData = this._makeRegistFormData(boardId, threadNo, comment, file, videoEmbeds, null, subject, email, name, password);
         return this._sendRequest(formData);
     }
 
@@ -80,17 +80,17 @@ class PixmicatRequest extends PolymerElement {
      * @param {Number} boardId
      * @param {Number} threadNo
      * @param {String} comment
-     * @param {String} password
      * @param {File} file
      * @param {String[]} videoEmbeds
      * @param {Poll} poll
      * @param {String} subject
      * @param {String} email
      * @param {String} name
+     * @param {String} password
      * @returns {FormData}
      * @private
      */
-    _makeRegistFormData(boardId, threadNo, comment, password, file, videoEmbeds, poll, subject, email, name) {
+    _makeRegistFormData(boardId, threadNo, comment, file, videoEmbeds, poll, subject, email, name, password) {
         const body = new FormData();
 
         // User provided contents

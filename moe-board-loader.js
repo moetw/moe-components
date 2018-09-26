@@ -1,7 +1,10 @@
 import {html, PolymerElement} from '@polymer/polymer/polymer-element';
-import './moe-board';
 
-class MoeBoardLoader extends PolymerElement {
+import {ReduxMixin} from './redux/redux-mixin';
+import './moe-board';
+import * as actions from './redux/redux-actions';
+
+class MoeBoardLoader extends ReduxMixin(PolymerElement) {
 
     static get template() {
         return html`
@@ -37,6 +40,8 @@ class MoeBoardLoader extends PolymerElement {
             .getBoardById(this.boardId)
             .then(resp => {
                 const board = document.createElement('moe-board');
+
+                // board
                 board.boardId = this.boardId;
                 board.boardName = resp.data.getBoardById.name;
                 board.boardDescription = resp.data.getBoardById.description;
@@ -49,6 +54,13 @@ class MoeBoardLoader extends PolymerElement {
                 board.graphqlServer = this.graphqlServer;
                 board.embedRequestServer = resp.data.getBoardById.embedRequestServer;
                 board.postServer = resp.data.getBoardById.postServer;
+
+                // validation criteria
+                this.dispatch({
+                    type: actions.UPDATE_VALIDATION_CRITERIA,
+                    validationCriteria: resp.data.getValidationCriteria
+                });
+
                 this.$.boardContainer.innerHTML = '';
                 this.$.boardContainer.appendChild(board);
             })

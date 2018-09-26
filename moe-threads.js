@@ -35,7 +35,12 @@ moe-thread {
     margin-left: 0.5em;
 }
 .loading paper-spinner-lite {
+    display: block;    
     --paper-spinner-color: var(--futaba-red-color);
+    background: white;
+    border-radius: 50%;
+    padding: 5px;
+    @apply --shadow-elevation-6dp;
 } 
 
 #paginator {
@@ -177,11 +182,7 @@ moe-thread {
         this.addEventListener('create-thread-ack', (e) => {
             this.$.moeGraphQL.getThreadByNo(e.detail.boardId, e.detail.threadNo, 0, this.repliesPerThread)
                 .then(resp => {
-                    this.dispatch({
-                        type: actions.UNSHIFT_THREADS,
-                        thread: this._threadTransformer(resp.data.getThreadByNo)
-                    });
-                    window.scrollTo({top: 0, behavior: 'smooth'})
+                    this.goHome();
                 })
                 .catch(err => console.error(err));
         });
@@ -195,7 +196,7 @@ moe-thread {
         });
 
         this.set('loading', true);
-        this.$.moeGraphQL
+        return this.$.moeGraphQL
             .getThreads(this.boardId, this.page * this.threadsPerPage, this.threadsPerPage, 0, this.repliesPerThread)
             .then(resp => {
                 this.dispatch({
@@ -220,7 +221,12 @@ moe-thread {
 
     reload() {
         this.set('threads', []);
-        this.load();
+        return this.load();
+    }
+
+    goHome() {
+        this.set('routeData.page', 0);
+        return this.reload();
     }
 
     loadPrevPage() {

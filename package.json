@@ -38,6 +38,7 @@
     "core-js": "^2.5.7",
     "dompurify": "^1.0.8",
     "fetchql": "^2.3.0",
+    "js-cookie": "^2.2.0",
     "juicy-html": "^2.0.0",
     "lodash": "github:lodash/lodash#6018350ac10d5ce6a5b7db625140b82aeab804df",
     "moment": "^2.22.2",

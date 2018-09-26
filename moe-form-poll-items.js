@@ -33,7 +33,7 @@ ul {
 </style>
 <ul>
     <template is="dom-repeat" items="[[items]]">
-        <li><moe-form-poll-item-input index="[[index]]" value="{{item}}" on-remove="_onItemRemove" disabled$="[[disabled]]"></moe-form-poll-item-input></li>
+        <li><moe-form-poll-item-input index="[[index]]" value="{{item}}" on-remove="_onItemRemove" max-length="[[maxLength]]" disabled$="[[disabled]]"></moe-form-poll-item-input></li>
     </template>
 </ul>
 <paper-button id="add" on-click="_onAddClick" disabled$="[[disabled]]">
@@ -50,14 +50,9 @@ ul {
                 value: [],
                 notify: true
             },
-            minItems: {
-                type: Number,
-                value: 2
-            },
-            maxItems: {
-                type: Number,
-                value: 10
-            },
+            minItems: Number,
+            maxItems: Number,
+            maxLength: Number,
             disabled: {
                 type: Boolean,
                 value: false,
@@ -66,11 +61,10 @@ ul {
         }
     }
 
-    ready() {
-        super.ready();
-        if (this.items.length === 0) {
-            this.reset();
-        }
+    static get observers() {
+        return [
+            '_observeMinItems(minItems)'
+        ];
     }
 
     add(value="") {
@@ -94,6 +88,10 @@ ul {
 
     changed() {
         return !this.items.every(item => item === '');
+    }
+
+    _observeMinItems(minItems) {
+        this.reset();
     }
 
     _onAddClick(e) {

@@ -11,7 +11,7 @@ class MoeFormPollItemInput extends PolymerElement {
 <style>
 :host {
     @apply --layout-horizontal;
-    @apply --layout-end;
+    @apply --layout-center-center;
 }
 paper-input {
     @apply --layout-auto;
@@ -19,12 +19,15 @@ paper-input {
 }
 </style>
 <paper-icon-button icon="cancel" disabled$="[[disabled]]" on-click="_onCancelClick"></paper-icon-button>
-<paper-input id="input" label="投票選項 [[index]]" value="{{value}}" disabled$="[[disabled]]" required></paper-input>
+<paper-input id="input" label="投票選項 [[index]]" value="{{value}}" disabled$="[[disabled]]" maxlength="[[maxLength]]" required char-counter></paper-input>
 `;
     }
 
     static get properties() {
         return {
+            maxLength: {
+                type: Number
+            },
             value: {
                 type: String,
                 notify: true,

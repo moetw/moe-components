@@ -28,6 +28,7 @@ moe-form-video-embed {
 
     static get properties() {
         return {
+            maxEmbeds: Number,
             embeds: {
                 type: Array,
                 notify: true,
@@ -62,6 +63,11 @@ moe-form-video-embed {
     }
 
     add(image, title, data) {
+        if (this.embeds.length >= this.maxEmbeds) {
+            alert(`最多只能附加 ${this.maxEmbeds} 個影片`);
+            return false;
+        }
+
         const newEmbed = {image, title, data};
 
         if (this.embedsSet.has(JSON.stringify(newEmbed))) {

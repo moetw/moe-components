@@ -3,8 +3,16 @@ import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-styles/shadow';
 import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/app-layout/app-toolbar/app-toolbar';
+import '@polymer/app-layout/app-header/app-header';
+import '@polymer/paper-icon-button/paper-icon-button';
+import '@polymer/iron-icons/image-icons';
+import '@polymer/paper-progress/paper-progress';
+import './color';
 
 import './moe-icons';
+import {MoeForm} from './moe-form';
+import {MoeReplyForm} from './moe-reply-form';
 
 class MoeFormDialog extends PolymerElement {
     static get template() {
@@ -18,16 +26,19 @@ class MoeFormDialog extends PolymerElement {
     margin: 0;
     padding: 0;
     z-index: 5;
+    @apply --shadow-elevation-24dp;
 }
 :host([hidden]) {
     display: none;
 }
 #container {
-    @apply --shadow-elevation-24dp;
     display: block;
     position: relative;
     padding: 16px;
     background: white;
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden; 
 }
 .handle {
     @apply --layout-horizontal;
@@ -35,12 +46,38 @@ class MoeFormDialog extends PolymerElement {
     cursor: move;
     user-select: none;
 }
+
+app-header {
+  background-color: var(--moe-thread-no-background-color);
+  color: white;
+}
+
+paper-tooltip {
+    --paper-tooltip-delay-out: 0s;
+    --paper-tooltip-delay-in: 0s;
+    --paper-tooltip-duration-out: 0s;
+    --paper-tooltip-duration-in: 0s;
+    white-space: nowrap;
+}
+
+paper-progress {
+    width: 100%;
+}
+paper-progress:not([active]) {
+    display: none;
+}
 </style>
+<app-header class="handle">
+    <app-toolbar>
+        <paper-icon-button id="closeButton" icon="close" on-click="_onCloseClick"></paper-icon-button>
+        <paper-tooltip for="closeButton">關閉</paper-tooltip>
+        <div main-title>[[dialogTitle]]</div>
+        <paper-icon-button id="sendButton" icon="send" alt="送出" on-click="_onSendClick"></paper-icon-button>
+        <paper-tooltip for="sendButton">送出</paper-tooltip>
+    </app-toolbar>
+</app-header>
+<paper-progress indeterminate active$="[[loading]]"></paper-progress>
 <div id="container">
-    <h2 class="handle">
-        <iron-icon icon="moe:handle"></iron-icon>
-        <div>[[dialogTitle]]</div>
-    </h2>
     <slot id="form"></slot>
 </div>
 `;
@@ -61,8 +98,13 @@ class MoeFormDialog extends PolymerElement {
                 type: Number,
                 value: 0
             },
+            loading: {
+                type: Boolean,
+                value: false
+            },
             width: Number,
-            height: Number
+            height: Number,
+            formElement: Object
         };
     }
 
@@ -75,10 +117,30 @@ class MoeFormDialog extends PolymerElement {
 
     ready() {
         super.ready();
+
+        // drag-n-drop
         this.shadowRoot.querySelectorAll('.handle').forEach(handle => handle.addEventListener('mousedown', this._onHandleMouseDown.bind(this)));
         this.addEventListener('dragstart', this._onDragStart.bind(this));
         this.addEventListener('drag', this._onDrag.bind(this));
         this.addEventListener('dragend', this._onDragEnd.bind(this));
+
+        // search for moe-form element in the form slot
+        for (let node of this.$.form.assignedNodes()) {
+            if (typeof node === "object" && (node instanceof MoeReplyForm || node instanceof MoeForm)) {
+                this.formElement = node;
+                break;
+            }
+        }
+        if (!this.formElement) {
+            console.error("There must be a moe-form/moe-reply-form slotted inside of moe-form-dialog", this);
+        } else {
+            this.formElement.addEventListener('on-loading-start', () => {
+                this.set('loading', true);
+            });
+            this.formElement.addEventListener('on-loading-end', () => {
+                this.set('loading', false);
+            });
+        }
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -121,6 +183,17 @@ class MoeFormDialog extends PolymerElement {
     _onDragEnd(e) {
         this.draggable = false;
     }
+
+    _onCloseClick() {
+        this.dispatchEvent(new CustomEvent('close'));
+    }
+
+    _onSendClick() {
+        this.dispatchEvent(new CustomEvent('submit', {
+            detail: this.formElement.getFormData()
+        }));
+    }
+
 }
 
 window.customElements.define('moe-form-dialog', MoeFormDialog);

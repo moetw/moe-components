@@ -56,6 +56,18 @@ export class MoeGraphQL extends PolymerElement {
         embedRequestServer
         postServer
     }
+    getValidationCriteria(boardId: ${boardId}) {
+        nameMaxLength
+        emailMaxLength
+        subjectMaxLength
+        commentMaxLength
+        fileMaxSize
+        videoMaxEmbeds
+        pollTitleMaxLength
+        pollMinItems
+        pollMaxItems
+        pollItemMaxLength    
+    }
 }`
         });
     }

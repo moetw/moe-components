@@ -327,27 +327,32 @@ moe-form-dialog {
 -->
 
 <!-- Reply Form -->
-<moe-form-dialog id="replyDialog" hidden>
+<moe-form-dialog id="replyDialog" hidden on-submit="_onReplyFormSubmit" on-close="_onReplyFormClose">
     <moe-reply-form id="replyForm" 
                     board-id="[[boardId]]"
-                    comment-max-length="1000" 
-                    file-max-size="2097152"
+                    comment-max-length="[[commentMaxLength]]"
+                    subject-max-length="[[subjectMaxLength]]" 
+                    file-max-size="[[fileMaxSize]]"
                     embed-request-server="[[embedRequestServer]]"
-                    on-submit="_onReplyFormSubmit"
-                    on-cancel="_onReplyFormCancel"></moe-reply-form>
+                    video-max-embeds="[[videoMaxEmbeds]]"></moe-reply-form>
 </moe-form-dialog>
 <pixmicat-request id="replyRequest" method="POST" server="[[postServer]]"></pixmicat-request>
 
 <!-- Create Thread Form -->
-<moe-form-dialog id="createThreadDialog" dialog-title="建立討論串" hidden>
+<moe-form-dialog id="createThreadDialog" dialog-title="建立討論串" hidden on-submit="_onCreateThreadFormSubmit" on-close="_onCreateThreadFormClose">
     <moe-form id="createThreadForm" 
               board-id="[[boardId]]"
-              comment-max-length="1000" 
-              file-max-size="2097152"
+              comment-max-length="[[commentMaxLength]]"
+              has-subject
+              subject-max-length="[[subjectMaxLength]]"
+              file-max-size="[[fileMaxSize]]"
               embed-request-server="[[embedRequestServer]]"
-              on-submit="_onCreateThreadFormSubmit"
-              on-cancel="_onCreateThreadFormCancel"
-              poll></moe-form>
+              video-max-embeds="[[videoMaxEmbeds]]"
+              has-poll
+              poll-title-max-length="[[pollTitleMaxLength]]"
+              poll-item-max-length="[[pollItemMaxLength]]"
+              poll-min-items="[[pollMinItems]]"
+              poll-max-items="[[pollMaxItems]]"></moe-form>
 </moe-form-dialog>
 <pixmicat-request id="createThreadRequest" method="POST" server="[[postServer]]"></pixmicat-request>
 
@@ -422,7 +427,19 @@ moe-form-dialog {
                     'BCDN_SRC': (file, subdomain, alias) => `https://mymoe.b-cdn.net/my/${subdomain}/${alias}/src/${file}`,
                     'BCDN_THUMB': (file, subdomain, alias) => `https://mymoe.b-cdn.net/my/${subdomain}/${alias}/thumb/${file}`,
                 }
-            }
+            },
+
+            // validation criteria
+            nameMaxLength: {type: Number, statePath: 'validationCriteria.nameMaxLength'},
+            emailMaxLength: {type: Number, statePath: 'validationCriteria.emailMaxLength'},
+            subjectMaxLength: {type: Number, statePath: 'validationCriteria.subjectMaxLength'},
+            commentMaxLength: {type: Number, statePath: 'validationCriteria.commentMaxLength'},
+            fileMaxSize: {type: Number, statePath: 'validationCriteria.fileMaxSize'},
+            videoMaxEmbeds: {type: Number, statePath: 'validationCriteria.videoMaxEmbeds'},
+            pollTitleMaxLength: {type: Number, statePath: 'validationCriteria.pollTitleMaxLength'},
+            pollItemMaxLength: {type: Number, statePath: 'validationCriteria.pollItemMaxLength'},
+            pollMinItems: {type: Number, statePath: 'validationCriteria.pollMinItems'},
+            pollMaxItems: {type: Number, statePath: 'validationCriteria.pollMaxItems'},
         };
     }
 
@@ -446,8 +463,13 @@ moe-form-dialog {
         });
     }
 
+    hideAllFormDialogs() {
+        this.shadowRoot.querySelectorAll('moe-form-dialog').forEach(dialog => dialog.setAttribute('hidden', 'hidden'));
+    }
+
     /** Reply Form */
     showReplyForm(boardId, threadNo, replyTo) {
+        this.hideAllFormDialogs();
         this.$.replyDialog.removeAttribute('hidden');
         this.$.replyDialog.dialogTitle = `回應 - No.${replyTo}`;
         this.$.replyForm.setProperties({
@@ -469,7 +491,6 @@ moe-form-dialog {
             e.detail.boardId,
             e.detail.threadNo,
             e.detail.comment,
-            "password",
             e.detail.file,
             e.detail.videoEmbeds,
         ).then(res => {
@@ -496,7 +517,7 @@ moe-form-dialog {
         });
     }
 
-    _onReplyFormCancel(e) {
+    _onReplyFormClose(e) {
         if (this.$.replyForm.changed() && !confirm("確定要取消回應嗎？")) {
             return;
         }
@@ -507,7 +528,7 @@ moe-form-dialog {
 
     /** Create Thread Form */
     showCreateThreadForm(boardId) {
-        console.log(this.$.createThreadDialog);
+        this.hideAllFormDialogs();
         this.$.createThreadDialog.removeAttribute('hidden');
         this.$.createThreadDialog.setProperties({
             boardId: boardId
@@ -524,10 +545,10 @@ moe-form-dialog {
         this.$.createThreadRequest.makeThread(
             e.detail.boardId,
             e.detail.comment,
-            "password",
             e.detail.file,
             e.detail.poll,
             e.detail.videoEmbeds,
+            e.detail.subject
         ).then(res => {
             // hide form
             this.$.createThreadDialog.setAttribute('hidden', 'hidden');
@@ -555,7 +576,7 @@ moe-form-dialog {
         });
     }
 
-    _onCreateThreadFormCancel(e) {
+    _onCreateThreadFormClose(e) {
         if (this.$.createThreadForm.changed() && !confirm("確定要取消建立討論串嗎？")) {
             return;
         }

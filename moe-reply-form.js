@@ -2,7 +2,7 @@ import {html, PolymerElement} from "@polymer/polymer/polymer-element";
 
 import './moe-form';
 
-class MoeReplyForm extends PolymerElement {
+export class MoeReplyForm extends PolymerElement {
     static get template() {
         return html`
 <style>
@@ -84,6 +84,10 @@ class MoeReplyForm extends PolymerElement {
 
     changed() {
         return this.$.form.changed();
+    }
+
+    getFormData() {
+        return this.$.form.getFormData();
     }
 
 }

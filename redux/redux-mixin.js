@@ -10,11 +10,17 @@ const initial = {
     // [${boardId}:${threadNo}]
     pageThreadKeys: [],
 
-    ui: {
-        scrollToThread: {
-            boardId: undefined,
-            threadNo: undefined
-        }
+    validationCriteria: {
+        nameMaxLength: 0,
+        emailMaxLength: 0,
+        subjectMaxLength: 0,
+        commentMaxLength: 0,
+        fileMaxSize: 0,
+        videoMaxEmbeds: 0,
+        pollTitleMaxLength: 0,
+        pollMinItems: 0,
+        pollMaxItems: 0,
+        pollItemMaxLength: 0,
     }
 };
 
@@ -47,6 +53,12 @@ const reducer = function (state, action) {
             const reply = action.reply;
             const key = `${reply.boardId}:${reply.threadNo}`;
             state.threadMap[key].replies.push(reply);
+            return state;
+        }
+
+        // {validationCriteria: {}}
+        case actions.UPDATE_VALIDATION_CRITERIA: {
+            Object.assign(state.validationCriteria, action.validationCriteria);
             return state;
         }
 
