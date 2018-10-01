@@ -12,6 +12,7 @@ import "@polymer/paper-fab";
 import "@polymer/paper-item/paper-icon-item";
 import "@polymer/paper-styles/paper-styles";
 import "@polymer/paper-ripple";
+import "@polymer/paper-toast";
 import "@polymer/app-route/app-route";
 import "@polymer/app-route/app-location";
 import "@polymer/iron-pages/iron-pages";
@@ -20,6 +21,7 @@ import "./moe-threads.js";
 import './moe-form-dialog';
 import './moe-reply-form';
 import './moe-form';
+import './moe-graphql';
 import './pixmicat-request';
 import {ReduxMixin} from './redux/redux-mixin';
 import * as actions from './redux/redux-actions';
@@ -280,7 +282,7 @@ moe-form-dialog {
         <app-toolbar class="board-top-menu">
             <div>[[subCaption]]</div>
         </app-toolbar>
-    </app-header>
+    </app-header>   
     
     <iron-pages role="main" selected="[[routeData.page]]" attr-for-selected="name" selected-attribute="visible" fallback-selection="404">
         <div name=""></div>
@@ -295,7 +297,8 @@ moe-form-dialog {
                      threads-per-page="5" 
                      replies-per-thread="3"
                      image-servers="[[imageServers]]"
-                     on-page-change="_onThreadsPageChange"></moe-threads>
+                     on-page-change="_onThreadsPageChange"
+                     on-post-menu-button-delete-click="_onPostDelete"></moe-threads>
         <div name="404"><h1>404</h1></div>
     </iron-pages>
     
@@ -363,6 +366,11 @@ moe-form-dialog {
               poll-max-items="[[pollMaxItems]]"></moe-form>
 </moe-form-dialog>
 <pixmicat-request id="createThreadRequest" method="POST" server="[[postServer]]"></pixmicat-request>
+
+<pixmicat-request id="deletePostRequest" method="POST" server="[[postServer]]"></pixmicat-request>
+<paper-toast id="deletePostToast" text="成功刪除文章"></paper-toast>
+
+<moe-graphql id="moeGraphQL" server="[[graphqlServer]]"></moe-graphql>
 
 <!-- Routes -->
 <app-location route="{{route}}"></app-location>
@@ -630,6 +638,59 @@ moe-form-dialog {
 
     _onFabClick(e) {
         this.showCreateThreadForm(this.boardId);
+    }
+
+    _onPostDelete(e) {
+        if (e.detail.threadNo !== e.detail.no) { // delete reply
+            this.$.deletePostRequest.delete(e.detail.boardId, e.detail.no)
+                .then(() => this.$.moeGraphQL.getDeleteReplyAck(e.detail.boardId, e.detail.threadNo))
+                .then(resp => {
+                    this.dispatch({
+                        type: actions.UPDATE_THREAD,
+                        thread: resp.data.getThreadByNo
+                    });
+                    this.dispatch({
+                        type: actions.REMOVE_REPLY_FROM_THREAD,
+                        reply: {
+                            boardId: e.detail.boardId,
+                            threadNo: e.detail.threadNo,
+                            no: e.detail.no
+                        }
+                    });
+
+                    this.$.deletePostToast.open();
+                })
+                .catch(err => {
+                    if (err.error) {
+                        alert(`${err.error}`);
+                    } else {
+                        alert(`Unexpected error: ${err}`);
+                        console.error(err);
+                    }
+                });
+        } else { // delete thread
+            this.$.deletePostRequest.delete(e.detail.boardId, e.detail.no)
+                .then(() => {
+                    this.dispatch({
+                        type: actions.REMOVE_THREAD,
+                        thread: {
+                            boardId: e.detail.boardId,
+                            threadNo: e.detail.threadNo,
+                            no: e.detail.no
+                        }
+                    });
+
+                    this.$.deletePostToast.open();
+                })
+                .catch(err => {
+                    if (err.error) {
+                        alert(`${err.error}`);
+                    } else {
+                        alert(`Unexpected error: ${err}`);
+                        console.error(err);
+                    }
+                });
+        }
     }
 }
 

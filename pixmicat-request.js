@@ -50,7 +50,7 @@ class PixmicatRequest extends PolymerElement {
         }
 
         const formData = this._makeRegistFormData(boardId, null, comment, file, videoEmbeds, poll, subject, email, name, password);
-        return this._sendRequest(formData);
+        return this._sendRegistRequest(formData);
     }
 
     /**
@@ -72,7 +72,7 @@ class PixmicatRequest extends PolymerElement {
         }
 
         const formData = this._makeRegistFormData(boardId, threadNo, comment, file, videoEmbeds, null, subject, email, name, password);
-        return this._sendRequest(formData);
+        return this._sendRegistRequest(formData);
     }
 
     /**
@@ -132,12 +132,32 @@ class PixmicatRequest extends PolymerElement {
         return body;
     }
 
+    _sendRegistRequest(formData) {
+        return this._sendRequest(this.server + "?mode=regist", formData);
+    }
+
     /**
+     * Delete a post
+     * @param {Number} boardId
+     * @param {Number} no
+     * @param {String} password
+     * @returns {Promise}
+     */
+    delete(boardId, no, password='') {
+        const body = new FormData();
+        body.append('pwd', password);
+        body.append('func', 'delete');
+        body.append(`${no}`, 'delete');
+        return this._sendRequest(this.server + "?mode=usrdel", body);
+    }
+
+    /**
+     * @param {String} url
      * @param {FormData} formData
      * @returns {Promise}
      * @private
      */
-    _sendRequest(formData) {
+    _sendRequest(url, formData) {
         return new Promise((resolve, reject) => {
             this.request = new XMLHttpRequest();
             this.request.addEventListener('progress', e => {
@@ -164,7 +184,7 @@ class PixmicatRequest extends PolymerElement {
                         break;
                 }
             });
-            this.request.open("POST", this.server);
+            this.request.open("POST", url);
             this.request.setRequestHeader('x-requested-with', 'pixmicat-request');
             this.request.withCredentials = true;
             this.request.responseType = "json";

@@ -34,6 +34,7 @@ import {MoeGraphQL} from "./moe-graphql";
 import {ReduxMixin} from './redux/redux-mixin';
 import * as selectors from './redux/redux-selectors';
 import * as actions from "./redux/redux-actions";
+import get from "lodash/get";
 
 /**
  * `moe-thread`
@@ -375,7 +376,14 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
                 type: Object,
                 reflectToAttribute: true
             },
-            replies: Array,
+            replies: {
+                type: Array,
+                statePath: function (state) {
+                    console.log(state, this.boardId, this.no);
+                    return get(state.threadMap, `${this.boardId}:${this.no}.replies`, [])
+                        .map(replyKey => state.replyMap[replyKey]);
+                }
+            },
             showFirstPostPoll: {
                 type: Boolean,
                 computed: '_computeShowFirstPostPoll(firstpost)'
@@ -444,19 +452,14 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         this.set('loadingMoreReplies', true);
 
         this.$.moeGraphQL
-            .getMoreReplies(this.boardId, this.no, this.replies[0].no, 100)
+            .getMoreReplies(this.boardId, this.no, this.replies[0] ? this.replies[0].no : 0, 100)
             .then(resp => {
-                resp.data.getMoreReplies.map(p => this._postTransformer(p)).forEach(reply => {
-                    this.replies.unshift(reply);
+                this.dispatch({
+                    type: actions.PREPEND_REPLIES_TO_THREAD,
+                    replies: resp.data.getMoreReplies.map(p => this._postTransformer(p))
                 });
 
-                this.notifySplices('replies', [{
-                    index: 0,
-                    removed: [],
-                    addedCount: resp.data.getMoreReplies.length,
-                    object: this.replies,
-                    type: 'splice'
-                }]);
+                this.notifyPath('replies.length');
             })
             .finally(() => this.set('loadingMoreReplies', false));
     }

@@ -78,12 +78,7 @@ export class MoeGraphQL extends PolymerElement {
             operationName: '',
             query: `{
   getThreads(boardId:${boardId}, offset:${threadsOffset},limit:${threadsLimit}) {
-      boardId
-      no
-      replyCount
-      flagAdminSticky
-      flagAdminThreadStop
-      flagAdminSage
+      ...ThreadFields
       firstPost {
         ...PostFields
       }
@@ -92,7 +87,7 @@ export class MoeGraphQL extends PolymerElement {
       }
   }
 }
-
+${this.FRAGMENT_THREAD_FIELDS}
 ${this.FRAGMENT_POST_FIELDS}`
         });
     }
@@ -102,12 +97,7 @@ ${this.FRAGMENT_POST_FIELDS}`
             operationName: '',
             query: `{
   getThreadByNo(boardId:${boardId}, no:${threadNo}) {
-      boardId
-      no
-      replyCount
-      flagAdminSticky
-      flagAdminThreadStop
-      flagAdminSage
+      ...ThreadFields
       firstPost {
         ...PostFields
       }
@@ -116,7 +106,7 @@ ${this.FRAGMENT_POST_FIELDS}`
       }
   }
 }
-
+${this.FRAGMENT_THREAD_FIELDS}
 ${this.FRAGMENT_POST_FIELDS}`
         });
     }
@@ -134,8 +124,20 @@ ${this.FRAGMENT_POST_FIELDS}`
         ...PostFields
     }
 }
-
 ${this.FRAGMENT_POST_FIELDS}`
+        });
+    }
+
+    getDeleteReplyAck(boardId, threadNo) {
+        return this.fetchQL.query({
+            operationName: '',
+            query: `{
+    getThreadByNo(boardId:${boardId},no:${threadNo}) {
+        boardId
+        no
+        replyCount
+    }
+}`
         });
     }
 
@@ -147,6 +149,17 @@ ${this.FRAGMENT_POST_FIELDS}`
 }
 ${this.FRAGMENT_POST_FIELDS}`
         });
+    }
+
+    get FRAGMENT_THREAD_FIELDS() {
+        return `fragment ThreadFields on Thread {
+    boardId
+    no
+    replyCount
+    flagAdminSticky
+    flagAdminThreadStop
+    flagAdminSage        
+}`
     }
 
     get FRAGMENT_POST_FIELDS() {

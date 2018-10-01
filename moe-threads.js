@@ -69,7 +69,6 @@ moe-thread {
         flag-admin-thread-stop="[[thread.flagAdminThreadStop]]"
         flag-admin-sage="[[thread.flagAdminSage]]"
         firstpost="[[thread.firstPost]]"
-        replies="[[thread.replies]]"
         graphql-server="[[graphqlServer]]"
         poll-server="[[pollServer]]"
         image-servers="[[imageServers]]"
@@ -168,11 +167,7 @@ moe-thread {
         });
 
         this.addEventListener('create-thread-ack', (e) => {
-            this.$.moeGraphQL.getThreadByNo(e.detail.boardId, e.detail.threadNo, 0, this.repliesPerThread)
-                .then(resp => {
-                    this.goHome();
-                })
-                .catch(err => console.error(err));
+            this.goHome();
         });
     }
 
