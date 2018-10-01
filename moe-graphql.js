@@ -55,6 +55,7 @@ export class MoeGraphQL extends PolymerElement {
         }
         embedRequestServer
         postServer
+        pollServer
     }
     getValidationCriteria(boardId: ${boardId}) {
         nameMaxLength

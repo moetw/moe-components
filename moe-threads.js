@@ -71,6 +71,7 @@ moe-thread {
         firstpost="[[thread.firstPost]]"
         replies="[[thread.replies]]"
         graphql-server="[[graphqlServer]]"
+        poll-server="[[pollServer]]"
         image-servers="[[imageServers]]"
         initial-reply-count="[[repliesPerThread]]">
     </moe-thread>
@@ -95,15 +96,9 @@ moe-thread {
 
     static get properties() {
         return {
-            boardId: {
-                type: Number
-            },
-            boardAlias: {
-                type: String
-            },
-            boardSubdomain: {
-                type: String
-            },
+            boardId: Number,
+            boardAlias: String,
+            boardSubdomain: String,
 
             route: {
                 type: Object,
@@ -113,12 +108,9 @@ moe-thread {
                 type: Object,
                 notify: true
             },
-            graphqlServer: {
-                type: String,
-            },
-            imageServers: {
-                type: Object
-            },
+            graphqlServer: String,
+            pollServer: String,
+            imageServers: Object,
             isAdmin: {
                 type: Boolean,
                 value: false,
@@ -134,12 +126,8 @@ moe-thread {
                 reflectToAttribute: true,
                 observer: '_observePage'
             },
-            threadsPerPage: {
-                type: Number
-            },
-            repliesPerThread: {
-                type: Number
-            },
+            threadsPerPage: Number,
+            repliesPerThread: Number,
             loading: {
                 type: Boolean,
                 value: true

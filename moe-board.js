@@ -284,9 +284,17 @@ moe-form-dialog {
     
     <iron-pages role="main" selected="[[routeData.page]]" attr-for-selected="name" selected-attribute="visible" fallback-selection="404">
         <div name=""></div>
-        <moe-threads name="threads" id="threads" route="{{threadsRoute}}" graphql-server="[[graphqlServer]]" 
-                     board-id="[[boardId]]" board-alias="[[boardAlias]]" board-subdomain="[[boardSubdomain]]" 
-                     threads-per-page="5" replies-per-thread="3" image-servers="[[imageServers]]"
+        <moe-threads name="threads" 
+                     id="threads" 
+                     route="{{threadsRoute}}" 
+                     graphql-server="[[graphqlServer]]"
+                     poll-server="[[pollServer]]" 
+                     board-id="[[boardId]]" 
+                     board-alias="[[boardAlias]]"
+                     board-subdomain="[[boardSubdomain]]" 
+                     threads-per-page="5" 
+                     replies-per-thread="3"
+                     image-servers="[[imageServers]]"
                      on-page-change="_onThreadsPageChange"></moe-threads>
         <div name="404"><h1>404</h1></div>
     </iron-pages>
@@ -372,30 +380,15 @@ moe-form-dialog {
 
     static get properties() {
         return {
-            graphqlServer: {
-                type: String
-            },
-            embedRequestServer: {
-                type: String
-            },
-            postServer: {
-                type: String
-            },
-            boardId: {
-                type: Number
-            },
-            boardAlias: {
-                type: String
-            },
-            boardSubdomain: {
-                type: String
-            },
-            boardExternalLinks: {
-                type: Array
-            },
-            page: {
-                type: String
-            },
+            graphqlServer: String,
+            embedRequestServer: String,
+            postServer: String,
+            pollServer: String,
+            boardId: Number,
+            boardAlias: String,
+            boardSubdomain: String,
+            boardExternalLinks: Array,
+            page: String,
             route: {
                 type: Object,
                 notify: true,

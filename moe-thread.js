@@ -19,6 +19,7 @@ import '@polymer/iron-list/iron-list'
 import './moe-icons';
 import './moe-pixmicat-pushpost';
 import './moe-poll';
+import './moe-poll-request';
 import './moe-post-comment';
 import './moe-post-header';
 import './moe-post-image';
@@ -235,7 +236,7 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         </template>
         <template is="dom-if" if="[[showFirstPostPoll]]">
             <div class="firstpost-poll-container">
-                <moe-poll board-id="[[firstpost.boardId]]" no="[[firstpost.no]]" subject="[[firstpost.poll.subject]]" items="[[firstpost.poll.items]]" voted="[[firstpost.poll.voted]]"></moe-poll>
+                <moe-poll board-id="[[firstpost.boardId]]" no="[[firstpost.no]]" subject="[[firstpost.poll.subject]]" items="[[firstpost.poll.items]]" voted="[[firstpost.poll.voted]]" on-item-click="_onMoePollItemClick"></moe-poll>
             </div>
         </template>
     </div>
@@ -323,7 +324,8 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         </div>
     </div>
 </paper-card>
-<moe-graphql id="moeGraphQL" server="[[graphqlServer]]"></moe-graphql>`;
+<moe-graphql id="moeGraphQL" server="[[graphqlServer]]"></moe-graphql>
+<moe-poll-request id="moePollRequest" server="[[pollServer]]"></moe-poll-request>`;
     }
 
     static get properties() {
@@ -333,24 +335,12 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
                 value: false,
                 reflectToAttribute: true
             },
-            boardId: {
-                type: Number
-            },
-            boardAlias: {
-                type: String
-            },
-            boardSubdomain: {
-                type: String
-            },
-            no: {
-                type: Number
-            },
-            replyCount: {
-                type: Number
-            },
-            initialReplyCount: {
-                type: Number,
-            },
+            boardId: Number,
+            boardAlias: String,
+            boardSubdomain: String,
+            no: Number,
+            replyCount: Number,
+            initialReplyCount: Number,
             omittedReplyCount: {
                 type: Number,
                 computed: '_computeOmittedReplyCount(replyCount, replies.length)',
@@ -385,9 +375,7 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
                 type: Object,
                 reflectToAttribute: true
             },
-            replies: {
-                type: Array
-            },
+            replies: Array,
             showFirstPostPoll: {
                 type: Boolean,
                 computed: '_computeShowFirstPostPoll(firstpost)'
@@ -396,12 +384,9 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
                 type: Boolean,
                 computed: '_computeShowFirstPostEmbeds(firstpost)'
             },
-            graphqlServer: {
-                type: String
-            },
-            imageServers: {
-                type: Object
-            }
+            graphqlServer: String,
+            pollServer: String,
+            imageServers: Object
         };
     }
 
@@ -501,6 +486,20 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         } else {
             return 0;
         }
+    }
+
+    _onMoePollItemClick(e) {
+         this.$.moePollRequest.vote(e.detail.no, e.detail.item)
+             .then(items => {
+                 this.shadowRoot.querySelector('moe-poll').setProperties({
+                     items,
+                     voted: true
+                 });
+             })
+             .catch(err => {
+                 console.error(err);
+                 alert(err.message);
+             });
     }
 }
 

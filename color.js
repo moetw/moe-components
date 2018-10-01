@@ -4,7 +4,6 @@ const template = html`
 <custom-style>
   <style is="custom-style">
     html {
-
         /* http://mcg.mbitson.com/#!?mcgpalette0=%237e1012&themename=futaba */
         --palette-50: rgb(240, 226, 227);
         --palette-100: rgb(216, 183, 184);

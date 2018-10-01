@@ -135,20 +135,16 @@ class MoePoll extends PolymerElement {
                 </div>
                 <div align="right" class="poll_total">( 目前有 <span>[[totalVotes]]</span> 名投票者 ) </div>
             </div>
-        </div>    
+        </div>
     </template>
 </div>
-    `;
+`;
     }
 
     static get properties() {
         return {
-            boardId: {
-                type: Number,
-            },
-            no: {
-                type: Number,
-            },
+            boardId: Number,
+            no: Number,
             subject: {
                 type: String,
                 value: '',
@@ -156,7 +152,7 @@ class MoePoll extends PolymerElement {
             items: {
                 type: Array,
                 value: [],
-                reflectToAttribute: true
+                notify: true
             },
             itemsProcessed: {
                 type: Array,
@@ -192,8 +188,7 @@ class MoePoll extends PolymerElement {
     }
 
     _onPollItemClick(e) {
-        this.dispatchEvent(new CustomEvent("pollItemClick", {
-            bubbles: true,
+        this.dispatchEvent(new CustomEvent("item-click", {
             composed: true,
             detail: {
                 board_id: this.boardId,
