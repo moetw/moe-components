@@ -2,6 +2,7 @@ import createStore from 'redux/src/createStore';
 import compose from 'redux/src/compose';
 import PolymerRedux from 'polymer-redux';
 import * as actions from './redux-actions';
+import merge from 'lodash-es/merge';
 
 const initial = {
     // ${boardId}:${threadNo} => thread object
@@ -107,7 +108,7 @@ const threadKey = (thread) => `${thread.boardId}:${thread.no}`;
 const updateThread = (state, thread) => {
     // fill threadMap
     if (state.threadMap[threadKey(thread)]) {
-        Object.assign(state.threadMap[threadKey(thread)], thread);
+        state.threadMap[threadKey(thread)] = merge(state.threadMap[threadKey(thread)], thread);
     } else {
         Object.assign(state.threadMap, {[threadKey(thread)]: thread})
     }
@@ -117,14 +118,14 @@ const updateThread = (state, thread) => {
 const replyKey = (reply) => `${reply.boardId}:${reply.no}`;
 const updateReply = (state, reply) => {
     if (state.replyMap[replyKey(reply)]) {
-        Object.assign(state.replyMap[replyKey(reply)], reply);
+        state.replyMap[replyKey(reply)] = merge(state.replyMap[replyKey(reply)], reply);
     } else {
         Object.assign(state.replyMap, {[replyKey(reply)]: reply})
     }
     return state;
 };
 
-const store = createStore(
+export const store = createStore(
     reducer,
     initial,
 

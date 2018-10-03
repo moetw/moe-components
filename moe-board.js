@@ -25,6 +25,7 @@ import './moe-graphql';
 import './pixmicat-request';
 import {ReduxMixin} from './redux/redux-mixin';
 import * as actions from './redux/redux-actions';
+import isError from "lodash-es/isError";
 
 class MoeBoard extends ReduxMixin(PolymerElement) {
     static get template() {
@@ -508,7 +509,13 @@ moe-form-dialog {
             }));
         }).catch(err => {
             console.error(err);
-            alert(err.error);
+
+            if (err.error) {
+                alert(err.error);
+            } else {
+                alert("Connection error");
+            }
+
         }).finally(() => {
             // remove loading status
             this.$.replyForm.setProperties({
@@ -661,11 +668,11 @@ moe-form-dialog {
                     this.$.deletePostToast.open();
                 })
                 .catch(err => {
-                    if (err.error) {
-                        alert(`${err.error}`);
+                    console.error(err);
+                    if (isError(err)) {
+                        alert(`${err.message}`);
                     } else {
-                        alert(`Unexpected error: ${err}`);
-                        console.error(err);
+                        alert(`Unexpected error`);
                     }
                 });
         } else { // delete thread
@@ -683,11 +690,11 @@ moe-form-dialog {
                     this.$.deletePostToast.open();
                 })
                 .catch(err => {
-                    if (err.error) {
-                        alert(`${err.error}`);
+                    console.error(err);
+                    if (isError(err)) {
+                        alert(`${err.message}`);
                     } else {
-                        alert(`Unexpected error: ${err}`);
-                        console.error(err);
+                        alert(`Unexpected error`);
                     }
                 });
         }

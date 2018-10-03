@@ -1,4 +1,5 @@
 import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data.js';
 import '@polymer/paper-styles/paper-styles.js';
 import '@polymer/iron-icons/social-icons.js';
 import '@polymer/iron-icon/iron-icon.js';
@@ -13,7 +14,7 @@ import './moe-styles.js';
  * @polymer
  * @demo demo/index.html
  */
-class MoePoll extends PolymerElement {
+class MoePoll extends MutableData(PolymerElement) {
     static get template() {
         return html`
 <style>
@@ -97,7 +98,7 @@ class MoePoll extends PolymerElement {
 
 <div>
     <!-- unvoted -->
-    <template is="dom-if" if="{{!voted}}">
+    <template is="dom-if" if="[[displayItems]]">
         <div class="poll_container">
             <div class="vote">
                 <div class="poll_title">
@@ -105,8 +106,8 @@ class MoePoll extends PolymerElement {
                 </div>						
                 <div class="pool">
                     <div class="poll_list">
-                        <template is="dom-repeat" items="{{itemsProcessed}}">
-                            <moe-poll-item text="{{item.text}}" on-click="_onPollItemClick"></moe-poll-item>
+                        <template is="dom-repeat" items="[[itemsProcessed]]">
+                            <moe-poll-item text="[[item.text]]" on-click="_onPollItemClick"></moe-poll-item>
                         </template>
                     </div>
                 </div>
@@ -116,18 +117,18 @@ class MoePoll extends PolymerElement {
     </template>
     
     <!-- voted -->
-    <template is="dom-if" if="{{voted}}">
+    <template is="dom-if" if="[[displayResult]]">
         <div class="poll_container">
             <div class="vote poll_result">
                 <div class="poll_title">
                     <iron-icon icon="social:poll"></iron-icon>[[subject]]
                 </div>					
                 <div class="progress poll_result_list">
-                    <template is="dom-repeat" items="{{itemsProcessed}}">
+                    <template is="dom-repeat" items="[[itemsProcessed]]">
                         <div>
                             <div><span class="poll_result_item_caption">[[item.text]]</span></div>
                             <div class="barCon poll_result_item_stats">						    		
-                                <div class="bar" style="width: {{item.percentage}}%;"></div>
+                                <div class="bar" style="width: [[item.percentage]]%;"></div>
                                 <div class="barData"><span class="percent">[[item.percentage]]%</span><span class="count">[[item.votes]]</span></div>
                             </div>						    							    	
                         </div>
@@ -167,6 +168,14 @@ class MoePoll extends PolymerElement {
                 type: Boolean,
                 value: false,
                 reflectToAttribute: true
+            },
+            displayResult: {
+                type: Boolean,
+                computed: '_computeDisplayResult(voted)'
+            },
+            displayItems: {
+                type: Boolean,
+                computed: '_computeDisplayItems(voted)'
             }
         };
     }
@@ -196,6 +205,14 @@ class MoePoll extends PolymerElement {
                 item: e.currentTarget.get('text')
             }
         }));
+    }
+
+    _computeDisplayResult(voted) {
+        return voted;
+    }
+
+    _computeDisplayItems(voted) {
+        return !voted;
     }
 }
 

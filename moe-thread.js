@@ -34,7 +34,7 @@ import {MoeGraphQL} from "./moe-graphql";
 import {ReduxMixin} from './redux/redux-mixin';
 import * as selectors from './redux/redux-selectors';
 import * as actions from "./redux/redux-actions";
-import get from "lodash/get";
+import get from "lodash-es/get";
 
 /**
  * `moe-thread`
@@ -121,18 +121,18 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         transition: max-height 0.5s;
     }
     
-    .firstpost {
+    .firstPost {
         display: block;
-        background-color: var(--moe-thread-firstpost-background-color);
+        background-color: var(--moe-thread-first-post-background-color);
         padding: 1em;
     }
-    .firstpost-poll-container {
+    .firstPost-poll-container {
         @apply --layout-horizontal;
     }
-    .firstpost-poll-container moe-poll {
+    .firstPost-poll-container moe-poll {
         @apply --layout-flex-auto;
     }
-    .firstpost .post-body {
+    .firstPost .post-body {
         margin-top: 1em; 
     }
     .replies {
@@ -153,7 +153,7 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     }
     
     @media only screen and (max-width: 600px) {
-        .firstpost .thumb {
+        .firstPost .thumb {
             display: block;
             float: none;
             margin-left: auto;
@@ -233,11 +233,11 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     <!-- thread cover -->
     <div class="cover">
         <template is="dom-if" if="[[showFirstPostEmebeds]]">
-            <moe-embeds embeds="[[firstpost.embeds]]"></moe-embeds>
+            <moe-embeds embeds="[[firstPost.embeds]]"></moe-embeds>
         </template>
         <template is="dom-if" if="[[showFirstPostPoll]]">
-            <div class="firstpost-poll-container">
-                <moe-poll board-id="[[firstpost.boardId]]" no="[[firstpost.no]]" subject="[[firstpost.poll.subject]]" items="[[firstpost.poll.items]]" voted="[[firstpost.poll.voted]]" on-item-click="_onMoePollItemClick"></moe-poll>
+            <div class="firstPost-poll-container">
+                <moe-poll board-id="[[firstPost.boardId]]" no="[[firstPost.no]]" subject="[[firstPost.poll.subject]]" items="[[firstPost.poll.items]]" voted="[[firstPost.poll.voted]]" on-item-click="_onMoePollItemClick"></moe-poll>
             </div>
         </template>
     </div>
@@ -255,9 +255,9 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     </div>
        
     <div class="body">
-        <!-- firstpost -->
-        <div class="firstpost">
-            <moe-post-menu-action-button board-id="[[firstpost.boardId]]" thread-no="[[firstpost.no]]" no="[[firstpost.no]]" is-first-post="true" is-admin="[[isAdmin]]" flag-admin-thread-stop="[[flagAdminThreadStop]]"></moe-post-menu-action-button>
+        <!-- firstPost -->
+        <div class="firstPost">
+            <moe-post-menu-action-button board-id="[[firstPost.boardId]]" thread-no="[[firstPost.no]]" no="[[firstPost.no]]" is-first-post="true" is-admin="[[isAdmin]]" flag-admin-thread-stop="[[flagAdminThreadStop]]"></moe-post-menu-action-button>
             <div class="post-subject">
                 <template is="dom-if" if="[[flagAdminSticky]]">
                     <iron-icon id="icon-thread-pin" icon="moe:thread-pin"></iron-icon>
@@ -271,10 +271,10 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
                     <iron-icon id="icon-thread-stop" icon="moe:thread-stop"></iron-icon>
                     <paper-tooltip for="icon-thread-stop">本討論串已禁止回應</paper-tooltip>
                 </template>
-                [[firstpost.sub]]
+                [[firstPost.sub]]
             </div>
-            <div id="firstpostPostBody" class="post-body">
-                <template is="dom-repeat" items="[[firstpost.images]]" as="image">
+            <div id="firstPostPostBody" class="post-body">
+                <template is="dom-repeat" items="[[firstPost.images]]" as="image">
                     <a target="_blank" href="[[image.imageSrc]]">
                         <moe-post-image 
                             image-src="[[image.imageSrc]]" image-width="[[image.imageWidth]]" image-height="[[image.imageHeight]]"
@@ -282,7 +282,7 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
                             class="thumb" />
                     </a>
                 </template>
-                <moe-post-comment comment="[[firstpost.com]]" on-processed="_onMoePostCommentProcessed" />
+                <moe-post-comment comment="[[firstPost.com]]" on-processed="_onMoePostCommentProcessed" />
             </div>
             
             <!-- show more contents --> 
@@ -294,7 +294,7 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
             </template>
             
             <div style="clear: both"></div>
-            <moe-post-header board-id="[[firstpost.boardId]]" no="[[firstpost.no]]" trip-id="[[firstpost.tripId]]" created-at="[[firstpost.createdAt]]" flag-admin-thread-stop="[[flagAdminThreadStop]]"></moe-post-header>
+            <moe-post-header board-id="[[firstPost.boardId]]" no="[[firstPost.no]]" trip-id="[[firstPost.tripId]]" created-at="[[firstPost.createdAt]]" flag-admin-thread-stop="[[flagAdminThreadStop]]"></moe-post-header>
         </div>
         
         <!-- show more replies -->
@@ -372,25 +372,26 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
                 type: Boolean,
                 value: false
             },
-            firstpost: {
+            firstPost: {
                 type: Object,
-                reflectToAttribute: true
+                statePath: function(state) {
+                    return get(state.threadMap, `${this.boardId}:${this.no}.firstPost`, {})
+                }
             },
             replies: {
                 type: Array,
                 statePath: function (state) {
-                    console.log(state, this.boardId, this.no);
                     return get(state.threadMap, `${this.boardId}:${this.no}.replies`, [])
                         .map(replyKey => state.replyMap[replyKey]);
                 }
             },
             showFirstPostPoll: {
                 type: Boolean,
-                computed: '_computeShowFirstPostPoll(firstpost)'
+                computed: '_computeShowFirstPostPoll(firstPost)'
             },
             showFirstPostEmebeds: {
                 type: Boolean,
-                computed: '_computeShowFirstPostEmbeds(firstpost)'
+                computed: '_computeShowFirstPostEmbeds(firstPost)'
             },
             graphqlServer: String,
             pollServer: String,
@@ -399,20 +400,20 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     }
 
     _onMoePostCommentProcessed() {
-        this.set('displayShowMore', this.$.firstpostPostBody.scrollHeight > this.$.firstpostPostBody.clientHeight);
+        this.set('displayShowMore', this.$.firstPostPostBody.scrollHeight > this.$.firstPostPostBody.clientHeight);
     }
 
     _onShowMoreClick() {
-        this.$.firstpostPostBody.style.maxHeight = this.$.firstpostPostBody.scrollHeight + 'px';
+        this.$.firstPostPostBody.style.maxHeight = this.$.firstPostPostBody.scrollHeight + 'px';
         this.set('displayShowMore', false);
     }
 
-    _computeShowFirstPostEmbeds(firstpost) {
-        return firstpost.embeds && firstpost.embeds.length > 0;
+    _computeShowFirstPostEmbeds(firstPost) {
+        return firstPost.embeds && firstPost.embeds.length > 0;
     }
 
-    _computeShowFirstPostPoll(firstpost) {
-        return firstpost.poll && firstpost.poll.items && firstpost.poll.items.length > 0;
+    _computeShowFirstPostPoll(firstPost) {
+        return firstPost.poll && firstPost.poll.items && firstPost.poll.items.length > 0;
     }
 
     _computeOmittedReplyCount(replyCount, repliesLength) {
@@ -494,9 +495,18 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     _onMoePollItemClick(e) {
          this.$.moePollRequest.vote(e.detail.no, e.detail.item)
              .then(items => {
-                 this.shadowRoot.querySelector('moe-poll').setProperties({
-                     items,
-                     voted: true
+                 this.dispatch({
+                     type: actions.UPDATE_THREAD,
+                     thread: {
+                         boardId: this.boardId,
+                         no: this.no,
+                         firstPost: {
+                             poll: {
+                                 voted: true,
+                                 items
+                             }
+                         }
+                     }
                  });
              })
              .catch(err => {

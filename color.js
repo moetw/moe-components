@@ -36,7 +36,7 @@ const template = html`
         --moe-thread-more-replies-button-hover-background-color: #af6060;
         --moe-thread-more-replies-button-text-color: #ffffff; 
         
-        --moe-thread-firstpost-background-color: #fffde5;
+        --moe-thread-first-post-background-color: #fffde5;
         --moe-thread-reply-odd-background-color: #E7CFC0;
         --moe-thread-reply-even-background-color: #F0E0D6;
         

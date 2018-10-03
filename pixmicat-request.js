@@ -178,8 +178,12 @@ class PixmicatRequest extends PolymerElement {
                     case 4:
                         if (this.request.status === 200) {
                             resolve(this.request.response);
+                        } else if (this.request.response && this.request.response.error) {
+                            reject(new Error(this.request.response.error));
+                        } else if (this.request.statusText) {
+                            reject(new Error(`${this.request.statusText} (${this.request.status})`));
                         } else {
-                            reject(this.request.response);
+                            reject(new Error('Network error'));
                         }
                         break;
                 }

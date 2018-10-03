@@ -1,7 +1,7 @@
 import {html, PolymerElement} from "@polymer/polymer/polymer-element";
 
-import isArray from 'lodash/isArrayLike';
-import isObject from 'lodash/isObject';
+import isArray from 'lodash-es/isArrayLike';
+import isObject from 'lodash-es/isObject';
 
 class MoePollRequest extends PolymerElement {
     static get template() {

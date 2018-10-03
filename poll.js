@@ -1,5 +1,5 @@
-import isString from 'lodash/isString';
-import isArray from 'lodash/isArrayLike';
+import isString from 'lodash-es/isString';
+import isArray from 'lodash-es/isArrayLike';
 
 export class Poll {
 

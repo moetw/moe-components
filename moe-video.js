@@ -8,7 +8,7 @@ import '@polymer/iron-icon/iron-icon';
 import '@polymer/iron-icons/iron-icons';
 import '@polymer/iron-icons/av-icons';
 import '@polymer/google-youtube/google-youtube';
-import get from 'lodash/get';
+import get from 'lodash-es/get';
 
 class MoeVideo extends PolymerElement {
 

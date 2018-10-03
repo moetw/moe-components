@@ -68,7 +68,6 @@ moe-thread {
         flag-admin-sticky="[[thread.flagAdminSticky]]"
         flag-admin-thread-stop="[[thread.flagAdminThreadStop]]"
         flag-admin-sage="[[thread.flagAdminSage]]"
-        firstpost="[[thread.firstPost]]"
         graphql-server="[[graphqlServer]]"
         poll-server="[[pollServer]]"
         image-servers="[[imageServers]]"
