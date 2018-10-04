@@ -117,7 +117,9 @@ moe-thread {
             },
             threads: {
                 type: Array,
-                statePath: selectors.threadsSelector
+                statePath: function (state) {
+                  return selectors.threadsSelector(state);
+                }
             },
             page: {
                 type: Number,

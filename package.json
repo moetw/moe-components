@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@polymer/app-layout": "^3.0.0-pre.26",
+    "@polymer/app-localize-behavior": "^3.0.1",
     "@polymer/app-route": "^3.0.0",
     "@polymer/google-youtube": "git+https://github.com/moetw/google-youtube.git",
     "@polymer/iron-flex-layout": "^3.0.0-pre.25",
@@ -30,6 +31,8 @@
     "@polymer/paper-listbox": "^3.0.0-pre.25",
     "@polymer/paper-menu-button": "^3.0.0-pre.25",
     "@polymer/paper-progress": "^3.0.0-pre.25",
+    "@polymer/paper-radio-button": "^3.0.1",
+    "@polymer/paper-radio-group": "^3.0.1",
     "@polymer/paper-ripple": "^3.0.0-pre.25",
     "@polymer/paper-spinner": "^3.0.0-pre.25",
     "@polymer/paper-styles": "^3.0.0-pre.25",

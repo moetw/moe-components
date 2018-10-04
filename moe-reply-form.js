@@ -86,10 +86,13 @@ export class MoeReplyForm extends PolymerElement {
         return this.$.form.changed();
     }
 
+    validate() {
+      return null;
+    }
+
     getFormData() {
         return this.$.form.getFormData();
     }
-
 }
 
 

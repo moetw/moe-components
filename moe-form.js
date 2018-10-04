@@ -250,6 +250,10 @@ paper-spinner:not([active]) {
             (this.comment && this.comment.length > 0);
     }
 
+    validate() {
+      return null;
+    }
+
     getFormData() {
         return {
             boardId: this.boardId,
@@ -361,12 +365,12 @@ paper-spinner:not([active]) {
     /** Loading State */
     _observeLoading(newValue, oldValue) {
         if (newValue && !oldValue) {
-            this.dispatchEvent(new CustomEvent('on-loading-start', {
+            this.dispatchEvent(new CustomEvent('loading-start', {
                 bubbles: true,
                 composed: true
             }));
         } else if (!newValue && oldValue) {
-            this.dispatchEvent(new CustomEvent('on-loading-end', {
+            this.dispatchEvent(new CustomEvent('loading-end', {
                 bubbles: true,
                 composed: true
             }));

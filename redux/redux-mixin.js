@@ -5,6 +5,8 @@ import * as actions from './redux-actions';
 import merge from 'lodash-es/merge';
 
 const initial = {
+    language: 'zh-TW',
+
     // ${boardId}:${threadNo} => thread object
     threadMap: {},
 
@@ -25,7 +27,11 @@ const initial = {
         pollMinItems: 0,
         pollMaxItems: 0,
         pollItemMaxLength: 0,
-    }
+        reportContentMaxLength: 0,
+    },
+
+    // {[id] => {id,name,order}}
+    reportCategories: {}
 };
 
 const reducer = function (state, action) {
@@ -97,6 +103,15 @@ const reducer = function (state, action) {
         // {validationCriteria: {}}
         case actions.UPDATE_VALIDATION_CRITERIA: {
             Object.assign(state.validationCriteria, action.validationCriteria);
+            return state;
+        }
+
+        // action: {reportCategories: [{id,name,order}]}
+        case actions.UPDATE_REPORT_CATEGORIES: {
+            state.reportCategories = {};
+            action.reportCategories.forEach(reportCategory => {
+                state.reportCategories[reportCategory.id] = reportCategory;
+            });
             return state;
         }
 

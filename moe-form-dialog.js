@@ -8,17 +8,18 @@ import '@polymer/app-layout/app-header/app-header';
 import '@polymer/paper-icon-button/paper-icon-button';
 import '@polymer/iron-icons/image-icons';
 import '@polymer/paper-progress/paper-progress';
+import '@polymer/paper-tooltip/paper-tooltip';
+import isError from 'lodash-es/isError';
 import './color';
 
 import './moe-icons';
-import {MoeForm} from './moe-form';
-import {MoeReplyForm} from './moe-reply-form';
 
 class MoeFormDialog extends PolymerElement {
     static get template() {
         return html`
 <style>
 :host {
+    @apply --shadow-elevation-24dp;
     display: block;
     position: fixed;
     top: 0;
@@ -26,10 +27,19 @@ class MoeFormDialog extends PolymerElement {
     margin: 0;
     padding: 0;
     z-index: 5;
-    @apply --shadow-elevation-24dp;
+    width: 500px;
 }
 :host([hidden]) {
     display: none;
+}
+@media (max-width: 500px) {
+    :host {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        top: 0;
+        left: 0;
+    }
 }
 #container {
     display: block;
@@ -72,7 +82,7 @@ paper-progress:not([active]) {
         <paper-icon-button id="closeButton" icon="close" on-click="_onCloseClick"></paper-icon-button>
         <paper-tooltip for="closeButton">關閉</paper-tooltip>
         <div main-title>[[dialogTitle]]</div>
-        <paper-icon-button id="sendButton" icon="send" alt="送出" on-click="_onSendClick"></paper-icon-button>
+        <paper-icon-button id="sendButton" icon="send" on-click="_onSendClick"></paper-icon-button>
         <paper-tooltip for="sendButton">送出</paper-tooltip>
     </app-toolbar>
 </app-header>
@@ -115,6 +125,16 @@ paper-progress:not([active]) {
         ];
     }
 
+    /**
+     * @param {Object} node a component that implements getFormData and validate methods
+     * @returns {boolean}
+     */
+    static isForm(node) {
+        return typeof node === "object" &&
+          typeof node.getFormData === 'function' &&
+          typeof node.validate === 'function';
+    }
+
     ready() {
         super.ready();
 
@@ -126,7 +146,7 @@ paper-progress:not([active]) {
 
         // search for moe-form element in the form slot
         for (let node of this.$.form.assignedNodes()) {
-            if (typeof node === "object" && (node instanceof MoeReplyForm || node instanceof MoeForm)) {
+            if (MoeFormDialog.isForm(node)) {
                 this.formElement = node;
                 break;
             }
@@ -134,13 +154,21 @@ paper-progress:not([active]) {
         if (!this.formElement) {
             console.error("There must be a moe-form/moe-reply-form slotted inside of moe-form-dialog", this);
         } else {
-            this.formElement.addEventListener('on-loading-start', () => {
+            this.formElement.addEventListener('loading-start', () => {
                 this.set('loading', true);
             });
-            this.formElement.addEventListener('on-loading-end', () => {
+            this.formElement.addEventListener('loading-end', () => {
                 this.set('loading', false);
             });
         }
+    }
+
+    hide() {
+      this.setAttribute('hidden', 'hidden');
+    }
+
+    show() {
+      this.removeAttribute('hidden');
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -169,7 +197,7 @@ paper-progress:not([active]) {
     _onDragStart(e) {
         this.draggingXDelta = e.clientX - this.offsetLeft;
         this.draggingYDelta = e.clientY - this.offsetTop;
-        e.dataTransfer.setDragImage(document.createElement('img'),0,0);
+        e.dataTransfer.setDragImage(document.createElement('img'),0,0); // remove drag image
     }
 
     _onDrag(e) {
@@ -189,9 +217,16 @@ paper-progress:not([active]) {
     }
 
     _onSendClick() {
-        this.dispatchEvent(new CustomEvent('submit', {
-            detail: this.formElement.getFormData()
+      const error = this.formElement.validate();
+      if (isError(error)) {
+        this.dispatchEvent(new CustomEvent('error', {
+          detail: {error}
         }));
+      } else {
+        this.dispatchEvent(new CustomEvent('submit', {
+          detail: this.formElement.getFormData()
+        }));
+      }
     }
 
 }

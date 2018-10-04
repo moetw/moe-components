@@ -62,6 +62,12 @@ class MoeBoardLoader extends ReduxMixin(PolymerElement) {
                     validationCriteria: resp.data.getValidationCriteria
                 });
 
+                // report categories
+                this.dispatch({
+                    type: actions.UPDATE_REPORT_CATEGORIES,
+                    reportCategories: resp.data.getReportCategories
+                });
+
                 this.$.boardContainer.innerHTML = '';
                 this.$.boardContainer.appendChild(board);
             })

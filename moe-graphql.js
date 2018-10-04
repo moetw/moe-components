@@ -67,7 +67,13 @@ export class MoeGraphQL extends PolymerElement {
         pollTitleMaxLength
         pollMinItems
         pollMaxItems
-        pollItemMaxLength    
+        pollItemMaxLength
+        reportContentMaxLength    
+    }
+    getReportCategories {
+        id
+        name
+        order
     }
 }`
         });

@@ -21,13 +21,18 @@ import "./moe-threads.js";
 import './moe-form-dialog';
 import './moe-reply-form';
 import './moe-form';
+import './moe-report-form';
 import './moe-graphql';
 import './pixmicat-request';
 import {ReduxMixin} from './redux/redux-mixin';
 import * as actions from './redux/redux-actions';
 import isError from "lodash-es/isError";
+import {mixinBehaviors} from "@polymer/polymer/lib/legacy/class";
+import {AppLocalizeBehavior} from "@polymer/app-localize-behavior";
 
-class MoeBoard extends ReduxMixin(PolymerElement) {
+import locales from "./locales/moe-board";
+
+class MoeBoard extends mixinBehaviors([AppLocalizeBehavior], ReduxMixin(PolymerElement)) {
     static get template() {
         return html`
 <style>
@@ -235,24 +240,6 @@ app-drawer ul {
 app-drawer a paper-button:hover {
     background-color: var(--paper-grey-300);
 }
-
-/** Dialog */
-moe-form-dialog {
-    width: 500px;
-    top: 0;
-    left: 0;
-}
-
-@media (max-width: 500px) {
-    moe-form-dialog {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        top: 0;
-        left: 0;
-    }
-}
-
 </style>
 <app-header-layout fullbleed>
     <app-header slot="header" condenses reveals shadow effects="waterfall parallax-background blend-background" style="width: 100%">
@@ -299,7 +286,8 @@ moe-form-dialog {
                      replies-per-thread="3"
                      image-servers="[[imageServers]]"
                      on-page-change="_onThreadsPageChange"
-                     on-post-menu-button-delete-click="_onPostDelete"></moe-threads>
+                     on-post-menu-button-delete-click="_onPostDelete"
+                     on-post-menu-button-report-click="_onPostReport"></moe-threads>
         <div name="404"><h1>404</h1></div>
     </iron-pages>
     
@@ -370,6 +358,11 @@ moe-form-dialog {
 
 <pixmicat-request id="deletePostRequest" method="POST" server="[[postServer]]"></pixmicat-request>
 <paper-toast id="deletePostToast" text="成功刪除文章"></paper-toast>
+
+<!-- Report Form -->
+<moe-form-dialog id="reportDialog" on-submit="_onReportSubmit" on-error="_onReportError" on-close="_onReportDialogClose" hidden>
+  <moe-report-form name="form" id="reportForm"></moe-report-form>
+</moe-form-dialog>
 
 <moe-graphql id="moeGraphQL" server="[[graphqlServer]]"></moe-graphql>
 
@@ -442,6 +435,12 @@ moe-form-dialog {
             pollItemMaxLength: {type: Number, statePath: 'validationCriteria.pollItemMaxLength'},
             pollMinItems: {type: Number, statePath: 'validationCriteria.pollMinItems'},
             pollMaxItems: {type: Number, statePath: 'validationCriteria.pollMaxItems'},
+
+            // i18n
+            language: {
+                type: String,
+                statePath: 'language'
+            }
         };
     }
 
@@ -451,6 +450,8 @@ moe-form-dialog {
 
     ready() {
         super.ready();
+
+        this.resources = locales;
 
         this.addEventListener('post-menu-button-reply-click', (e) => {
             this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no);
@@ -472,7 +473,7 @@ moe-form-dialog {
     /** Reply Form */
     showReplyForm(boardId, threadNo, replyTo) {
         this.hideAllFormDialogs();
-        this.$.replyDialog.removeAttribute('hidden');
+        this.$.replyDialog.show();
         this.$.replyDialog.dialogTitle = `回應 - No.${replyTo}`;
         this.$.replyForm.setProperties({
             boardId: boardId,
@@ -497,7 +498,7 @@ moe-form-dialog {
             e.detail.videoEmbeds,
         ).then(res => {
             // hide form
-            this.$.replyDialog.setAttribute('hidden', 'hidden');
+            this.$.replyDialog.hide();
             this.$.replyForm.reset();
             // fetch post
             this.$.threads.dispatchEvent(new CustomEvent('reply-ack', {
@@ -569,8 +570,8 @@ moe-form-dialog {
                 }
             }));
         }).catch(err => {
-            if (err.error) {
-                alert(`${err.error}`);
+            if (isError(err)) {
+                alert(`${err.message}`);
             } else {
                 alert(`Unexpected error: ${err}`);
                 console.error(err);
@@ -698,6 +699,37 @@ moe-form-dialog {
                     }
                 });
         }
+    }
+
+    /* Report Event Handlers */
+
+    _onReportSubmit(e) {
+      // TODO: submit report to api
+      console.log(e.detail);
+    }
+
+    _onReportError(e) {
+      if (isError(e.detail.error)) {
+        alert(e.detail.error.message);
+      } else {
+        alert('Unexpected error ' + e);
+        console.error(e);
+      }
+    }
+
+    _onPostReport(e) {
+      this.$.reportForm.reset();
+      this.$.reportForm.setProperties({
+        boardId: e.detail.boardId,
+        no: e.detail.no
+      });
+      this.$.reportDialog.dialogTitle = this.localize('reportDialogTitle', 'no', e.detail.no);
+      this.$.reportDialog.show();
+    }
+
+    _onReportDialogClose(e) {
+      this.$.reportForm.reset();
+      this.$.reportDialog.hide();
     }
 }
 
