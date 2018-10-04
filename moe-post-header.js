@@ -25,7 +25,7 @@ class MoePostHeader extends PolymerElement {
     padding-left: 0.5em;
     padding-right: 0.5em;
     border-radius: 1em;
-    background-color: var(--moe-post-header-no-background-color);
+    background-color: hsla(0,0%,80%,0.65);
 }
 .post-header-no-chip:hover {
     cursor: pointer;
@@ -58,7 +58,7 @@ paper-tooltip {
     <div class="post-header-no" on-click="_onPostHeaderNoClick">
         <div class="post-header-no-chip">No.[[no]]<paper-ripple></paper-ripple></div>
     </div>
-    <div class="post-header-id">ID:[[tripId]]</div>
+    <div class="post-header-id">[[tripId]]</div>
     <div id="post-header-date">[[formatCreatedAt(createdAt)]]</div>
     <paper-tooltip for="post-header-date" offset="0">[[fullyFormatCreatedAt(createdAt)]]</paper-tooltip>
 </div>

@@ -7,13 +7,14 @@ class MoePostComment extends PolymerElement {
         return html`
 <style>
 :host {
-    display: block;
+    display: inline;
     height: auto;
     word-break: break-all;
 }
 
 #content {
-    line-height: 1.5em;
+    line-height: 1.45em;    
+    margin: 0;
 }
 
 .highlight-quote {
@@ -21,7 +22,7 @@ class MoePostComment extends PolymerElement {
 }
 
 </style>
-<span id="content"></span>
+<p id="content"></p>
 <moe-pixmicat-pushpost id="pushpost" style="display:none"></moe-pixmicat-pushpost>
 `;
     }

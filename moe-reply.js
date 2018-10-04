@@ -12,16 +12,15 @@ class MoeReply extends PolymerElement {
     static get template() {
         return html`
 <style>
-:host {
+:host {    
     @apply --layout-vertical;
-    @apply --layout-start-aligned;
-    @apply --layout-self-stretch;
+    @apply --moe-reply-classic-styles;
+    position: relative;
     justify-content: space-between;
     height: auto;
 }
 
 .post-body {
-    @apply --layout-self-stretch; 
     @apply --paper-font-body1;
     padding: 1em 1em 0 1em;
 }
