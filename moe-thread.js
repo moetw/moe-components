@@ -56,7 +56,6 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         @apply --shadow-elevation-6dp;
         @apply --shadow-transition;
         width: 100%;
-        background-color: var(--moe-thread-first-post-background-color);
     }
     
     /** TODO: focus on reply */
@@ -115,9 +114,6 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     .post-subject { 
         @apply --paper-font-title;
     }
-    .post-subject iron-icon {    
-        vertical-align: top;
-    }
     .post-body { 
         @apply --paper-font-body1;
         max-height: 50vh;
@@ -169,7 +165,7 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         @apply --layout-horizontal;
         @apply --layout-center-justified;
         @apply --layout-self-center;
-        background-color: hsla(55, 41%, 87%, 1);;
+        background-color: var(--moe-thread-more-replies-button-background-color);
         margin: 0;
         position: sticky;
         top: 0px;
@@ -178,15 +174,15 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     }
     .more-replies .more-replies-text {
         @apply --layout-self-center;
-        color: var(--moe-post-quote-link-color);
+        color: var(--moe-thread-more-replies-button-text-color);
     }
     .more-replies:hover {
         cursor: pointer;
-        background-color: hsla(55, 31%, 85%, 1);
+        background-color: var(--moe-thread-more-replies-button-hover-background-color);
     }
     .more-replies-loading:hover {
         cursor: none;
-        background-color: hsla(55, 31%, 84%, 1);
+        background-color: var(--moe-thread-more-replies-button-background-color);
     }
     .more-replies iron-icon {
         --iron-icon-height: 1.5em;
@@ -224,10 +220,7 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         width: 100%;
         background-image: linear-gradient(to bottom, rgba(255, 253, 229, 0), rgba(255, 253, 229, 1));
     }
-    .replies {
-        @apply --layout-vertical;
-        @apply --moe-replies-classic-styles;           
-    }
+    
     .replies moe-reply:nth-child(even) {
         background-color: var(--moe-thread-reply-even-background-color);        
     }
