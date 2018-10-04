@@ -1,15 +1,18 @@
 import {terser} from 'rollup-plugin-terser';
-import resolve from 'rollup-plugin-node-resolve';
+import nodeResolve from 'rollup-plugin-node-resolve';
 
 export default {
-    input: 'moe-components.js',
+    input: './src/moe-components.js',
     output: {
         file: 'build/moe-components.bundle.js',
         format: 'umd',
         sourcemap: true
     },
     plugins: [
-        resolve(),
+        nodeResolve({
+            jsnext: true,
+            main: true
+        }),
         terser({
             sourcemap: true,
             warnings: 'verbose',
