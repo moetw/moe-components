@@ -228,8 +228,8 @@ class MoeVideo extends PolymerElement {
     }
 
     /**
-    *   Mobile Style
-    */
+     *   Mobile Style
+     */
     #container.layout.vertical {
         @apply(--layout-vertical);
     }
@@ -254,8 +254,8 @@ class MoeVideo extends PolymerElement {
     }
 
     /**
-    *   Scrollbar
-    */
+     *   Scrollbar
+     */
     ::-webkit-scrollbar{
         height:16px;
         overflow:visible;

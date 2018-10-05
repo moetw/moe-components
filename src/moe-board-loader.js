@@ -55,6 +55,7 @@ class MoeBoardLoader extends ReduxMixin(PolymerElement) {
         board.embedRequestServer = resp.data.getBoardById.embedRequestServer;
         board.postServer = resp.data.getBoardById.postServer;
         board.pollServer = resp.data.getBoardById.pollServer;
+        board.reportServer = resp.data.getBoardById.reportServer;
 
         // validation criteria
         this.dispatch({

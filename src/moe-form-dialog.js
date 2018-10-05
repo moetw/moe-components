@@ -79,10 +79,10 @@ paper-progress:not([active]) {
 </style>
 <app-header class="handle">
     <app-toolbar>
-        <paper-icon-button id="closeButton" icon="close" on-click="_onCloseClick"></paper-icon-button>
+        <paper-icon-button id="closeButton" icon="close" on-click="_onCloseClick" disabled$="[[disabled]]"></paper-icon-button>
         <paper-tooltip for="closeButton">關閉</paper-tooltip>
         <div main-title>[[dialogTitle]]</div>
-        <paper-icon-button id="sendButton" icon="send" on-click="_onSendClick"></paper-icon-button>
+        <paper-icon-button id="sendButton" icon="send" on-click="_onSendClick" disabled$="[[disabled]]"></paper-icon-button>
         <paper-tooltip for="sendButton">送出</paper-tooltip>
     </app-toolbar>
 </app-header>
@@ -112,6 +112,10 @@ paper-progress:not([active]) {
                 type: Boolean,
                 value: false
             },
+          disabled: {
+            type: Boolean,
+            value: false
+          },
             width: Number,
             height: Number,
             formElement: Object
@@ -155,10 +159,16 @@ paper-progress:not([active]) {
             console.error("There must be a moe-form/moe-reply-form slotted inside of moe-form-dialog", this);
         } else {
             this.formElement.addEventListener('loading-start', () => {
-                this.set('loading', true);
+                this.setProperties({
+                  loading: true,
+                  disabled: true
+                });
             });
             this.formElement.addEventListener('loading-end', () => {
-                this.set('loading', false);
+              this.setProperties({
+                loading: false,
+                disabled: false
+              });
             });
         }
     }

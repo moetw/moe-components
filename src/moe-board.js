@@ -62,7 +62,7 @@ app-header {
         background-size: cover;
         background-position: center;
     };
-    */
+     */
 }
 
 app-header paper-icon-button {
@@ -386,6 +386,7 @@ app-drawer a paper-button:hover {
             embedRequestServer: String,
             postServer: String,
             pollServer: String,
+            reportServer: String,
             boardId: Number,
             boardAlias: String,
             boardSubdomain: String,
@@ -706,8 +707,43 @@ app-drawer a paper-button:hover {
     /* Report Event Handlers */
 
     _onReportSubmit(e) {
-        // TODO: submit report to api
-        console.log(e.detail);
+      this.$.reportForm.setProperties({
+        disabled: true,
+        loading: true
+      });
+
+      fetch(this.reportServer, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          boardId: e.detail.boardId,
+          no: e.detail.no,
+          categoryId: e.detail.categoryId,
+          content: e.detail.content
+        })
+      })
+        .then(resp => resp.json())
+        .then(resp => {
+          if (resp.error) {
+            alert(resp.error);
+          } else {
+            alert(this.localize('reportSucceeded', 'id', resp.id));
+            this.$.reportDialog.hide();
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Network error');
+        })
+        .finally(() => {
+          this.$.reportForm.setProperties({
+            disabled: false,
+            loading: false
+          });
+        });
     }
 
     _onReportError(e) {
