@@ -1,8 +1,8 @@
-import createStore from 'redux/src/createStore';
-import compose from 'redux/src/compose';
-import PolymerRedux from 'polymer-redux';
-import * as actions from './redux-actions';
-import merge from 'lodash-es/merge';
+import createStore from 'redux/src/createStore'
+import compose from 'redux/src/compose'
+import PolymerRedux from 'polymer-redux'
+import * as actions from './redux-actions'
+import merge from 'lodash-es/merge'
 
 const initial = {
   language: 'zh-TW',
@@ -32,7 +32,7 @@ const initial = {
 
   // {[id] => {id,name,order}}
   reportCategories: {}
-};
+}
 
 const reducer = function (state, action) {
   switch (action.type) {
@@ -40,106 +40,106 @@ const reducer = function (state, action) {
     case actions.UPDATE_THREADS: {
       action.threads.forEach(thread => {
         // fill replyMap
-        thread.replies.forEach(reply => state = updateReply(state, reply));
+        thread.replies.forEach(reply => state = updateReply(state, reply))
 
         // replace thread.replies with replyKey
-        thread.replies = thread.replies.map(reply => replyKey(reply));
+        thread.replies = thread.replies.map(reply => replyKey(reply))
 
         // fill threadMap
-        state = updateThread(state, thread);
-      });
-      state.pageThreadKeys = action.threads.map(thread => `${thread.boardId}:${thread.no}`);
-      return state;
+        state = updateThread(state, thread)
+      })
+      state.pageThreadKeys = action.threads.map(thread => `${thread.boardId}:${thread.no}`)
+      return state
     }
 
     // {thread}
     case actions.UPDATE_THREAD: {
-      return updateThread(state, action.thread);
+      return updateThread(state, action.thread)
     }
 
     case actions.REMOVE_THREAD: {
       // delete replies
-      state.threadMap[threadKey(action.thread)].replies.forEach(reply => delete state.replyMap[replyKey(reply)]);
+      state.threadMap[threadKey(action.thread)].replies.forEach(reply => delete state.replyMap[replyKey(reply)])
 
       // delete thread
-      const threadKeyIndex = state.pageThreadKeys.indexOf(threadKey(action.thread));
+      const threadKeyIndex = state.pageThreadKeys.indexOf(threadKey(action.thread))
       if (threadKeyIndex >= 0) {
-        state.pageThreadKeys.splice(threadKeyIndex, 1);
+        state.pageThreadKeys.splice(threadKeyIndex, 1)
       }
-      delete state.threadMap[threadKey(action.thread)];
+      delete state.threadMap[threadKey(action.thread)]
 
-      return state;
+      return state
     }
 
     case actions.PREPEND_REPLIES_TO_THREAD: {
       for (const reply of action.replies) {
-        const threadKey = `${reply.boardId}:${reply.threadNo}`;
-        state.threadMap[threadKey].replies.unshift(replyKey(reply));
-        state = updateReply(state, reply);
+        const threadKey = `${reply.boardId}:${reply.threadNo}`
+        state.threadMap[threadKey].replies.unshift(replyKey(reply))
+        state = updateReply(state, reply)
       }
-      return state;
+      return state
     }
 
     // {reply: {boardId, threadNo}}
     case actions.APPEND_REPLY_TO_THREAD: {
-      const reply = action.reply;
-      const threadKey = `${reply.boardId}:${reply.threadNo}`;
-      state.threadMap[threadKey].replies.push(replyKey(reply));
-      state = updateReply(state, reply);
-      return state;
+      const reply = action.reply
+      const threadKey = `${reply.boardId}:${reply.threadNo}`
+      state.threadMap[threadKey].replies.push(replyKey(reply))
+      state = updateReply(state, reply)
+      return state
     }
 
     case actions.REMOVE_REPLY_FROM_THREAD: {
-      const reply = action.reply;
-      const threadKey = `${reply.boardId}:${reply.threadNo}`;
-      const replyKeyIndex = state.threadMap[threadKey].replies.indexOf(replyKey(reply));
+      const reply = action.reply
+      const threadKey = `${reply.boardId}:${reply.threadNo}`
+      const replyKeyIndex = state.threadMap[threadKey].replies.indexOf(replyKey(reply))
       if (replyKeyIndex >= 0) {
-        state.threadMap[threadKey].replies.splice(replyKeyIndex, 1);
+        state.threadMap[threadKey].replies.splice(replyKeyIndex, 1)
       }
-      delete state.replyMap[replyKey(reply)];
-      return state;
+      delete state.replyMap[replyKey(reply)]
+      return state
     }
 
     // {validationCriteria: {}}
     case actions.UPDATE_VALIDATION_CRITERIA: {
-      Object.assign(state.validationCriteria, action.validationCriteria);
-      return state;
+      Object.assign(state.validationCriteria, action.validationCriteria)
+      return state
     }
 
     // action: {reportCategories: [{id,name,order}]}
     case actions.UPDATE_REPORT_CATEGORIES: {
-      state.reportCategories = {};
+      state.reportCategories = {}
       action.reportCategories.forEach(reportCategory => {
-        state.reportCategories[reportCategory.id] = reportCategory;
-      });
-      return state;
+        state.reportCategories[reportCategory.id] = reportCategory
+      })
+      return state
     }
 
     default:
-      return state;
+      return state
   }
-};
+}
 
-const threadKey = (thread) => `${thread.boardId}:${thread.no}`;
+const threadKey = (thread) => `${thread.boardId}:${thread.no}`
 const updateThread = (state, thread) => {
   // fill threadMap
   if (state.threadMap[threadKey(thread)]) {
-    state.threadMap[threadKey(thread)] = merge(state.threadMap[threadKey(thread)], thread);
+    state.threadMap[threadKey(thread)] = merge(state.threadMap[threadKey(thread)], thread)
   } else {
     Object.assign(state.threadMap, {[threadKey(thread)]: thread})
   }
-  return state;
-};
+  return state
+}
 
-const replyKey = (reply) => `${reply.boardId}:${reply.no}`;
+const replyKey = (reply) => `${reply.boardId}:${reply.no}`
 const updateReply = (state, reply) => {
   if (state.replyMap[replyKey(reply)]) {
-    state.replyMap[replyKey(reply)] = merge(state.replyMap[replyKey(reply)], reply);
+    state.replyMap[replyKey(reply)] = merge(state.replyMap[replyKey(reply)], reply)
   } else {
     Object.assign(state.replyMap, {[replyKey(reply)]: reply})
   }
-  return state;
-};
+  return state
+}
 
 export const store = createStore(
   reducer,
@@ -151,7 +151,7 @@ export const store = createStore(
       ? window.devToolsExtension()
       : v => v
   )
-);
+)
 
 // Create the Polymer mixin
-export const ReduxMixin = PolymerRedux(store);
+export const ReduxMixin = PolymerRedux(store)

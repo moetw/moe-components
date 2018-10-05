@@ -1,12 +1,12 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js'
 
-import '@polymer/paper-input/paper-input';
-import '@polymer/paper-icon-button/paper-icon-button';
-import '@polymer/iron-flex-layout/iron-flex-layout';
-import '@polymer/iron-icons/iron-icons';
+import '@polymer/paper-input/paper-input'
+import '@polymer/paper-icon-button/paper-icon-button'
+import '@polymer/iron-flex-layout/iron-flex-layout'
+import '@polymer/iron-icons/iron-icons'
 
 class MoeFormPollItemInput extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -20,10 +20,10 @@ paper-input {
 </style>
 <paper-icon-button icon="cancel" disabled$="[[disabled]]" on-click="_onCancelClick"></paper-icon-button>
 <paper-input id="input" label="投票選項 [[index]]" value="{{value}}" disabled$="[[disabled]]" maxlength="[[maxLength]]" required char-counter></paper-input>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       maxLength: {
         type: Number
@@ -42,16 +42,16 @@ paper-input {
         type: Number,
         reflectToAttribute: true
       }
-    };
+    }
   }
 
-  focus() {
-    this.$.input.focus();
+  focus () {
+    this.$.input.focus()
   }
 
-  _onCancelClick(e) {
-    this.dispatchEvent(new CustomEvent('remove'));
+  _onCancelClick (e) {
+    this.dispatchEvent(new CustomEvent('remove'))
   }
 }
 
-window.customElements.define('moe-form-poll-item-input', MoeFormPollItemInput);
+window.customElements.define('moe-form-poll-item-input', MoeFormPollItemInput)

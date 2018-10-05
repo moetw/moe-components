@@ -1,40 +1,40 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
-import '@polymer/paper-card/paper-card.js';
-import '@polymer/paper-menu-button/paper-menu-button.js';
-import '@polymer/paper-icon-button/paper-icon-button.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '@polymer/paper-item/paper-item.js';
-import '@polymer/paper-styles/paper-styles.js';
-import '@polymer/paper-ripple/paper-ripple.js';
-import '@polymer/paper-button/paper-button';
-import '@polymer/paper-tooltip/paper-tooltip';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/iron-icons/av-icons';
-import '@polymer/iron-icons/communication-icons';
-import '@polymer/iron-image/iron-image.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js'
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data'
+import '@polymer/paper-card/paper-card.js'
+import '@polymer/paper-menu-button/paper-menu-button.js'
+import '@polymer/paper-icon-button/paper-icon-button.js'
+import '@polymer/paper-listbox/paper-listbox.js'
+import '@polymer/paper-item/paper-item.js'
+import '@polymer/paper-styles/paper-styles.js'
+import '@polymer/paper-ripple/paper-ripple.js'
+import '@polymer/paper-button/paper-button'
+import '@polymer/paper-tooltip/paper-tooltip'
+import '@polymer/iron-icons/iron-icons.js'
+import '@polymer/iron-icons/av-icons'
+import '@polymer/iron-icons/communication-icons'
+import '@polymer/iron-image/iron-image.js'
+import '@polymer/iron-flex-layout/iron-flex-layout.js'
 import '@polymer/iron-list/iron-list'
 
-import './moe-icons';
-import './moe-pixmicat-pushpost';
-import './moe-poll';
-import './moe-poll-request';
-import './moe-post-comment';
-import './moe-post-header';
-import './moe-post-image';
-import './moe-post-menu';
-import './moe-quote-link';
-import './moe-rate';
-import './moe-reply';
-import './moe-styles';
-import './moe-video';
-import './moe-graphql';
-import {MoeGraphQL} from "./moe-graphql";
-import {ReduxMixin} from './redux/redux-mixin';
-import * as selectors from './redux/redux-selectors';
-import * as actions from "./redux/redux-actions";
-import get from "lodash-es/get";
+import './moe-icons'
+import './moe-pixmicat-pushpost'
+import './moe-poll'
+import './moe-poll-request'
+import './moe-post-comment'
+import './moe-post-header'
+import './moe-post-image'
+import './moe-post-menu'
+import './moe-quote-link'
+import './moe-rate'
+import './moe-reply'
+import './moe-styles'
+import './moe-video'
+import './moe-graphql'
+import { MoeGraphQL } from './moe-graphql'
+import { ReduxMixin } from './redux/redux-mixin'
+import * as selectors from './redux/redux-selectors'
+import * as actions from './redux/redux-actions'
+import get from 'lodash-es/get'
 
 /**
  * `moe-thread`
@@ -45,7 +45,7 @@ import get from "lodash-es/get";
  * @demo demo/index.html
  */
 class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
-  static get template() {
+  static get template () {
     return html`
 <style>
     :host {
@@ -326,10 +326,10 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
     </div>
 </paper-card>
 <moe-graphql id="moeGraphQL" server="[[graphqlServer]]"></moe-graphql>
-<moe-poll-request id="moePollRequest" server="[[pollServer]]"></moe-poll-request>`;
+<moe-poll-request id="moePollRequest" server="[[pollServer]]"></moe-poll-request>`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       isAdmin: {
         type: Boolean,
@@ -382,7 +382,7 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         type: Array,
         statePath: function (state) {
           return get(state.threadMap, `${this.boardId}:${this.no}.replies`, [])
-            .map(replyKey => state.replyMap[replyKey]);
+            .map(replyKey => state.replyMap[replyKey])
         }
       },
       showFirstPostPoll: {
@@ -396,41 +396,41 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
       graphqlServer: String,
       pollServer: String,
       imageServers: Object
-    };
+    }
   }
 
-  _onMoePostCommentProcessed() {
-    this.set('displayShowMore', this.$.firstPostPostBody.scrollHeight > this.$.firstPostPostBody.clientHeight);
+  _onMoePostCommentProcessed () {
+    this.set('displayShowMore', this.$.firstPostPostBody.scrollHeight > this.$.firstPostPostBody.clientHeight)
   }
 
-  _onShowMoreClick() {
-    this.$.firstPostPostBody.style.maxHeight = this.$.firstPostPostBody.scrollHeight + 'px';
-    this.set('displayShowMore', false);
+  _onShowMoreClick () {
+    this.$.firstPostPostBody.style.maxHeight = this.$.firstPostPostBody.scrollHeight + 'px'
+    this.set('displayShowMore', false)
   }
 
-  _computeShowFirstPostEmbeds(firstPost) {
-    return firstPost.embeds && firstPost.embeds.length > 0;
+  _computeShowFirstPostEmbeds (firstPost) {
+    return firstPost.embeds && firstPost.embeds.length > 0
   }
 
-  _computeShowFirstPostPoll(firstPost) {
-    return firstPost.poll && firstPost.poll.items && firstPost.poll.items.length > 0;
+  _computeShowFirstPostPoll (firstPost) {
+    return firstPost.poll && firstPost.poll.items && firstPost.poll.items.length > 0
   }
 
-  _computeOmittedReplyCount(replyCount, repliesLength) {
-    return replyCount - repliesLength;
+  _computeOmittedReplyCount (replyCount, repliesLength) {
+    return replyCount - repliesLength
   }
 
-  _computeShowMoreReplies(omittedReplyCount) {
-    return omittedReplyCount > 0;
+  _computeShowMoreReplies (omittedReplyCount) {
+    return omittedReplyCount > 0
   }
 
-  _computeNotLoadingMoreReplies(loadingMoreReplies) {
-    return !loadingMoreReplies;
+  _computeNotLoadingMoreReplies (loadingMoreReplies) {
+    return !loadingMoreReplies
   }
 
-  _onThreadHeaderNoClick() {
+  _onThreadHeaderNoClick () {
     if (this.flagAdminThreadStop) {
-      return false;
+      return false
     }
 
     this.dispatchEvent(new CustomEvent('thread-header-no-click', {
@@ -441,16 +441,16 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         threadNo: this.get('no'),
         no: this.get('no')
       }
-    }));
+    }))
   }
 
-  _onThreadHeaderReplyCountClick() {
+  _onThreadHeaderReplyCountClick () {
   }
 
-  _onMoreRepliesClick() {
-    if (this.loadingMoreReplies) return;
+  _onMoreRepliesClick () {
+    if (this.loadingMoreReplies) return
 
-    this.set('loadingMoreReplies', true);
+    this.set('loadingMoreReplies', true)
 
     this.$.moeGraphQL
       .getMoreReplies(this.boardId, this.no, this.replies[0] ? this.replies[0].no : 0, 100)
@@ -458,41 +458,41 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
         this.dispatch({
           type: actions.PREPEND_REPLIES_TO_THREAD,
           replies: resp.data.getMoreReplies.map(p => this._postTransformer(p))
-        });
+        })
 
-        this.notifyPath('replies.length');
+        this.notifyPath('replies.length')
       })
-      .finally(() => this.set('loadingMoreReplies', false));
+      .finally(() => this.set('loadingMoreReplies', false))
   }
 
-  _onReplyAck(e) {
+  _onReplyAck (e) {
     if (e.detail.threadNo === this.no) {
       this.$.moeGraphQL
         .getReplyAck(e.detail.boardId, e.detail.threadNo, e.detail.no)
         .then(resp => {
-          this.set('replyCount', resp.data.getThreadByNo.replyCount);
+          this.set('replyCount', resp.data.getThreadByNo.replyCount)
           if (resp.data.getPostByNo) {
-            this.push('replies', this._postTransformer(resp.data.getPostByNo));
+            this.push('replies', this._postTransformer(resp.data.getPostByNo))
           }
-        });
+        })
     }
   }
 
-  _postTransformer(post) {
-    return MoeGraphQL.postTransformer(this.boardSubdomain, this.boardAlias, this.imageServers, post);
+  _postTransformer (post) {
+    return MoeGraphQL.postTransformer(this.boardSubdomain, this.boardAlias, this.imageServers, post)
   }
 
-  _sortReplies(a, b) {
+  _sortReplies (a, b) {
     if (a.no < b.no) {
-      return -1;
+      return -1
     } else if (a.no > b.no) {
-      return 1;
+      return 1
     } else {
-      return 0;
+      return 0
     }
   }
 
-  _onMoePollItemClick(e) {
+  _onMoePollItemClick (e) {
     this.$.moePollRequest.vote(e.detail.no, e.detail.item)
       .then(items => {
         this.dispatch({
@@ -507,13 +507,13 @@ class MoeThread extends MutableData(ReduxMixin(PolymerElement)) {
               }
             }
           }
-        });
+        })
       })
       .catch(err => {
-        console.error(err);
-        alert(err.message);
-      });
+        console.error(err)
+        alert(err.message)
+      })
   }
 }
 
-window.customElements.define('moe-thread', MoeThread);
+window.customElements.define('moe-thread', MoeThread)

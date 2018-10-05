@@ -1,10 +1,10 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
-import '@polymer/paper-tooltip/paper-tooltip';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
+import '@polymer/paper-tooltip/paper-tooltip'
 
-import moment from "./moment";
+import moment from './moment'
 
 class MoePostHeader extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -62,10 +62,10 @@ paper-tooltip {
     <div id="post-header-date">[[formatCreatedAt(createdAt)]]</div>
     <paper-tooltip for="post-header-date" offset="0">[[fullyFormatCreatedAt(createdAt)]]</paper-tooltip>
 </div>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       boardId: {
         type: Number
@@ -86,20 +86,20 @@ paper-tooltip {
         type: Boolean,
         value: false
       }
-    };
+    }
   }
 
-  formatCreatedAt(created_at) {
-    return moment(created_at).calendar();
+  formatCreatedAt (created_at) {
+    return moment(created_at).calendar()
   }
 
-  fullyFormatCreatedAt(created_at) {
-    return moment(created_at).toString();
+  fullyFormatCreatedAt (created_at) {
+    return moment(created_at).toString()
   }
 
-  _onPostHeaderNoClick(e) {
+  _onPostHeaderNoClick (e) {
     if (this.flagAdminThreadStop) {
-      return false;
+      return false
     }
 
     this.dispatchEvent(new CustomEvent('post-header-no-click', {
@@ -110,8 +110,8 @@ paper-tooltip {
         threadNo: this.get('threadNo'),
         no: this.get('no')
       }
-    }));
+    }))
   }
 }
 
-window.customElements.define('moe-post-header', MoePostHeader);
+window.customElements.define('moe-post-header', MoePostHeader)

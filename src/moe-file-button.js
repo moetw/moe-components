@@ -1,14 +1,14 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
 
-import '@polymer/paper-button';
-import '@polymer/iron-icons/iron-icons';
-import '@polymer/iron-icons/image-icons';
+import '@polymer/paper-button'
+import '@polymer/iron-icons/iron-icons'
+import '@polymer/iron-icons/image-icons'
 import '@polymer/iron-icon'
-import '@polymer/iron-flex-layout/iron-flex-layout';
+import '@polymer/iron-flex-layout/iron-flex-layout'
 
 class MoeFileButton extends PolymerElement {
 
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -35,10 +35,10 @@ iron-icon {
     <div>圖片</div>
     <input id="file" type="file" accept$="[[accept]]" on-change="_onFileChange" />
 </paper-button>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       accept: {
         type: String,
@@ -59,36 +59,36 @@ iron-icon {
         reflectToAttribute: true
       }
     }
-      ;
+
   }
 
-  cancel() {
-    this.$.file.value = "";
-    this.$.file.dispatchEvent(new Event('change'));
+  cancel () {
+    this.$.file.value = ''
+    this.$.file.dispatchEvent(new Event('change'))
   }
 
-  _onFileChange() {
-    const files = this.$.file.files;
+  _onFileChange () {
+    const files = this.$.file.files
     if (files.length > 0) {
       this.dispatchEvent(new CustomEvent('change', {
         detail: {
           file: files[0]
         }
-      }));
+      }))
       this.set('file', files[0])
     } else {
       this.dispatchEvent(new CustomEvent('change', {
         detail: {
           file: null
         }
-      }));
-      this.set('file', null);
+      }))
+      this.set('file', null)
     }
   }
 
-  _computeFileSelected(file) {
-    return !!file;
+  _computeFileSelected (file) {
+    return !!file
   }
 }
 
-window.customElements.define('moe-file-button', MoeFileButton);
+window.customElements.define('moe-file-button', MoeFileButton)

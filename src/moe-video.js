@@ -1,18 +1,18 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import '@polymer/paper-ripple/paper-ripple';
-import '@polymer/paper-icon-button/paper-icon-button';
-import '@polymer/iron-selector/iron-selector';
-import '@polymer/iron-flex-layout/iron-flex-layout';
-import '@polymer/iron-image/iron-image';
-import '@polymer/iron-icon/iron-icon';
-import '@polymer/iron-icons/iron-icons';
-import '@polymer/iron-icons/av-icons';
-import '@polymer/google-youtube/google-youtube';
-import get from 'lodash-es/get';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js'
+import '@polymer/paper-ripple/paper-ripple'
+import '@polymer/paper-icon-button/paper-icon-button'
+import '@polymer/iron-selector/iron-selector'
+import '@polymer/iron-flex-layout/iron-flex-layout'
+import '@polymer/iron-image/iron-image'
+import '@polymer/iron-icon/iron-icon'
+import '@polymer/iron-icons/iron-icons'
+import '@polymer/iron-icons/av-icons'
+import '@polymer/google-youtube/google-youtube'
+import get from 'lodash-es/get'
 
 class MoeVideo extends PolymerElement {
 
-  static get template() {
+  static get template () {
     return html`
 <style>
     :host {
@@ -389,10 +389,10 @@ class MoeVideo extends PolymerElement {
         <paper-icon-button icon="icons:close" action-type="stop" on-click="_handlePlayControl"></paper-icon-button>
     </template>
 </div>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       data: {
         type: Array,
@@ -439,7 +439,7 @@ class MoeVideo extends PolymerElement {
       },
       placeHolderStyle: {
         type: String,
-        computed: "_computePlaceHolderStyle(selectedVideoIndex, data)"
+        computed: '_computePlaceHolderStyle(selectedVideoIndex, data)'
       },
       startVideoIndex: {
         type: Number,
@@ -483,179 +483,179 @@ class MoeVideo extends PolymerElement {
         reflectToAttribute: true,
         computed: '_computeLayoutClasses(mobile)'
       }
-    };
+    }
   }
 
-  ready() {
-    super.ready();
-    this._mediaQuery();
-    window.addEventListener('resize', () => this._mediaQuery());
+  ready () {
+    super.ready()
+    this._mediaQuery()
+    window.addEventListener('resize', () => this._mediaQuery())
   }
 
-  _mediaQuery() {
-    this.set('mobile', window.matchMedia('(max-width: 600px)').matches);
+  _mediaQuery () {
+    this.set('mobile', window.matchMedia('(max-width: 600px)').matches)
   }
 
   /**
    * Public Method
    * */
-  play(id) {
+  play (id) {
     // if undeinfed
     // play 0
     if (id === undefined || id === '') {
       if (!this.data || !get(this.data, '0.res_id')) {
-        return;
+        return
       }
-      this.play(this.data[0].res_id);
-      return; // End
+      this.play(this.data[0].res_id)
+      return // End
     }
 
     if (this.mobile) {
-      this._checkPlaySupport();
+      this._checkPlaySupport()
       if (this.playSupported) {
         // console.log( 'Play() Supported:' + this.playSupported);
-        this.set('playing', true);
-        this.set('playingVideoId', id);
+        this.set('playing', true)
+        this.set('playingVideoId', id)
         // this.listen(document.querySelector('#youtube'), 'google-youtube-ready', '_mobilePlay');
       }
     }
-    this.set('playing', true);
-    this.set('playingVideoId', id);
+    this.set('playing', true)
+    this.set('playingVideoId', id)
   }
 
-  stop() {
-    this.set('prevPlayedVideo', this.playingVideoId);
-    this.set('playingVideoId', '');
-    this.set('playing', false);
+  stop () {
+    this.set('prevPlayedVideo', this.playingVideoId)
+    this.set('playingVideoId', '')
+    this.set('playing', false)
   }
 
   /**
    * Private Method
    * */
-  _dataChanged() {
+  _dataChanged () {
     /**  Initialize Moe-video **/
-    if (this.data === undefined || this.data[0] === undefined) return;
-    this.selectedVideoIndex = this.startVideoIndex ? this.startVideoIndex : 0;
-    this.listLength = this.data.length;
+    if (this.data === undefined || this.data[0] === undefined) return
+    this.selectedVideoIndex = this.startVideoIndex ? this.startVideoIndex : 0
+    this.listLength = this.data.length
     if (this.listLength > 1) {
-      this.set('list-toggle', true);
+      this.set('list-toggle', true)
     }
-    this.set('selectedVideoIndex', 0);
-    this.set('playing', false);
+    this.set('selectedVideoIndex', 0)
+    this.set('playing', false)
   }
 
-  _computePlaceHolderStyle(selectedVideoIndex, data) {
+  _computePlaceHolderStyle (selectedVideoIndex, data) {
     if (data.length > 0 && selectedVideoIndex >= 0) {
-      return "background-image: url(" + this.data[selectedVideoIndex].thumb + ");";
+      return 'background-image: url(' + this.data[selectedVideoIndex].thumb + ');'
     }
   }
 
-  _handleStateChanged(ev) {
+  _handleStateChanged (ev) {
     // ended
     if (get(ev, 'detail.data') === 0) {
-      this._nextVideo();
+      this._nextVideo()
     }
   }
 
-  _handleHolderTap(e) {
-    this.play(get(this.data, `${this.selectedVideoIndex}.res_id`));
+  _handleHolderTap (e) {
+    this.play(get(this.data, `${this.selectedVideoIndex}.res_id`))
   }
 
-  _handleChipTap(e) {
-    this.play(e.model.item.res_id);
+  _handleChipTap (e) {
+    this.play(e.model.item.res_id)
   }
 
-  _handlePlayControl(e) {
-    const action = e.currentTarget.getAttribute('action-type');
+  _handlePlayControl (e) {
+    const action = e.currentTarget.getAttribute('action-type')
     switch (action) {
       case 'next':
-        this._nextVideo();
-        break;
+        this._nextVideo()
+        break
       case 'prev':
-        this._prevVideo();
-        break;
+        this._prevVideo()
+        break
       case 'stop':
-        this.stop();
-        break;
+        this.stop()
+        break
     }
   }
 
-  _nextVideo() {
+  _nextVideo () {
     if (this.selectedVideoIndex < this.data.length - 1) {
-      this.selectedVideoIndex++;
+      this.selectedVideoIndex++
     } else {
-      this.selectedVideoIndex = 0;
+      this.selectedVideoIndex = 0
     }
 
-    var videoId = get(this.data, this.selectedVideoIndex + ".res_id");
+    var videoId = get(this.data, this.selectedVideoIndex + '.res_id')
     if (videoId) {
-      this.play(videoId);
+      this.play(videoId)
     } else {
-      console.warn("videoId not found at data[selectedVideoIndex]: " + this.selectedVideoIndex);
+      console.warn('videoId not found at data[selectedVideoIndex]: ' + this.selectedVideoIndex)
     }
   }
 
-  _prevVideo() {
+  _prevVideo () {
     if (this.selectedVideoIndex > 0) {
-      this.selectedVideoIndex--;
+      this.selectedVideoIndex--
     } else {
-      this.selectedVideoIndex = this.data.length - 1;
+      this.selectedVideoIndex = this.data.length - 1
     }
-    this.play(this.data[this.selectedVideoIndex].res_id);
+    this.play(this.data[this.selectedVideoIndex].res_id)
   }
 
-  _computeLayoutClasses(mobile) {
-    return mobile ? 'layout vertical' : 'layout horizontal';
+  _computeLayoutClasses (mobile) {
+    return mobile ? 'layout vertical' : 'layout horizontal'
   }
 
-  _computeShowList(data) {
-    return (data || []).length > 1;
+  _computeShowList (data) {
+    return (data || []).length > 1
   }
 
-  _computePlayIcon(data) {
+  _computePlayIcon (data) {
     if (!data[0] || data === undefined) {
-      return 'refresh';
+      return 'refresh'
     } else {
-      return 'av:play-arrow';
+      return 'av:play-arrow'
     }
   }
 
-  _computeContainerClass(mobile) {
+  _computeContainerClass (mobile) {
     if (mobile) {
-      return 'layout vertical';
+      return 'layout vertical'
     } else {
-      return 'layout horizontal';
+      return 'layout horizontal'
     }
   }
 
-  _computeSelectedVideoIndexDisplay(selectedVideoIndex) {
+  _computeSelectedVideoIndexDisplay (selectedVideoIndex) {
     return selectedVideoIndex + 1
   }
 
-  _computeShowPlaceHolder(playing) {
-    return playing ? false : true;
+  _computeShowPlaceHolder (playing) {
+    return playing ? false : true
   }
 
-  _computeHolderHref(index) {
-    return "https://www.youtube.com/watch?v=" + this.data[index].res_id;
+  _computeHolderHref (index) {
+    return 'https://www.youtube.com/watch?v=' + this.data[index].res_id
   }
 
-  _computeHolderTitle(index) {
-    return this.data[index].title;
+  _computeHolderTitle (index) {
+    return this.data[index].title
   }
 
-  _computeStartIndex(index) {
-    return index;
+  _computeStartIndex (index) {
+    return index
   }
 
-  _checkPlaySupport() {
+  _checkPlaySupport () {
     // this.playSupported = this.shadowRoot.querySelector('#youtube').playsupported;
   }
 
-  _mobilePlay(e) {
+  _mobilePlay (e) {
     /** Failed to execute 'play' on 'HTMLMediaElement': API can only be initiated by a user gesture. **/
     // e.target.play();
   }
 }
 
-window.customElements.define('moe-video', MoeVideo);
+window.customElements.define('moe-video', MoeVideo)

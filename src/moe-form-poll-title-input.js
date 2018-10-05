@@ -1,12 +1,12 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js'
 
-import '@polymer/paper-input/paper-input';
-import '@polymer/paper-icon-button/paper-icon-button';
-import '@polymer/iron-flex-layout/iron-flex-layout';
-import '@polymer/iron-icons/iron-icons';
+import '@polymer/paper-input/paper-input'
+import '@polymer/paper-icon-button/paper-icon-button'
+import '@polymer/iron-flex-layout/iron-flex-layout'
+import '@polymer/iron-icons/iron-icons'
 
 class MoeFormPollTitleInput extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -23,10 +23,10 @@ paper-input {
 </style>
 <paper-icon-button icon="cancel" disabled$="[[disabled]]" on-click="_onCancelClick"></paper-icon-button>
 <paper-input id="input" label="投票主題" value="{{value}}" disabled$="[[disabled]]" maxlength="[[maxLength]]" autofocus required char-counter></paper-input>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       maxLength: {
         type: Number
@@ -41,24 +41,24 @@ paper-input {
         value: false,
         reflectToAttribute: true
       }
-    };
+    }
   }
 
-  reset() {
-    this.value = "";
+  reset () {
+    this.value = ''
   }
 
-  focus() {
-    this.$.input.focus();
+  focus () {
+    this.$.input.focus()
   }
 
-  cancel() {
-    this.dispatchEvent(new CustomEvent('cancel'));
+  cancel () {
+    this.dispatchEvent(new CustomEvent('cancel'))
   }
 
-  _onCancelClick(e) {
-    this.cancel();
+  _onCancelClick (e) {
+    this.cancel()
   }
 }
 
-window.customElements.define('moe-form-poll-title-input', MoeFormPollTitleInput);
+window.customElements.define('moe-form-poll-title-input', MoeFormPollTitleInput)

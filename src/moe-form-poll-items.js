@@ -1,13 +1,13 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import '@polymer/paper-button';
-import '@polymer/iron-icons/iron-icons';
-import '@polymer/iron-icon';
-import '@polymer/iron-flex-layout/iron-flex-layout';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js'
+import '@polymer/paper-button'
+import '@polymer/iron-icons/iron-icons'
+import '@polymer/iron-icon'
+import '@polymer/iron-flex-layout/iron-flex-layout'
 
-import './moe-form-poll-item-input';
+import './moe-form-poll-item-input'
 
 class MoeFormPollItems extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -40,10 +40,10 @@ ul {
     <iron-icon icon="add"></iron-icon>
     <div>新增選項</div>
 </paper-button>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       items: {
         type: Array,
@@ -61,50 +61,50 @@ ul {
     }
   }
 
-  static get observers() {
+  static get observers () {
     return [
       '_observeMinItems(minItems)'
-    ];
+    ]
   }
 
-  add(value = "") {
+  add (value = '') {
     if (this.items.length >= this.maxItems) {
-      alert(`最多只能有${this.maxItems}個選項`);
-      return false;
+      alert(`最多只能有${this.maxItems}個選項`)
+      return false
     }
 
-    this.push('items', value);
+    this.push('items', value)
     setTimeout(() => {
-      this.shadowRoot.querySelector(`moe-form-poll-item-input[index="${this.items.length - 1}"]`).focus();
-    }, 0);
+      this.shadowRoot.querySelector(`moe-form-poll-item-input[index="${this.items.length - 1}"]`).focus()
+    }, 0)
   }
 
-  reset() {
-    this.splice('items', 0, this.items.length);
+  reset () {
+    this.splice('items', 0, this.items.length)
     for (let i = 0; i < this.minItems; i++) {
-      this.push('items', '');
+      this.push('items', '')
     }
   }
 
-  changed() {
-    return !this.items.every(item => item === '');
+  changed () {
+    return !this.items.every(item => item === '')
   }
 
-  _observeMinItems(minItems) {
-    this.reset();
+  _observeMinItems (minItems) {
+    this.reset()
   }
 
-  _onAddClick(e) {
-    this.add();
+  _onAddClick (e) {
+    this.add()
   }
 
-  _onItemRemove(e) {
+  _onItemRemove (e) {
     if (this.items.length <= 2) {
-      alert('至少要有2個選項');
+      alert('至少要有2個選項')
     } else {
-      this.splice('items', e.currentTarget.index, 1);
+      this.splice('items', e.currentTarget.index, 1)
     }
   }
 }
 
-window.customElements.define('moe-form-poll-items', MoeFormPollItems);
+window.customElements.define('moe-form-poll-items', MoeFormPollItems)

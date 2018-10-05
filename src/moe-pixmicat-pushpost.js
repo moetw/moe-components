@@ -1,7 +1,7 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
 
 class MoePixmicatPushpost extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -24,12 +24,12 @@ class MoePixmicatPushpost extends PolymerElement {
 <div id="pushpost">
     <div id="content"><slot></slot></div>
 </div>
-`;
+`
   }
 
-  static get properties() {
-    return {};
+  static get properties () {
+    return {}
   }
 }
 
-window.customElements.define('moe-pixmicat-pushpost', MoePixmicatPushpost);
+window.customElements.define('moe-pixmicat-pushpost', MoePixmicatPushpost)

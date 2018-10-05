@@ -1,11 +1,11 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
-import '@polymer/paper-button';
-import '@polymer/paper-icon-button/paper-icon-button-light';
-import '@polymer/paper-styles/paper-styles';
-import '@polymer/iron-icon/iron-icon';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
+import '@polymer/paper-button'
+import '@polymer/paper-icon-button/paper-icon-button-light'
+import '@polymer/paper-styles/paper-styles'
+import '@polymer/iron-icon/iron-icon'
 
 class MoePostMenuActionButton extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -36,10 +36,10 @@ class MoePostMenuActionButton extends PolymerElement {
         </template>
     </div>
 </template>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       boardId: {
         type: Number,
@@ -70,18 +70,18 @@ class MoePostMenuActionButton extends PolymerElement {
         type: Boolean,
         value: false
       }
-    };
+    }
   }
 
-  ready() {
-    super.ready();
+  ready () {
+    super.ready()
     this.addEventListener('blur', () => {
-      this.displayItem = false;
-    });
+      this.displayItem = false
+    })
   }
 
-  _computeItems(isAdmin, isFirstPost, flagAdminThreadStop) {
-    const items = [];
+  _computeItems (isAdmin, isFirstPost, flagAdminThreadStop) {
+    const items = []
 
     if (!flagAdminThreadStop) {
       items.push({text: '回應', action: 'reply', icon: 'reply'})
@@ -90,22 +90,22 @@ class MoePostMenuActionButton extends PolymerElement {
     items.push(
       {text: '舉報', action: 'report', icon: 'report'},
       {text: '刪除', action: 'delete', icon: 'delete'}
-    );
+    )
 
     if (isAdmin && isFirstPost) {
-      items.push({text: '禁止回應', action: 'stopThread', icon: 'moe:thread-stop'});
-      items.push({text: '強制sage', action: 'forceSage', icon: 'moe:thread-sage'});
-      items.push({text: '置頂', action: 'pinThread', icon: 'moe:thread-pin'});
+      items.push({text: '禁止回應', action: 'stopThread', icon: 'moe:thread-stop'})
+      items.push({text: '強制sage', action: 'forceSage', icon: 'moe:thread-sage'})
+      items.push({text: '置頂', action: 'pinThread', icon: 'moe:thread-pin'})
     }
 
-    return items;
+    return items
   }
 
-  _onMoreClick(e) {
-    this.displayItem = !this.displayItem;
+  _onMoreClick (e) {
+    this.displayItem = !this.displayItem
   }
 
-  _onItemClick(e) {
+  _onItemClick (e) {
     this.dispatchEvent(new CustomEvent(`post-menu-button-${e.currentTarget.action}-click`, {
       bubbles: true,
       composed: true,
@@ -114,12 +114,12 @@ class MoePostMenuActionButton extends PolymerElement {
         threadNo: this.threadNo,
         no: this.no
       }
-    }));
+    }))
   }
 }
 
 class MoePostMenuActionItem extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -146,10 +146,10 @@ paper-button:hover {
     <iron-icon icon="[[icon]]"></iron-icon>
     <span>[[text]]</span>
 </paper-button>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       boardId: {
         type: Number
@@ -169,13 +169,13 @@ paper-button:hover {
       icon: {
         type: String
       }
-    };
+    }
   }
 
-  _onClick(e) {
-    this.blur();
+  _onClick (e) {
+    this.blur()
   }
 }
 
-window.customElements.define('moe-post-menu-action-button', MoePostMenuActionButton);
-window.customElements.define('moe-post-menu-action-item', MoePostMenuActionItem);
+window.customElements.define('moe-post-menu-action-button', MoePostMenuActionButton)
+window.customElements.define('moe-post-menu-action-item', MoePostMenuActionItem)

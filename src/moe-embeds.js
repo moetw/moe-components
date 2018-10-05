@@ -1,9 +1,9 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
 
-import './moe-video';
+import './moe-video'
 
 class MoeEmbeds extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -24,10 +24,10 @@ moe-video {
 }
 </style>
 <moe-video id="video"></moe-video>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       embeds: {
         type: Array,
@@ -38,28 +38,28 @@ moe-video {
         value: false,
         reflectToAttribute: true
       }
-    };
+    }
   }
 
-  ready() {
-    super.ready();
-    this._mediaQuery();
-    window.addEventListener('resize', () => this._mediaQuery());
+  ready () {
+    super.ready()
+    this._mediaQuery()
+    window.addEventListener('resize', () => this._mediaQuery())
   }
 
-  _mediaQuery() {
-    this.set('mobile', window.matchMedia('(max-width: 600px)').matches);
+  _mediaQuery () {
+    this.set('mobile', window.matchMedia('(max-width: 600px)').matches)
   }
 
-  _onEmbedsChange(newValue) {
-    const embeds = newValue || [];
+  _onEmbedsChange (newValue) {
+    const embeds = newValue || []
     if (embeds.length) {
-      this.style.display = 'block';
-      this.$.video.set('data', embeds.map(embed => JSON.parse(embed.data)));
+      this.style.display = 'block'
+      this.$.video.set('data', embeds.map(embed => JSON.parse(embed.data)))
     } else {
-      this.style.display = 'none';
+      this.style.display = 'none'
     }
   }
 }
 
-window.customElements.define('moe-embeds', MoeEmbeds);
+window.customElements.define('moe-embeds', MoeEmbeds)

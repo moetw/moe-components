@@ -1,10 +1,10 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
 
-import './moe-form';
+import './moe-form'
 
 export class MoeReplyForm extends PolymerElement {
-    static get template() {
-        return html`
+  static get template () {
+    return html`
 <style>
 :host {
     display: block;
@@ -24,76 +24,75 @@ export class MoeReplyForm extends PolymerElement {
     comment-max-length="[[commentMaxLength]]"
     video-embeds="{{videoEmbeds}}"
     embed-request-server="[[embedRequestServer]]"></moe-form>
-`;
+`
+  }
+
+  static get properties () {
+    return {
+      disabled: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+      loading: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+
+      /** Post properties */
+      boardId: {
+        type: Number,
+      },
+      threadNo: {
+        type: Number
+      },
+      replyTo: {
+        type: Number
+      },
+
+      /** Comment */
+      comment: {
+        type: String,
+        notify: true
+      },
+      commentMaxLength: {
+        type: Number,
+        reflectToAttribute: true
+      },
+
+      /** Video Embed */
+      videoEmbeds: {
+        type: Array,
+        notify: true
+      },
+      embedRequestServer: {
+        type: String
+      }
     }
+  }
 
-    static get properties() {
-        return {
-            disabled: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            },
-            loading: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            },
+  /** Form control */
 
-            /** Post properties */
-            boardId: {
-                type: Number,
-            },
-            threadNo: {
-                type: Number
-            },
-            replyTo: {
-                type: Number
-            },
+  focus () {
+    return this.$.form.focus()
+  }
 
-            /** Comment */
-            comment: {
-                type: String,
-                notify: true
-            },
-            commentMaxLength: {
-                type: Number,
-                reflectToAttribute: true
-            },
+  reset () {
+    return this.$.form.reset()
+  }
 
-            /** Video Embed */
-            videoEmbeds: {
-                type: Array,
-                notify: true
-            },
-            embedRequestServer: {
-                type: String
-            }
-        };
-    }
+  changed () {
+    return this.$.form.changed()
+  }
 
-    /** Form control */
+  validate () {
+    return null
+  }
 
-    focus() {
-        return this.$.form.focus();
-    }
-
-    reset() {
-        return this.$.form.reset();
-    }
-
-    changed() {
-        return this.$.form.changed();
-    }
-
-    validate() {
-        return null;
-    }
-
-    getFormData() {
-        return this.$.form.getFormData();
-    }
+  getFormData () {
+    return this.$.form.getFormData()
+  }
 }
 
-
-window.customElements.define('moe-reply-form', MoeReplyForm);
+window.customElements.define('moe-reply-form', MoeReplyForm)

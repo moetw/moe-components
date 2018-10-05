@@ -1,15 +1,15 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
 
-import '@polymer/paper-button';
-import './moe-embeds';
-import './moe-post-menu';
-import './moe-post-image';
-import './moe-post-comment';
-import './moe-post-header';
+import '@polymer/paper-button'
+import './moe-embeds'
+import './moe-post-menu'
+import './moe-post-image'
+import './moe-post-comment'
+import './moe-post-header'
 
 class MoeReply extends PolymerElement {
 
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -79,10 +79,10 @@ moe-post-menu-action-button {
 </template>
 
 <moe-post-header board-id="[[boardId]]" thread-no="[[threadNo]]" no="[[no]]" trip-id="[[tripId]]" created-at="[[createdAt]]"></moe-post-header>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       boardId: {
         type: Number
@@ -117,17 +117,17 @@ moe-post-menu-action-button {
         value: false
       }
 
-    };
+    }
   }
 
-  _onMoePostCommentProcessed() {
-    this.set('displayShowMore', this.$.comment.scrollHeight > this.$.comment.clientHeight);
+  _onMoePostCommentProcessed () {
+    this.set('displayShowMore', this.$.comment.scrollHeight > this.$.comment.clientHeight)
   }
 
-  _onShowMoreClick() {
-    this.$.comment.style.maxHeight = this.$.comment.scrollHeight + 'px';
-    this.set('displayShowMore', false);
+  _onShowMoreClick () {
+    this.$.comment.style.maxHeight = this.$.comment.scrollHeight + 'px'
+    this.set('displayShowMore', false)
   }
 }
 
-window.customElements.define('moe-reply', MoeReply);
+window.customElements.define('moe-reply', MoeReply)

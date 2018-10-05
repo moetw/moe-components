@@ -1,4 +1,4 @@
-import {html} from '@polymer/polymer/lib/utils/html-tag.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js'
 
 const template = html`
 <custom-style>
@@ -62,6 +62,6 @@ const template = html`
 
   </style>
 </custom-style>
-`;
-template.setAttribute('style', 'display: none;');
-document.head.appendChild(template.content);
+`
+template.setAttribute('style', 'display: none;')
+document.head.appendChild(template.content)

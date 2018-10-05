@@ -1,9 +1,9 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
-import DOMPurify from "dompurify";
-import './moe-quote-link';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
+import DOMPurify from 'dompurify'
+import './moe-quote-link'
 
 class MoePostComment extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -23,70 +23,69 @@ class MoePostComment extends PolymerElement {
 </style>
 <span id="content"></span>
 <moe-pixmicat-pushpost id="pushpost" style="display:none"></moe-pixmicat-pushpost>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       comment: {
         type: String,
         observer: '_observeComment'
       }
-    };
+    }
   }
 
-  _observeComment(newValue) {
-    if (!newValue) return;
+  _observeComment (newValue) {
+    if (!newValue) return
 
-    let processed = newValue;
+    let processed = newValue
 
     // link quotes
-    processed = this._linkQuotes(processed);
+    processed = this._linkQuotes(processed)
 
     // highlight quotes
-    processed = this._highlightQuotes(processed);
+    processed = this._highlightQuotes(processed)
 
     // mod_pushpost
-    processed = this._modPushpost(processed);
+    processed = this._modPushpost(processed)
 
     this.$.content.innerHTML = DOMPurify.sanitize(processed, {
       ALLOWED_TAGS: ['br', 'code', 'pre', 'span', 'div', 'moe-quote-link']
-    });
+    })
 
     this.$.content.querySelectorAll('img').forEach(img => {
       img.addEventListener('load', () => {
-        this.dispatchEvent(new CustomEvent("processed"));
-      });
-    });
+        this.dispatchEvent(new CustomEvent('processed'))
+      })
+    })
 
-    setTimeout(() => this.dispatchEvent(new CustomEvent("processed")), 0);
+    setTimeout(() => this.dispatchEvent(new CustomEvent('processed')), 0)
   }
 
-  _highlightQuotes(text) {
-    const regex = /(^|<br(?: \/)?>)((?:&gt;|＞).*?)(?=<br(?: \/)?>|$)/gm;
-    const subst = '$1<span class="highlight-quote">$2</span>';
-    return text.replace(regex, subst);
+  _highlightQuotes (text) {
+    const regex = /(^|<br(?: \/)?>)((?:&gt;|＞).*?)(?=<br(?: \/)?>|$)/gm
+    const subst = '$1<span class="highlight-quote">$2</span>'
+    return text.replace(regex, subst)
   }
 
-  _linkQuotes(text) {
-    const regex = /((?:&gt;|＞)+)(?:No\.)?(\d+)/i;
-    const subst = '<moe-quote-link no="$2">No.$2</moe-quote-link>';
-    return text.replace(regex, subst);
+  _linkQuotes (text) {
+    const regex = /((?:&gt;|＞)+)(?:No\.)?(\d+)/i
+    const subst = '<moe-quote-link no="$2">No.$2</moe-quote-link>'
+    return text.replace(regex, subst)
   }
 
-  _modPushpost(text) {
-    const regex = /\[MOD_PUSHPOST_USE\]<br(?: \/)?>([\w\W]+$)/gm;
-    const matches = regex.exec(text);
+  _modPushpost (text) {
+    const regex = /\[MOD_PUSHPOST_USE\]<br(?: \/)?>([\w\W]+$)/gm
+    const matches = regex.exec(text)
     if (matches) {
-      this.$.pushpost.innerHTML = matches[1];
-      this.$.pushpost.style.display = 'block';
+      this.$.pushpost.innerHTML = matches[1]
+      this.$.pushpost.style.display = 'block'
     } else {
-      this.$.pushpost.innerHTML = '';
-      this.$.pushpost.style.display = 'none';
+      this.$.pushpost.innerHTML = ''
+      this.$.pushpost.style.display = 'none'
     }
-    return text.replace(regex, '');
+    return text.replace(regex, '')
   }
 }
 
-
-window.customElements.define('moe-post-comment', MoePostComment);
+window.customElements.define('moe-post-comment', MoePostComment)

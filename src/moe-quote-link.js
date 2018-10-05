@@ -1,8 +1,8 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
-import './moe-styles';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
+import './moe-styles'
 
 class MoeQuoteLink extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -18,18 +18,18 @@ span:before {
 }
 </style>
 <span on-click="_onClick"><slot></slot></span>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       no: {
         type: Number
       }
-    };
+    }
   }
 
-  _onClick(e) {
+  _onClick (e) {
     this.dispatchEvent(new CustomEvent('quoteLinkClick', {
       bubbles: true,
       composed: true,
@@ -40,4 +40,4 @@ span:before {
   }
 }
 
-window.customElements.define('moe-quote-link', MoeQuoteLink);
+window.customElements.define('moe-quote-link', MoeQuoteLink)

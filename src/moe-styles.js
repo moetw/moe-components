@@ -1,1 +1,1 @@
-import './color.js';
+import './color.js'

@@ -1,11 +1,11 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
-import '@polymer/iron-flex-layout/iron-flex-layout';
-import '@polymer/iron-icons/iron-icons';
-import '@polymer/paper-icon-button/paper-icon-button';
-import '@polymer/paper-input/paper-input';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
+import '@polymer/iron-flex-layout/iron-flex-layout'
+import '@polymer/iron-icons/iron-icons'
+import '@polymer/paper-icon-button/paper-icon-button'
+import '@polymer/paper-input/paper-input'
 
 class MoeFormVideoEmbedInput extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -25,31 +25,31 @@ paper-icon-button {
 <paper-icon-button icon="cancel" on-click="cancel" disabled$="[[disabled]]"></paper-icon-button>
 <paper-input id="input" label="影片網址 (Youtube)" disabled$="[[disabled]]" on-keypress="_onVideoEmbedInputKeypress" pattern="^https?://.+$" error-message="必須為HTTP網址" auto-validate></paper-input>
 <paper-icon-button icon="add" on-click="submit" disabled$="[[disabled]]"></paper-icon-button>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       disabled: {
         type: Boolean,
         value: false,
         reflectToAttribute: true
       }
-    };
+    }
   }
 
-  reset() {
-    this.$.input.value = "";
+  reset () {
+    this.$.input.value = ''
   }
 
-  cancel() {
-    this.reset();
-    this.dispatchEvent(new CustomEvent('cancel'));
+  cancel () {
+    this.reset()
+    this.dispatchEvent(new CustomEvent('cancel'))
   }
 
-  submit() {
+  submit () {
     if (!this.valid() || this.disabled) {
-      return false;
+      return false
     }
 
     this.dispatchEvent(new CustomEvent('submit', {
@@ -59,19 +59,19 @@ paper-icon-button {
     }))
   }
 
-  focus() {
-    this.$.input.focus();
+  focus () {
+    this.$.input.focus()
   }
 
-  valid() {
-    return !this.$.input.invalid && this.$.input.value;
+  valid () {
+    return !this.$.input.invalid && this.$.input.value
   }
 
-  _onVideoEmbedInputKeypress(e) {
+  _onVideoEmbedInputKeypress (e) {
     if (e.code === 'Enter') {
-      this.submit();
+      this.submit()
     }
   }
 }
 
-window.customElements.define('moe-form-video-embed-input', MoeFormVideoEmbedInput);
+window.customElements.define('moe-form-video-embed-input', MoeFormVideoEmbedInput)

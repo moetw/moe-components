@@ -1,10 +1,10 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data.js';
-import '@polymer/paper-styles/paper-styles.js';
-import '@polymer/iron-icons/social-icons.js';
-import '@polymer/iron-icon/iron-icon.js';
-import '@polymer/paper-ripple/paper-ripple';
-import './moe-styles.js';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js'
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data.js'
+import '@polymer/paper-styles/paper-styles.js'
+import '@polymer/iron-icons/social-icons.js'
+import '@polymer/iron-icon/iron-icon.js'
+import '@polymer/paper-ripple/paper-ripple'
+import './moe-styles.js'
 
 /**
  * `moe-poll`
@@ -15,7 +15,7 @@ import './moe-styles.js';
  * @demo demo/index.html
  */
 class MoePoll extends MutableData(PolymerElement) {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -139,10 +139,10 @@ class MoePoll extends MutableData(PolymerElement) {
         </div>
     </template>
 </div>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       boardId: Number,
       no: Number,
@@ -177,47 +177,47 @@ class MoePoll extends MutableData(PolymerElement) {
         type: Boolean,
         computed: '_computeDisplayItems(voted)'
       }
-    };
+    }
   }
 
-  _processItems(items) {
+  _processItems (items) {
     // count total votes
     const totalVotes = (items || []).reduce((previousValue, currentValue) => {
       if (typeof currentValue === 'object' && typeof currentValue['votes'] === 'number') {
-        return previousValue + currentValue['votes'];
+        return previousValue + currentValue['votes']
       } else {
-        return previousValue;
+        return previousValue
       }
-    }, 0);
-    this.set('totalVotes', totalVotes);
+    }, 0)
+    this.set('totalVotes', totalVotes)
 
     return items.map(item => Object.assign({}, item, {
       percentage: Math.round(item.votes / totalVotes * 100)
-    }));
+    }))
   }
 
-  _onPollItemClick(e) {
-    this.dispatchEvent(new CustomEvent("item-click", {
+  _onPollItemClick (e) {
+    this.dispatchEvent(new CustomEvent('item-click', {
       composed: true,
       detail: {
         board_id: this.boardId,
         no: this.no,
         item: e.currentTarget.get('text')
       }
-    }));
+    }))
   }
 
-  _computeDisplayResult(voted) {
-    return voted;
+  _computeDisplayResult (voted) {
+    return voted
   }
 
-  _computeDisplayItems(voted) {
-    return !voted;
+  _computeDisplayItems (voted) {
+    return !voted
   }
 }
 
 class MoePollItem extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host {
@@ -248,17 +248,17 @@ class MoePollItem extends PolymerElement {
     <a>[[text]]</a>
     <paper-ripple></paper-ripple>
 </div>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       text: {
         type: String
       }
-    };
+    }
   }
 }
 
-window.customElements.define('moe-poll', MoePoll);
-window.customElements.define('moe-poll-item', MoePollItem);
+window.customElements.define('moe-poll', MoePoll)
+window.customElements.define('moe-poll-item', MoePollItem)

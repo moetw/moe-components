@@ -1,40 +1,40 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import "@polymer/app-layout";
-import "@polymer/app-layout/app-scroll-effects/effects/parallax-background";
-import "@polymer/app-layout/app-scroll-effects/effects/waterfall";
-import "@polymer/app-layout/app-scroll-effects/effects/resize-title";
-import "@polymer/app-layout/app-scroll-effects/effects/resize-snapped-title";
-import "@polymer/app-layout/app-scroll-effects/effects/blend-background";
-import "@polymer/iron-icons";
-import "@polymer/iron-icons/image-icons";
-import "@polymer/paper-icon-button";
-import "@polymer/paper-fab";
-import "@polymer/paper-item/paper-icon-item";
-import "@polymer/paper-styles/paper-styles";
-import "@polymer/paper-ripple";
-import "@polymer/paper-toast";
-import "@polymer/app-route/app-route";
-import "@polymer/app-route/app-location";
-import "@polymer/iron-pages/iron-pages";
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js'
+import '@polymer/app-layout'
+import '@polymer/app-layout/app-scroll-effects/effects/parallax-background'
+import '@polymer/app-layout/app-scroll-effects/effects/waterfall'
+import '@polymer/app-layout/app-scroll-effects/effects/resize-title'
+import '@polymer/app-layout/app-scroll-effects/effects/resize-snapped-title'
+import '@polymer/app-layout/app-scroll-effects/effects/blend-background'
+import '@polymer/iron-icons'
+import '@polymer/iron-icons/image-icons'
+import '@polymer/paper-icon-button'
+import '@polymer/paper-fab'
+import '@polymer/paper-item/paper-icon-item'
+import '@polymer/paper-styles/paper-styles'
+import '@polymer/paper-ripple'
+import '@polymer/paper-toast'
+import '@polymer/app-route/app-route'
+import '@polymer/app-route/app-location'
+import '@polymer/iron-pages/iron-pages'
 
-import "./moe-threads.js";
-import './moe-form-dialog';
-import './moe-reply-form';
-import './moe-form';
-import './moe-report-form';
-import './moe-graphql';
-import './pixmicat-request';
-import {ReduxMixin} from './redux/redux-mixin';
-import * as actions from './redux/redux-actions';
-import isError from "lodash-es/isError";
-import {mixinBehaviors} from "@polymer/polymer/lib/legacy/class";
-import {AppLocalizeBehavior} from "@polymer/app-localize-behavior";
+import './moe-threads.js'
+import './moe-form-dialog'
+import './moe-reply-form'
+import './moe-form'
+import './moe-report-form'
+import './moe-graphql'
+import './pixmicat-request'
+import { ReduxMixin } from './redux/redux-mixin'
+import * as actions from './redux/redux-actions'
+import isError from 'lodash-es/isError'
+import { mixinBehaviors } from '@polymer/polymer/lib/legacy/class'
+import { AppLocalizeBehavior } from '@polymer/app-localize-behavior'
 
-import locales from "./locales/moe-board";
+import locales from './locales/moe-board'
 
 class MoeBoard extends mixinBehaviors([AppLocalizeBehavior], ReduxMixin(PolymerElement)) {
-    static get template() {
-        return html`
+  static get template () {
+    return html`
 <style>
 :host {
     display: block;
@@ -377,398 +377,398 @@ app-drawer a paper-button:hover {
     pattern="/threads"
     route="{{route}}"
     tail="{{threadsRoute}}"></app-route>
-`;
-    }
+`
+  }
 
-    static get properties() {
-        return {
-            graphqlServer: String,
-            embedRequestServer: String,
-            postServer: String,
-            pollServer: String,
-            reportServer: String,
-            boardId: Number,
-            boardAlias: String,
-            boardSubdomain: String,
-            boardExternalLinks: Array,
-            page: String,
-            route: {
-                type: Object,
-                notify: true,
-            },
-            routeData: {
-                type: Object,
-                notify: true,
-            },
-            queryParams: {
-                type: Object
-            },
-            threadsRoute: {
-                type: Object,
-                notify: true
-            },
-            subCaption: {
-                type: String,
-                value: ''
-            },
-            showSubCaption: {
-                type: Boolean,
-                computed: '_computeShowSubCaption(subCaption)'
-            },
-            imageServers: {
-                type: Object,
-                value: {
-                    'DEV_SRC': (file, subdomain, alias) => `https://dev.imgs.moe/my/${subdomain}/${alias}/src/${file}`,
-                    'DEV_THUMB': (file, subdomain, alias) => `https://dev.imgs.moe/my/${subdomain}/${alias}/thumb/${file}`,
-                    'BCDN_SRC': (file, subdomain, alias) => `https://mymoe.b-cdn.net/my/${subdomain}/${alias}/src/${file}`,
-                    'BCDN_THUMB': (file, subdomain, alias) => `https://mymoe.b-cdn.net/my/${subdomain}/${alias}/thumb/${file}`,
-                }
-            },
-
-            // validation criteria
-            nameMaxLength: {type: Number, statePath: 'validationCriteria.nameMaxLength'},
-            emailMaxLength: {type: Number, statePath: 'validationCriteria.emailMaxLength'},
-            subjectMaxLength: {type: Number, statePath: 'validationCriteria.subjectMaxLength'},
-            commentMaxLength: {type: Number, statePath: 'validationCriteria.commentMaxLength'},
-            fileMaxSize: {type: Number, statePath: 'validationCriteria.fileMaxSize'},
-            videoMaxEmbeds: {type: Number, statePath: 'validationCriteria.videoMaxEmbeds'},
-            pollTitleMaxLength: {type: Number, statePath: 'validationCriteria.pollTitleMaxLength'},
-            pollItemMaxLength: {type: Number, statePath: 'validationCriteria.pollItemMaxLength'},
-            pollMinItems: {type: Number, statePath: 'validationCriteria.pollMinItems'},
-            pollMaxItems: {type: Number, statePath: 'validationCriteria.pollMaxItems'},
-
-            // i18n
-            language: {
-                type: String,
-                statePath: 'language'
-            }
-        };
-    }
-
-    static get observers() {
-        return [
-            '_routePageChanged(routeData.page)'
-        ]
-    }
-
-    ready() {
-        super.ready();
-
-        this.resources = locales;
-
-        this.addEventListener('post-menu-button-reply-click', (e) => {
-            this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no);
-        });
-
-        this.addEventListener('post-header-no-click', (e) => {
-            this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no);
-        });
-
-        this.addEventListener('thread-header-no-click', (e) => {
-            this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no);
-        });
-    }
-
-    hideAllFormDialogs() {
-        this.shadowRoot.querySelectorAll('moe-form-dialog').forEach(dialog => dialog.setAttribute('hidden', 'hidden'));
-    }
-
-    /** Reply Form */
-    showReplyForm(boardId, threadNo, replyTo) {
-        this.hideAllFormDialogs();
-        this.$.replyDialog.show();
-        this.$.replyDialog.dialogTitle = `回應 - No.${replyTo}`;
-        this.$.replyForm.setProperties({
-            boardId: boardId,
-            threadNo: threadNo,
-            replyTo: replyTo,
-            comment: `>>No.${replyTo}\n`
-        });
-        setTimeout(() => this.$.replyForm.focus(), 0);
-    }
-
-    _onReplyFormSubmit(e) {
-        this.$.replyForm.setProperties({
-            disabled: true,
-            loading: true
-        });
-
-        this.$.replyRequest.makeReply(
-            e.detail.boardId,
-            e.detail.threadNo,
-            e.detail.comment,
-            e.detail.file,
-            e.detail.videoEmbeds,
-        ).then(res => {
-            // hide form
-            this.$.replyDialog.hide();
-            this.$.replyForm.reset();
-            // fetch post
-            this.$.threads.dispatchEvent(new CustomEvent('reply-ack', {
-                detail: {
-                    boardId: e.detail.boardId,
-                    threadNo: e.detail.threadNo,
-                    no: res.no
-                }
-            }));
-        }).catch(err => {
-            console.error(err);
-
-            if (err.error) {
-                alert(err.error);
-            } else {
-                alert("Connection error");
-            }
-
-        }).finally(() => {
-            // remove loading status
-            this.$.replyForm.setProperties({
-                disabled: false,
-                loading: false
-            });
-        });
-    }
-
-    _onReplyFormClose(e) {
-        if (this.$.replyForm.changed() && !confirm("確定要取消回應嗎？")) {
-            return;
+  static get properties () {
+    return {
+      graphqlServer: String,
+      embedRequestServer: String,
+      postServer: String,
+      pollServer: String,
+      reportServer: String,
+      boardId: Number,
+      boardAlias: String,
+      boardSubdomain: String,
+      boardExternalLinks: Array,
+      page: String,
+      route: {
+        type: Object,
+        notify: true,
+      },
+      routeData: {
+        type: Object,
+        notify: true,
+      },
+      queryParams: {
+        type: Object
+      },
+      threadsRoute: {
+        type: Object,
+        notify: true
+      },
+      subCaption: {
+        type: String,
+        value: ''
+      },
+      showSubCaption: {
+        type: Boolean,
+        computed: '_computeShowSubCaption(subCaption)'
+      },
+      imageServers: {
+        type: Object,
+        value: {
+          'DEV_SRC': (file, subdomain, alias) => `https://dev.imgs.moe/my/${subdomain}/${alias}/src/${file}`,
+          'DEV_THUMB': (file, subdomain, alias) => `https://dev.imgs.moe/my/${subdomain}/${alias}/thumb/${file}`,
+          'BCDN_SRC': (file, subdomain, alias) => `https://mymoe.b-cdn.net/my/${subdomain}/${alias}/src/${file}`,
+          'BCDN_THUMB': (file, subdomain, alias) => `https://mymoe.b-cdn.net/my/${subdomain}/${alias}/thumb/${file}`,
         }
+      },
 
-        this.$.replyDialog.setAttribute('hidden', "hidden");
-        this.$.replyForm.reset();
+      // validation criteria
+      nameMaxLength: {type: Number, statePath: 'validationCriteria.nameMaxLength'},
+      emailMaxLength: {type: Number, statePath: 'validationCriteria.emailMaxLength'},
+      subjectMaxLength: {type: Number, statePath: 'validationCriteria.subjectMaxLength'},
+      commentMaxLength: {type: Number, statePath: 'validationCriteria.commentMaxLength'},
+      fileMaxSize: {type: Number, statePath: 'validationCriteria.fileMaxSize'},
+      videoMaxEmbeds: {type: Number, statePath: 'validationCriteria.videoMaxEmbeds'},
+      pollTitleMaxLength: {type: Number, statePath: 'validationCriteria.pollTitleMaxLength'},
+      pollItemMaxLength: {type: Number, statePath: 'validationCriteria.pollItemMaxLength'},
+      pollMinItems: {type: Number, statePath: 'validationCriteria.pollMinItems'},
+      pollMaxItems: {type: Number, statePath: 'validationCriteria.pollMaxItems'},
+
+      // i18n
+      language: {
+        type: String,
+        statePath: 'language'
+      }
     }
+  }
 
-    /** Create Thread Form */
-    showCreateThreadForm(boardId) {
-        this.hideAllFormDialogs();
-        this.$.createThreadDialog.removeAttribute('hidden');
-        this.$.createThreadDialog.setProperties({
-            boardId: boardId
-        });
-        setTimeout(() => this.$.createThreadForm.focus(), 0);
-    }
+  static get observers () {
+    return [
+      '_routePageChanged(routeData.page)'
+    ]
+  }
 
-    _onCreateThreadFormSubmit(e) {
-        this.$.createThreadForm.setProperties({
-            disabled: true,
-            loading: true
-        });
+  ready () {
+    super.ready()
 
-        this.$.createThreadRequest.makeThread(
-            e.detail.boardId,
-            e.detail.comment,
-            e.detail.file,
-            e.detail.poll,
-            e.detail.videoEmbeds,
-            e.detail.subject
-        ).then(res => {
-            // hide form
-            this.$.createThreadDialog.setAttribute('hidden', 'hidden');
-            this.$.createThreadForm.reset();
-            // fetch post
-            this.$.threads.dispatchEvent(new CustomEvent('create-thread-ack', {
-                detail: {
-                    boardId: e.detail.boardId,
-                    threadNo: res.no
-                }
-            }));
-        }).catch(err => {
-            if (isError(err)) {
-                alert(`${err.message}`);
-            } else {
-                alert(`Unexpected error: ${err}`);
-                console.error(err);
-            }
-        }).finally(() => {
-            // remove loading status
-            this.$.createThreadForm.setProperties({
-                disabled: false,
-                loading: false
-            });
-        });
-    }
+    this.resources = locales
 
-    _onCreateThreadFormClose(e) {
-        if (this.$.createThreadForm.changed() && !confirm("確定要取消建立討論串嗎？")) {
-            return;
-        }
+    this.addEventListener('post-menu-button-reply-click', (e) => {
+      this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no)
+    })
 
-        this.$.createThreadDialog.setAttribute('hidden', "hidden");
-        this.$.createThreadForm.reset();
-    }
+    this.addEventListener('post-header-no-click', (e) => {
+      this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no)
+    })
 
-    /** Routing */
+    this.addEventListener('thread-header-no-click', (e) => {
+      this.showReplyForm(e.detail.boardId, e.detail.threadNo, e.detail.no)
+    })
+  }
 
-    goHome() {
-        const forceReload = this.$.threads.page === 0;
-        this.set('route.path', '/threads/0');
-        if (forceReload) {
-            this.$.threads.reload();
-        }
-    }
+  hideAllFormDialogs () {
+    this.shadowRoot.querySelectorAll('moe-form-dialog').forEach(dialog => dialog.setAttribute('hidden', 'hidden'))
+  }
 
-    _routePageChanged(page) {
-        console.log('moe-board: routePageChanged', this.route, this.routeData);
+  /** Reply Form */
+  showReplyForm (boardId, threadNo, replyTo) {
+    this.hideAllFormDialogs()
+    this.$.replyDialog.show()
+    this.$.replyDialog.dialogTitle = `回應 - No.${replyTo}`
+    this.$.replyForm.setProperties({
+      boardId: boardId,
+      threadNo: threadNo,
+      replyTo: replyTo,
+      comment: `>>No.${replyTo}\n`
+    })
+    setTimeout(() => this.$.replyForm.focus(), 0)
+  }
 
-        switch (page) {
-            // redirect index to threads page
-            case "":
-                this.set('route.path', '/threads/0');
-                return;
-        }
-    }
+  _onReplyFormSubmit (e) {
+    this.$.replyForm.setProperties({
+      disabled: true,
+      loading: true
+    })
 
-    _onToolBarTitleClick(e) {
-        window.scroll({
-            top: 0,
-            left: 0,
-            behavior: 'smooth'
-        });
-    }
-
-    _onMenuButtonClick(e) {
-        this.$.leftDrawer.open();
-    }
-
-    _onRefreshButotnClicked() {
-        this.goHome();
-    }
-
-    _onBoardNameClick() {
-        this.goHome();
-        this.$.leftDrawer.close();
-    }
-
-    _onThreadsPageChange(e) {
-        this.set('subCaption', ` 第 ${e.detail.page} 頁`);
-    }
-
-    _computeShowSubCaption(subCaption) {
-        return (typeof subCaption === 'string' && subCaption);
-    }
-
-    _onFabClick(e) {
-        this.showCreateThreadForm(this.boardId);
-    }
-
-    _onPostDelete(e) {
-        if (e.detail.threadNo !== e.detail.no) { // delete reply
-            this.$.deletePostRequest.delete(e.detail.boardId, e.detail.no)
-                .then(() => this.$.moeGraphQL.getDeleteReplyAck(e.detail.boardId, e.detail.threadNo))
-                .then(resp => {
-                    this.dispatch({
-                        type: actions.UPDATE_THREAD,
-                        thread: resp.data.getThreadByNo
-                    });
-                    this.dispatch({
-                        type: actions.REMOVE_REPLY_FROM_THREAD,
-                        reply: {
-                            boardId: e.detail.boardId,
-                            threadNo: e.detail.threadNo,
-                            no: e.detail.no
-                        }
-                    });
-
-                    this.$.deletePostToast.open();
-                })
-                .catch(err => {
-                    console.error(err);
-                    if (isError(err)) {
-                        alert(`${err.message}`);
-                    } else {
-                        alert(`Unexpected error`);
-                    }
-                });
-        } else { // delete thread
-            this.$.deletePostRequest.delete(e.detail.boardId, e.detail.no)
-                .then(() => {
-                    this.dispatch({
-                        type: actions.REMOVE_THREAD,
-                        thread: {
-                            boardId: e.detail.boardId,
-                            threadNo: e.detail.threadNo,
-                            no: e.detail.no
-                        }
-                    });
-
-                    this.$.deletePostToast.open();
-                })
-                .catch(err => {
-                    console.error(err);
-                    if (isError(err)) {
-                        alert(`${err.message}`);
-                    } else {
-                        alert(`Unexpected error`);
-                    }
-                });
-        }
-    }
-
-    /* Report Event Handlers */
-
-    _onReportSubmit(e) {
-      this.$.reportForm.setProperties({
-        disabled: true,
-        loading: true
-      });
-
-      fetch(this.reportServer, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-        body: JSON.stringify({
+    this.$.replyRequest.makeReply(
+      e.detail.boardId,
+      e.detail.threadNo,
+      e.detail.comment,
+      e.detail.file,
+      e.detail.videoEmbeds,
+    ).then(res => {
+      // hide form
+      this.$.replyDialog.hide()
+      this.$.replyForm.reset()
+      // fetch post
+      this.$.threads.dispatchEvent(new CustomEvent('reply-ack', {
+        detail: {
           boardId: e.detail.boardId,
-          no: e.detail.no,
-          categoryId: e.detail.categoryId,
-          content: e.detail.content
-        })
+          threadNo: e.detail.threadNo,
+          no: res.no
+        }
+      }))
+    }).catch(err => {
+      console.error(err)
+
+      if (err.error) {
+        alert(err.error)
+      } else {
+        alert('Connection error')
+      }
+
+    }).finally(() => {
+      // remove loading status
+      this.$.replyForm.setProperties({
+        disabled: false,
+        loading: false
       })
-        .then(resp => resp.json())
+    })
+  }
+
+  _onReplyFormClose (e) {
+    if (this.$.replyForm.changed() && !confirm('確定要取消回應嗎？')) {
+      return
+    }
+
+    this.$.replyDialog.setAttribute('hidden', 'hidden')
+    this.$.replyForm.reset()
+  }
+
+  /** Create Thread Form */
+  showCreateThreadForm (boardId) {
+    this.hideAllFormDialogs()
+    this.$.createThreadDialog.removeAttribute('hidden')
+    this.$.createThreadDialog.setProperties({
+      boardId: boardId
+    })
+    setTimeout(() => this.$.createThreadForm.focus(), 0)
+  }
+
+  _onCreateThreadFormSubmit (e) {
+    this.$.createThreadForm.setProperties({
+      disabled: true,
+      loading: true
+    })
+
+    this.$.createThreadRequest.makeThread(
+      e.detail.boardId,
+      e.detail.comment,
+      e.detail.file,
+      e.detail.poll,
+      e.detail.videoEmbeds,
+      e.detail.subject
+    ).then(res => {
+      // hide form
+      this.$.createThreadDialog.setAttribute('hidden', 'hidden')
+      this.$.createThreadForm.reset()
+      // fetch post
+      this.$.threads.dispatchEvent(new CustomEvent('create-thread-ack', {
+        detail: {
+          boardId: e.detail.boardId,
+          threadNo: res.no
+        }
+      }))
+    }).catch(err => {
+      if (isError(err)) {
+        alert(`${err.message}`)
+      } else {
+        alert(`Unexpected error: ${err}`)
+        console.error(err)
+      }
+    }).finally(() => {
+      // remove loading status
+      this.$.createThreadForm.setProperties({
+        disabled: false,
+        loading: false
+      })
+    })
+  }
+
+  _onCreateThreadFormClose (e) {
+    if (this.$.createThreadForm.changed() && !confirm('確定要取消建立討論串嗎？')) {
+      return
+    }
+
+    this.$.createThreadDialog.setAttribute('hidden', 'hidden')
+    this.$.createThreadForm.reset()
+  }
+
+  /** Routing */
+
+  goHome () {
+    const forceReload = this.$.threads.page === 0
+    this.set('route.path', '/threads/0')
+    if (forceReload) {
+      this.$.threads.reload()
+    }
+  }
+
+  _routePageChanged (page) {
+    console.log('moe-board: routePageChanged', this.route, this.routeData)
+
+    switch (page) {
+      // redirect index to threads page
+      case '':
+        this.set('route.path', '/threads/0')
+        return
+    }
+  }
+
+  _onToolBarTitleClick (e) {
+    window.scroll({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    })
+  }
+
+  _onMenuButtonClick (e) {
+    this.$.leftDrawer.open()
+  }
+
+  _onRefreshButotnClicked () {
+    this.goHome()
+  }
+
+  _onBoardNameClick () {
+    this.goHome()
+    this.$.leftDrawer.close()
+  }
+
+  _onThreadsPageChange (e) {
+    this.set('subCaption', ` 第 ${e.detail.page} 頁`)
+  }
+
+  _computeShowSubCaption (subCaption) {
+    return (typeof subCaption === 'string' && subCaption)
+  }
+
+  _onFabClick (e) {
+    this.showCreateThreadForm(this.boardId)
+  }
+
+  _onPostDelete (e) {
+    if (e.detail.threadNo !== e.detail.no) { // delete reply
+      this.$.deletePostRequest.delete(e.detail.boardId, e.detail.no)
+        .then(() => this.$.moeGraphQL.getDeleteReplyAck(e.detail.boardId, e.detail.threadNo))
         .then(resp => {
-          if (resp.error) {
-            alert(resp.error);
-          } else {
-            alert(this.localize('reportSucceeded', 'id', resp.id));
-            this.$.reportDialog.hide();
-          }
+          this.dispatch({
+            type: actions.UPDATE_THREAD,
+            thread: resp.data.getThreadByNo
+          })
+          this.dispatch({
+            type: actions.REMOVE_REPLY_FROM_THREAD,
+            reply: {
+              boardId: e.detail.boardId,
+              threadNo: e.detail.threadNo,
+              no: e.detail.no
+            }
+          })
+
+          this.$.deletePostToast.open()
         })
         .catch(err => {
-          console.error(err);
-          alert('Network error');
+          console.error(err)
+          if (isError(err)) {
+            alert(`${err.message}`)
+          } else {
+            alert(`Unexpected error`)
+          }
         })
-        .finally(() => {
-          this.$.reportForm.setProperties({
-            disabled: false,
-            loading: false
-          });
-        });
-    }
+    } else { // delete thread
+      this.$.deletePostRequest.delete(e.detail.boardId, e.detail.no)
+        .then(() => {
+          this.dispatch({
+            type: actions.REMOVE_THREAD,
+            thread: {
+              boardId: e.detail.boardId,
+              threadNo: e.detail.threadNo,
+              no: e.detail.no
+            }
+          })
 
-    _onReportError(e) {
-        if (isError(e.detail.error)) {
-            alert(e.detail.error.message);
+          this.$.deletePostToast.open()
+        })
+        .catch(err => {
+          console.error(err)
+          if (isError(err)) {
+            alert(`${err.message}`)
+          } else {
+            alert(`Unexpected error`)
+          }
+        })
+    }
+  }
+
+  /* Report Event Handlers */
+
+  _onReportSubmit (e) {
+    this.$.reportForm.setProperties({
+      disabled: true,
+      loading: true
+    })
+
+    fetch(this.reportServer, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        boardId: e.detail.boardId,
+        no: e.detail.no,
+        categoryId: e.detail.categoryId,
+        content: e.detail.content
+      })
+    })
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.error) {
+          alert(resp.error)
         } else {
-            alert('Unexpected error ' + e);
-            console.error(e);
+          alert(this.localize('reportSucceeded', 'id', resp.id))
+          this.$.reportDialog.hide()
         }
-    }
-
-    _onPostReport(e) {
-        this.$.reportForm.reset();
+      })
+      .catch(err => {
+        console.error(err)
+        alert('Network error')
+      })
+      .finally(() => {
         this.$.reportForm.setProperties({
-            boardId: e.detail.boardId,
-            no: e.detail.no
-        });
-        this.$.reportDialog.dialogTitle = this.localize('reportDialogTitle', 'no', e.detail.no);
-        this.$.reportDialog.show();
-    }
+          disabled: false,
+          loading: false
+        })
+      })
+  }
 
-    _onReportDialogClose(e) {
-        this.$.reportForm.reset();
-        this.$.reportDialog.hide();
+  _onReportError (e) {
+    if (isError(e.detail.error)) {
+      alert(e.detail.error.message)
+    } else {
+      alert('Unexpected error ' + e)
+      console.error(e)
     }
+  }
+
+  _onPostReport (e) {
+    this.$.reportForm.reset()
+    this.$.reportForm.setProperties({
+      boardId: e.detail.boardId,
+      no: e.detail.no
+    })
+    this.$.reportDialog.dialogTitle = this.localize('reportDialogTitle', 'no', e.detail.no)
+    this.$.reportDialog.show()
+  }
+
+  _onReportDialogClose (e) {
+    this.$.reportForm.reset()
+    this.$.reportDialog.hide()
+  }
 }
 
-window.customElements.define('moe-board', MoeBoard);
+window.customElements.define('moe-board', MoeBoard)

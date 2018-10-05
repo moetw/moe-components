@@ -1,6 +1,6 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import '@polymer/paper-button/paper-button.js';
-import './moe-styles.js';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js'
+import '@polymer/paper-button/paper-button.js'
+import './moe-styles.js'
 
 /**
  * `moe-rate`
@@ -11,7 +11,7 @@ import './moe-styles.js';
  * @demo demo/index.html
  */
 class MoeRate extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
       <style>
         :host {
@@ -60,10 +60,10 @@ class MoeRate extends PolymerElement {
         <span class="rate">(・∀・)ｂ</span>
         <span class="votes">[[like]]</span>
       </paper-button>
-    `;
+    `
   }
 
-  static get properties() {
+  static get properties () {
     return {
       dislike: {
         type: Number,
@@ -78,16 +78,16 @@ class MoeRate extends PolymerElement {
         reflectToAttribute: true,
         value: false,
       }
-    };
+    }
   }
 
-  onLikeClick(e) {
-    this.dispatchEvent(new CustomEvent('onLikeClick'));
+  onLikeClick (e) {
+    this.dispatchEvent(new CustomEvent('onLikeClick'))
   }
 
-  onDislikeClick(e) {
-    this.dispatchEvent(new CustomEvent('onDislikeClick'));
+  onDislikeClick (e) {
+    this.dispatchEvent(new CustomEvent('onDislikeClick'))
   }
 }
 
-window.customElements.define('moe-rate', MoeRate);
+window.customElements.define('moe-rate', MoeRate)

@@ -1,15 +1,15 @@
-import {html, PolymerElement} from "@polymer/polymer/polymer-element";
+import { html, PolymerElement } from '@polymer/polymer/polymer-element'
 
-import '@polymer/paper-icon-button/paper-icon-button';
-import '@polymer/iron-icons/iron-icons';
-import '@polymer/iron-icon/iron-icon';
-import '@polymer/paper-styles/shadow';
-import '@polymer/iron-image/iron-image';
+import '@polymer/paper-icon-button/paper-icon-button'
+import '@polymer/iron-icons/iron-icons'
+import '@polymer/iron-icon/iron-icon'
+import '@polymer/paper-styles/shadow'
+import '@polymer/iron-image/iron-image'
 
-import './moe-icons';
+import './moe-icons'
 
 class MoeFormVideoEmbed extends PolymerElement {
-  static get template() {
+  static get template () {
     return html`
 <style>
 :host: {
@@ -48,10 +48,10 @@ paper-icon-button[icon="cancel"] {
     <div id="title">[[title]]</div>
     <paper-icon-button icon="cancel" on-click="_onRemoveButtonClick" disabled$="[[disabled]]"></paper-icon-button>
 </div>
-`;
+`
   }
 
-  static get properties() {
+  static get properties () {
     return {
       index: {
         type: Number
@@ -67,12 +67,12 @@ paper-icon-button[icon="cancel"] {
         value: false,
         reflectToAttribute: true
       }
-    };
+    }
   }
 
-  _onRemoveButtonClick() {
-    this.dispatchEvent(new CustomEvent('remove'));
+  _onRemoveButtonClick () {
+    this.dispatchEvent(new CustomEvent('remove'))
   }
 }
 
-window.customElements.define('moe-form-video-embed', MoeFormVideoEmbed);
+window.customElements.define('moe-form-video-embed', MoeFormVideoEmbed)
